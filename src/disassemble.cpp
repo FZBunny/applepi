@@ -1,31 +1,32 @@
 /*****************************************************************************
 
-    File: "disassemble6502.cpp"
+    File: "disassemble.cpp"
 
-    Copyright (C) 2003,2019 Bruce Ward
+    Copyright (C) 2021, Bruce Ward
 
-    This file is part of ApplePi, the Apple2 emulator for the Raspberry Pi.
+    This file is part of applepi, an apple2 emulator for Linux,
+    especially aimed at the Raspberry Pi operating system.
 
-    ApplePi is free software; you can redistribute it and/or modify
+    applepi is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
     (at your option) any later version.
 
-    ApplePi is distributed in the hope that it will be useful,
+    applepi is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with ApplePi; if not, write to the Free Software
+    along with applepi; if not, write to the Free Software
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
     Or perhaps visit: http://www.gnu.org/licenses/licenses.html
 
 *****************************************************************************/
 
-//
-// disassemble a rom containing 6502 instructions.
+
+
 //
 //    ./disassemble6502 romimagefile  startaddress
 //

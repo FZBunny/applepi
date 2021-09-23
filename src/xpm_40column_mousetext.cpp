@@ -1,7 +1,6 @@
 
 
 
-
 const char*  xpm_40ColMouseText[] =
 {
     "16 512 2 1",

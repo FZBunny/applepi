@@ -4,15 +4,15 @@
 
     Copyright (C) 2003,2019 Bruce Ward
 
-    This file is part of apple2-qt, an Apple2 Emulator.
+    This file is part of applepi, an Apple2 Emulator.
     (Apple2 is a trademark of Apple, Inc.)
 
-    "apple2-qt" is free software; you can redistribute it and/or modify
+    "applepi" is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
 
-    "apple2-qt" is distributed in the hope that it will be useful,
+    "applepi" is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
