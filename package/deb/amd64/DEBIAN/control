@@ -1,0 +1,12 @@
+Package: applepi
+Source: J.B.Ward <j.bruce.ward@gmail.com>
+Version: 0.1.5
+Architecture: amd64
+Maintainer: J.B.Ward <j.bruce.ward@gmail.com>
+Installed-Size: 1114
+Depends: wx-common, libwxbase3.0-0v5, libasound2
+Section: misc
+Priority: optional
+Homepage: https://  ???
+Description: An emulator for the enhanced Apple IIe computer
+
