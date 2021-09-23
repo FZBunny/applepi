@@ -1,8 +1,0 @@
-[Desktop Entry]
-Type=Application
-Terminal=false
-Icon=/usr/share/applepi/apple.png
-Name[en]=ApplePi
-Exec=/usr/bin/applepi
-Name=ApplePi
-
