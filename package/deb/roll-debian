@@ -60,11 +60,11 @@ if [ $(id -u) != 0 ]; then
 
     echo; echo Done.; echo
 
+
 else                                   # ------------- 2nd pass, as root
 
 
     # --- Check that user & group are valid
-
 
     TEST=$(id $2 2>/dev/null)
     if [ ${#TEST} = 0 ]; then
@@ -80,7 +80,6 @@ else                                   # ------------- 2nd pass, as root
 
 
     # --- Check for files & dirs
-
 
     EXEC=../../bin/applepi
     HELP=../../help
@@ -106,6 +105,8 @@ else                                   # ------------- 2nd pass, as root
 
     # --- Copy files & make them owned by root
 
+    mkdir -p $SHARE
+    mkdir -p $BIN
 
     rm -f $SHARE/*
     rm -f $BIN/*
