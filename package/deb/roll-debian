@@ -7,7 +7,7 @@
 #  contents ApplePi project.  
 #
 #  The new .deb will contain:
-#  - the executable, in <project dir>/bin/native/applepi
+#  - the executable, from <project dir>/bin/applepi
 #  - and the future contents of /usr/share/applepi, from:
 #    <project dir>/help
 #
@@ -124,14 +124,6 @@ else                                   # ------------- 2nd pass, as root
 
     VERSION=$(cut -d'"' -f2 ../../src/version.h)
     sed -i -e"s/Version:.*/Version: $VERSION/g"  $1/DEBIAN/control
-
-
-    # --- If this is a Raspberry Pi, insert 'RPI' in the file name
-
-
-    if [ -f /etc/rpi-issue ]; then
-        VERSION=$(echo -n $VERSION; echo -n _RPI)
-    fi
 
 
     # --- Create the .deb file with the current version number
