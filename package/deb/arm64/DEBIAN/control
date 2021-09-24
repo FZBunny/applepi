@@ -1,12 +1,12 @@
 Package: applepi
 Source: J.B.Ward <j.bruce.ward@gmail.com>
-Version: 0.1.4
+Version: 0.1.0
 Architecture: arm64
 Maintainer: J.B.Ward <j.bruce.ward@gmail.com>
-Installed-Size: 667
-Depends: wx-common, libwxbase3.0-0v5, libasound2
+Installed-Size: * not yet measured *
+Depends: libasound2 libqt5widgets5 libqt5gui5 libqt5core5a
 Section: misc
 Priority: optional
-Homepage: https://  ???
-Description: An emulator for the enhanced Apple IIe computer
+Homepage: https://github.com/FZBunny/applepi
+Description: An emulator for the Apple IIe computer
 

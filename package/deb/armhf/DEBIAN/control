@@ -1,12 +1,12 @@
 Package: applepi
 Source: J.B.Ward <j.bruce.ward@gmail.com>
-Version: 0.1.5
+Version: 0.1.0
 Architecture: armhf
 Maintainer: J.B.Ward <j.bruce.ward@gmail.com>
-Installed-Size: 5692
-Depends: libasound2
+Installed-Size: 668
+Depends: libasound2 libqt5widgets5 libqt5gui5 libqt5core5a
 Section: misc
 Priority: optional
-Homepage: https://  ???
-Description: An emulator for the enhanced Apple IIe computer
+Homepage: https://github.com/FZBunny/applepi
+Description: An emulator for the Apple IIe computer
 

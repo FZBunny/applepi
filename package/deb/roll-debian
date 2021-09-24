@@ -82,7 +82,7 @@ else                                   # ------------- 2nd pass, as root
     # --- Check for files & dirs
 
 
-    EXEC=../../bin/native/applepi
+    EXEC=../../bin/applepi
     HELP=../../help
     CONTROL=$1/DEBIAN/control
     SHARE=$1/usr/share/applepi
