@@ -1,6 +1,7 @@
-#### *** Notice, 2021-09-25 16:30 UTC: 
-#### *** The version 0.1.0 PiOS release is bad; wait for v.0.1.1 ***
-
+## *** Notice, 2021-09-25 16:30 UTC: 
+## The version 0.1.0 PiOS release is bad; wait for v.0.1.1 ***
+   
+    
 # ApplePi
 "applepi" is an apple IIe emulator for the Raspberry Pi, but can be built (I think) on most Linux distributions.  
 It runs easily on a Pi4B, and acceptably on a Pi3B. (The original Pi can't quite handle the load.)  
