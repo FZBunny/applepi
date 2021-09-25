@@ -7,7 +7,7 @@ This version 0.1.0, so expect bugs.   Report them to j.bruce.ward@gmail.com; be 
 # .deb files:
 As of 2021-09-24, there are two .deb package files in directory 'binaries', one each for PiOS & Ubuntu 29-0.04.
 
-Use:  
+Right-click & "Save Link as...", or Use:  
 wget https://github.com/FZBunny/applepi/blob/main/binaries/applepi-0.1.0_amd64.deb  
 or  
 wget https://github.com/FZBunny/applepi/blob/main/binaries/applepi-0.1.0_armhf.deb  
