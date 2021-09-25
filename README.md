@@ -11,9 +11,9 @@ As of 2021-09-24, there are two .deb package files in directory [binaries].
 - https://github.com/FZBunny/applepi/blob/main/binaries/applepi-0.1.0_armhf.deb   (32-bit Raspberry Pi OS)
 - https://github.com/FZBunny/applepi/blob/main/binaries/applepi-0.1.0_amd64.deb   (64-bit Ubuntu 20.04)
 
-Just right-click & "Save Link As..." to get a copy, and then *(as root)* use: 
+Just right-click & "Save Link As..." to get a copy, then use: 
 ```sh
-apt install ./applepi-0.1.0_(whichever)
+sudo apt install ./applepi-0.1.0_(whichever)
 ```
  to install.    (Note that the "./" is necessary.)
 
