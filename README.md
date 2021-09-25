@@ -6,7 +6,7 @@ It also runs well on Ubuntu 20.04, the O/S used for development.  To build from 
 This is only version 0.1.0, so expect bugs.   You can report them to j.bruce.ward@gmail.com; be sure to describe what must be done to bring the bug out.
 
 
-To get a copy, Go to "Releases" on the right, download a .deb file, then use: 
+To get a copy, go to "Releases" on the right of this page, download a .deb file, then use: 
 ```sh
 sudo apt install ./applepi-0.1.0_(whichever)
 ```
