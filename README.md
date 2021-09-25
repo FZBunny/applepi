@@ -1,5 +1,5 @@
-
-#### *** As of 2021-09-25 16:30 UTC:  Bad Pi binary!  the version 0.1.0 .deb file for the R.Pi is bad; wait for v.0.1.1 ***
+#### *** Notice, 2021-09-25 16:30 UTC: 
+#### *** The version 0.1.0 PiOS release is bad; wait for v.0.1.1 ***
 
 # ApplePi
 "applepi" is an apple IIe emulator for the Raspberry Pi, but can be built (I think) on most Linux distributions.  
