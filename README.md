@@ -1,3 +1,6 @@
+
+#### *** As of 2021-09-25 16:30 UTC:  Bad Pi binary!  the version 0.1.0 .deb file for the R.Pi is bad; wait for v.0.1.1 ***
+
 # ApplePi
 "applepi" is an apple IIe emulator for the Raspberry Pi, but can be built (I think) on most Linux distributions.  
 It runs easily on a Pi4B, and acceptably on a Pi3B. (The original Pi can't quite handle the load.)  
@@ -5,7 +8,6 @@ It also runs well on Ubuntu 20.04, the O/S used for development.  To build from 
 
 This is only version 0.1.0, so expect bugs.   You can report them to j.bruce.ward@gmail.com; be sure to describe what must be done to bring the bug out.
 
-#### *** 2021-09-25, 16:30 UTC:  Bad Pi binary!  the version 0.1.0 .deb file for the R.Pi is bad; wait for v.0.1.1 ***
 To get a copy, go to "Releases" on the right of this page, download a .deb file, then use: 
 ```sh
 sudo apt install ./applepi-0.1.0_(whichever)
