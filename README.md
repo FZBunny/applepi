@@ -5,13 +5,8 @@ It also runs well on Ubuntu 20.04, the O/S used for development.  To build from 
 
 This is only version 0.1.0, so expect bugs.   You can report them to j.bruce.ward@gmail.com; be sure to describe what must be done to bring the bug out.
 
-### .deb files:
-As of 2021-09-24, there are two .deb package files in directory [binaries].  
-# 2021-09-25 11:24 UTC / OOPS. Bad .deb files... one moment please 
-- https://github.com/FZBunny/applepi/blob/main/binaries/applepi-0.1.0_armhf.deb   (32-bit Raspberry Pi OS)
-- https://github.com/FZBunny/applepi/blob/main/binaries/applepi-0.1.0_amd64.deb   (64-bit Ubuntu 20.04)
 
-Just right-click & "Save Link As..." to get a copy, then use: 
+Go to to get a copy, Go to "Releases" on the right, download a .deb file, then use: 
 ```sh
 sudo apt install ./applepi-0.1.0_(whichever)
 ```
