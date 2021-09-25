@@ -215,15 +215,21 @@ void Config::Get (const QString& key, QPoint *pos)
     if (keyExists(key) == false) return ;
 
     QString buffer ;
-    
     buffer = m_settings->value (key).value<QString>() ;
     QStringList list = buffer.split (",") ;
 
-    uint tmp ;
-    tmp = list.at(0).toUInt() ; 
-    pos->setX (tmp) ;
-    tmp = list.at(1).toUInt() ;
-    pos->setY (tmp) ;
+    if (list.length() < 2) {
+        QString tmpStr ("10,10") ;
+        Set (key, tmpStr) ;
+         pos->setX (10) ;
+         pos->setY (10) ;
+    } else {
+        uint tmp ;
+        tmp = list.at(0).toUInt() ; 
+        pos->setX (tmp) ;
+        tmp = list.at(1).toUInt() ;
+        pos->setY (tmp) ;
+    }
 }
 
 
@@ -232,14 +238,20 @@ void Config::Get (const QString& key, QSize *size)
     if (keyExists(key) == false) return ;
 
     QString  buffer ;
-
     buffer = m_settings->value (key).value<QString>() ;
     QStringList list = buffer.split (",") ;
 
-    uint tmp ;
-    tmp = list.at(0).toUInt() ; 
-    size->setWidth (tmp) ;
-    tmp = list.at(1).toUInt() ;
-    size->setHeight (tmp) ;
+    if (list.length() < 2) {
+        QString tmpStr ("10,10") ;
+        Set (key, tmpStr) ;
+        size->setWidth (100) ;
+        size->setHeight (100) ;
+    } else {
+        uint tmp ;
+        tmp = list.at(0).toUInt() ;
+        size->setWidth (tmp) ;
+        tmp = list.at(1).toUInt() ;
+        size->setHeight (tmp) ;
+    }
 }
 
