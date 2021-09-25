@@ -7,7 +7,7 @@
 It runs easily on a Pi4B, and acceptably on a Pi3B. (The original Pi can't quite handle the load.)  
 It also runs well on Ubuntu 20.04, the O/S used for development.  To build from source, you will need the development packages for Qt5 for your distro.
 
-This is only version 0.1.0, so expect bugs.   You can report them to j.bruce.ward@gmail.com; be sure to describe what must be done to bring the bug out.
+This is only version 0.1.0, so expect bugs.   You can report them to jbward@bellaliant.net; be sure to describe what must be done to bring the bug out.
 
 To get a copy, go to "Releases" on the right of this page, download a .deb file, then use: 
 ```sh
