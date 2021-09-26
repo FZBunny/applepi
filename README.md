@@ -15,6 +15,7 @@ sudo apt install ./applepi-(whichever)
 - Of course, an Apple II of any kind isn't much use without a disk or two. To find disk-image files on the 'web, google "apple ii disk images". One place I occasionally go is  https://www.apple.asimov.net/images/, but there's lots others.  
 A note about games:  if a game fails to boot, put it in the 'Floppy 2' drive, and boot dos3. Then enter   ``` RUN HELLO,D2 ``` . If that fails (it won't), catalog disk 2 to find the game's file name: ``` CATALOG,D2 ``` ; then ``` BRUN ``` whatever the name is.
 - When you do boot a floppy disk image, you will hear a series of 'tick' sounds.  These are a kind-of lame attempt to mimic the sound of head seeks as the drive moves from track to track. They will be replaced by proper recorded sounds someday.
+- The 'help' files are incomplete, and out-of-date.  Upates coming soon.
 
 Not a lot more here yet, but here's a perty picture:
 ### Splash screen
