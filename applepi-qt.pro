@@ -6,7 +6,6 @@ CONFIG += qt debug
 TEMPLATE = app
 TARGET = applepi
 QMAKE_CXXFLAGS += -Wno-implicit-fallthrough
-DEFINES_DEBUG = -O0 -ggdb3
 OBJECTS_DIR=obj
 DESTDIR=bin
 INCLUDEPATH += .
