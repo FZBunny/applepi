@@ -8,11 +8,13 @@ This is only up to version 0.1.1, so expect bugs.   You can report them to jbwar
 
 To get a copy, go to "Releases" on the right of this page, download a .deb file, then use: 
 ```sh
-sudo apt install ./applepi-0.1.0_(whichever)
+sudo apt install ./applepi-(whichever)
 ```
- to install.    (Note that the "./" is necessary.)
+ to install.    (Note that the "./" is necessary.)   
+ 
+Of course, an Apple II of any kind isn't much use without a disk or two. To find disk-image files on the 'web, google "apple ii disk images". One place I occasionally go is  https://www.apple.asimov.net/images/, but there's lots others.
 
-Not a lot else here yet, but here's a perty picture:
+Not a lot more here yet, but here's a perty picture:
 ### Splash screen
 ![Screenshot of ApplePi](https://github.com/FZBunny/applepi/blob/main/images/Screenshot_2021-09-21_08-52-27.png)
 
