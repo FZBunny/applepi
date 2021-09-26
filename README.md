@@ -19,4 +19,4 @@ Not a lot else here yet, but here's a perty picture:
 ### Splash screen
 ![Screenshot of ApplePi](https://github.com/FZBunny/applepi/blob/main/images/Screenshot_2021-09-21_08-52-27.png)
 
-[binaries]: <https://github.com/FZBunny/applepi/blob/main/binaries>
+
