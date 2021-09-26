@@ -216,7 +216,7 @@ void RomDialog::centerFileName (void)
     int w, txtX ;
     QFont font = this->font() ;
     QFontMetrics fm (font) ;
-    w = fm.width (m_romFileName->text()) ;
+    w = fm.horizontalAdvance (m_romFileName->text()) ;
     txtX = (this->width()/2) - w/2 ;
     m_romFileName->move (txtX, m_buttonY+140) ;
 }

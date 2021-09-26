@@ -46,7 +46,7 @@ class Screen : public QWidget
 {
 public:
 
-    Screen (QWidget *parent = 0, Qt::WindowFlags f = 0) ;
+    Screen (QWidget *parent = 0) ;
     void initialize (void) ;
     void setScale (uint scale) ;
     void splashScreen (void) ;

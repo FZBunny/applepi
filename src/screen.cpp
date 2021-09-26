@@ -75,7 +75,7 @@ static quint16 screen_RdTEXT_offsets[24] = {
 } ;
 
 
-Screen::Screen (QWidget *parent, Qt::WindowFlags f) : QWidget (parent, f)
+Screen::Screen (QWidget *parent) : QWidget (parent)
 {
  //   this->setAutoFillBackground (true) ;
     initialize() ;
