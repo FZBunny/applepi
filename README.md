@@ -1,5 +1,4 @@
-## *** Notice, 2021-09-25 16:30 UTC: 
-## Version 0.1.0 release for the Raspberry Pi is bad; wait for v.0.1.1 ***
+## *** Notice, 2021-09-25 16:30 UTC: Version 0.1.0 release for the Raspberry Pi is bad; wait for v.0.1.1 ***
    
     
 # ApplePi
