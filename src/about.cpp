@@ -134,7 +134,7 @@ int About::centerText (QLabel* label)
     int w, txtX ;
     QFont font = label->font() ;
     QFontMetrics fm (font) ;
-    w = fm.width (label->text()) ;
+    w = fm.horizontalAdvance (label->text()) ;
     txtX = (this->width()/2) - w/2 ;
     
     return txtX ;
