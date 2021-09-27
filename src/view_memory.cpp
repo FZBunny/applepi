@@ -316,17 +316,22 @@ Panel::Panel (ViewMemory* parent)
     m_height = this->height() ;
 
     m_timer = new QTimer (this) ;
-    m_timer->start (100) ; // // XXXXXXXXXXXXXXXXX temporary XXXXXXXXXXXXXXXXXXXXXXX
+    m_timer->start (100) ;
 
     connect (m_timer, &QTimer::timeout, this, &Panel::onTimer) ;
 
-    m_font = QFont ("DejaVu Sans Mono", 12) ;
-    QFontMetrics fm (m_font);
-    m_lineHeight = fm.height() ;
+    int fontSize = 14 ;
+    int bufferLen = 77 ;
+    int requiredPanelWidth ;
+    do {                                      // Find the largest font that will fit.
+        m_font = QFont ("DejaVu Sans Mono", fontSize--) ;
+        QFontMetrics fm (m_font) ;
+        m_lineHeight = fm.height() ;
+        int charWidth = fm.horizontalAdvance('0') ;
+        requiredPanelWidth = bufferLen * charWidth ;
+    } while (requiredPanelWidth > m_width) ;
 
     this->show() ;
-//    this->update (this->rect()) ;
-
 }
 
 
@@ -416,6 +421,7 @@ void Panel::onTimer (void)
             buffer[n+bix++] = c ;
         }
         buffer[n+bix] = 0 ;
+
         painter.drawText (10,20+line*m_lineHeight, QString((const char*)buffer)) ;
 
         if (ssPage && line >= 15) break ;
