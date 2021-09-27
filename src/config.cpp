@@ -124,7 +124,7 @@ bool Config::keyExists (QString key)
         QTextStream (&errMsg) << "The configuration file " << m_cfgName 
                               << " doesn't contain the key \"" << key << "\"." ;
 
-        qStdOut() << Qt::endl << "*** Warning: " << errMsg << Qt::endl << Qt::endl ;
+        qStdOut() << endl << "*** Warning: " << errMsg << endl << endl ;
 
  //       QErrorMessage* box = new QErrorMessage (main_window) ;
  //       box->showMessage (errMsg) ;
