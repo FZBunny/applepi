@@ -1,6 +1,6 @@
 Package: applepi
 Source: J.B.Ward <j.bruce.ward@gmail.com>
-Version: 0.1.1
+Version: 0.1.2
 Architecture: arm64
 Maintainer: J.B.Ward <j.bruce.ward@gmail.com>
 Installed-Size: * not yet measured *

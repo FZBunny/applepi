@@ -552,7 +552,7 @@ void MainWindow::keyPressEvent (QKeyEvent *e)
                                   0xffff} ;  // Delete
     quint16 c = e->nativeVirtualKey() ;
     quint16 mods = e->nativeModifiers() ;
-printf ("mods=%8.8x  c=%2.2x\n", mods, c) ;
+// printf ("mods=%8.8x  c=%2.2x\n", mods, c) ;
     if ((c & 0xff00) == 0xff00) {
         switch (c) {
             case 0xff51:
@@ -581,7 +581,7 @@ printf ("mods=%8.8x  c=%2.2x\n", mods, c) ;
     if (mods == ctrlMod) c &= 0x1f ;
     else                 c &= 0x7f ;
     if (m_upperCaseOnly && (c>0x60) && (c<0x7b)) c &= 0xdf ;
-printf ("               c=%2.2x\n", c) ;
+// printf ("               c=%2.2x\n", c) ;
     if (c == 0x16) pasteToKeyboard() ;
     else           MAC->m_ss[0] =  c | 0x80 ;
 
