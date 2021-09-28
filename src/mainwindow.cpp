@@ -70,7 +70,7 @@ MainWindow::MainWindow (void)
     main_window = this ;
 
     m_cfg = new Config() ;
-//qStdOut() << endl << " **** MainWindow is starting." << endl << endl;
+
     const QIcon* icon = new QIcon (QPixmap(xpm_redapple));
     this->setWindowIcon (*icon) ;
 
@@ -142,6 +142,26 @@ MainWindow::MainWindow (void)
     else              scaleButtonText = "Small Screen" ;
     m_scaleButton = new ApplepiButton (scaleButtonText, this) ;
 
+    m_scaleButtonKludge = 1 ;                                  // Choose which kludge to apply to the sceeen-scale
+                                                               // button; on some distros, the text overflows
+    if (m_scaleButtonKludge == 1) {
+        QFont sbFont = m_scaleButton->font() ;                 // 1... Embiggen the button to fit the text
+        QFontMetrics fm (sbFont) ;
+        int stringWidth = fm.horizontalAdvance("Small Screen") ;
+        m_scaleButton->resize (stringWidth+6, m_buttonSize.height()) ;
+    } else {
+        int stringWidth ;                                      // 2... Find the largest font that will fit the button.
+        int buttonWidth = m_buttonSize.width() ;
+        QFont sbFont = m_scaleButton->font() ;
+        int pointSize = sbFont.pointSize() ;
+        do {
+            sbFont.setPointSize (pointSize--) ;
+            QFontMetrics fm (sbFont) ;
+            stringWidth = fm.horizontalAdvance("Small Screen") ;
+        } while (stringWidth > buttonWidth) ;
+        m_scaleButton->setFont (sbFont) ;
+    }
+
     connect (m_powerButton,   &ApplepiButton::clicked, this, &MainWindow::onPowerButton) ;
     connect (m_floppy1Button, &ApplepiButton::clicked, this, &MainWindow::onFloppy1Button) ;
     connect (m_floppy2Button, &ApplepiButton::clicked, this, &MainWindow::onFloppy2Button) ;
@@ -157,8 +177,6 @@ MainWindow::MainWindow (void)
     this->setFocus() ;
 
     m_volText  = new QLabel ("Volume", this) ;
-//   m_minText  = new QLabel ("Min", this) ;
-//    m_maxText  = new QLabel ("Max", this) ;
        
     QFont font2 ("courier", 8) ;
     font2.setBold (false) ;
@@ -524,31 +542,46 @@ Speaker* MainWindow::speaker (void)
 
 void MainWindow::keyPressEvent (QKeyEvent *e)
 {
-#if defined (__arm__) || defined (__aarch64__)
+#ifdef Q_PROCESSOR_ARM
     const quint16 ctrlMod = 0x04 ;
 #else
     const quint16 ctrlMod = 0x14 ;
 #endif
-    const quint16 passThese[3] = {0xff08, 0xff0d, 0xffff} ;
+    const quint16 passThese[3] = {0xff08,    // Backspace
+                                  0xff0d,    // Enter (carriage return)
+                                  0xffff} ;  // Delete
     quint16 c = e->nativeVirtualKey() ;
     quint16 mods = e->nativeModifiers() ;
-//printf ("mods=%8.8x  c=%2.2x\n", mods, c) ;
+printf ("mods=%8.8x  c=%2.2x\n", mods, c) ;
     if ((c & 0xff00) == 0xff00) {
-        if      (c == 0xff51) c = 0x08 ;
-        else if (c == 0xff52) c = 0x0b ;
-        else if (c == 0xff53) c = 0x15 ;
-        else if (c == 0xff54) c = 0x0a ;
-        else {
-            int i ;
-            for (i=2; i>=0; i--) if (c == passThese[i]) break ;
-            if (i < 0) return ;
+        switch (c) {
+            case 0xff51:
+                c = 0x08 ;   // backspace      (left-arrow)
+                break ;
+            case 0xff1b:
+                c = 0x1b ;   // escape         
+                break ;
+            case 0xff52:
+                c = 0x0b ;   // vertical tab   (up-arrow)
+                break ;
+            case 0xff53:
+                c = 0x15 ;   // shift in       (right-arrow)
+                break ;
+            case 0xff54:
+                c = 0x0a ;   // newline        (down-arrow)
+                break ;
+            default:
+                int i ;
+                for (i=2; i>=0; i--) if (c == passThese[i]) break ;
+                if (i < 0) return ;
+                break ;
         }
     }
 
     if (mods == ctrlMod) c &= 0x1f ;
     else                 c &= 0x7f ;
     if (m_upperCaseOnly && (c>0x60) && (c<0x7b)) c &= 0xdf ;
-//printf ("               c=%2.2x\n", c) ;
+printf ("               c=%2.2x\n", c) ;
     if (c == 0x16) pasteToKeyboard() ;
     else           MAC->m_ss[0] =  c | 0x80 ;
 
@@ -624,7 +657,8 @@ void MainWindow::resizeWindow (void)
         volumeY = 475 ;
 
         m_powerButton->move (5, row1ButtonY) ;
-        m_scaleButton->move (5, row2ButtonY) ;
+        if (m_scaleButtonKludge == 1) m_scaleButton->move (3, row2ButtonY) ;
+        else                          m_scaleButton->move (5, row2ButtonY) ;
         m_floppy1Button->move (floppy2ButtonX-buttonWidth-5, row1ButtonY) ;
         m_tapeButton->move (floppy2ButtonX+buttonWidth+10, row1ButtonY) ;
         m_hd1Button->move (floppy2ButtonX-buttonWidth-5, row2ButtonY) ;
@@ -642,7 +676,6 @@ void MainWindow::resizeWindow (void)
         m_screen->setScale(2) ;
         row1ButtonY = MAX_MAINWINDOW_HEIGHT - 140 ;
         row2ButtonY = MAX_MAINWINDOW_HEIGHT - 80 ;
-//volumeY = row2ButtonY ;
 
         volumeX = 950 ;
         volumeY = 860 ;

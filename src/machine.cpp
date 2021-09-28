@@ -134,7 +134,7 @@ void Machine::initialize (bool power)
 // Generate a slightly randomized pattern on screen after power-up.
 // A kind'a lame attempt to mimic dynamic RAM behaviour.
 
-#ifdef __WXMSW__  // ------------------------------------
+#ifdef Q_OS_WINDOWS  // ------------------------------------
 
 void Machine::intitializeRAM (void)  // XXXXXXXXXXXXXXXXXXXXXXXXXX  FIXME  XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 {

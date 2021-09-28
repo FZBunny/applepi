@@ -34,7 +34,7 @@
 
 #include <sys/types.h>
 #include <sys/stat.h>
-#ifndef __WXMSW__
+#ifndef Q_OS_WINDOWS
 #  include <unistd.h>
 #endif
 

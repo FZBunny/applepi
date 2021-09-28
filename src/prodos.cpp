@@ -38,7 +38,7 @@ using namespace std ;
 #include <sys/stat.h>
 #include <string.h>
 #include <stdio.h>
-#ifndef __WXMSW__
+#ifndef Q_OS_WINDOWS
   #include <unistd.h>
   #include <getopt.h>
 #endif

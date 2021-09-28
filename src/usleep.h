@@ -30,7 +30,7 @@
 // #include <wx/defs.h>
 
 
-#ifdef __WXMSW__
+#ifdef Q_OS_WINDOWS
   void usleep(unsigned int usec) ;
 #endif
 

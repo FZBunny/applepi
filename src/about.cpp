@@ -38,9 +38,9 @@
 
 About::About (QWindow*)
 {
-
-//    QFontComboBox* fb = new QFontComboBox (this) ;
-
+    const int WIDTH = 420 ;
+    const int HEIGHT = 620 ;
+    
     this->resize (WIDTH, HEIGHT) ;
     this->setMinimumSize (WIDTH, HEIGHT) ;
     this->setMaximumSize (WIDTH, HEIGHT) ;
@@ -72,7 +72,7 @@ About::About (QWindow*)
     m_txt4 = new QLabel ("Copyright © 2019-2021 J.B.Ward", this) ;
     m_txt4->setFont (font2) ;
     x = centerText (m_txt4) ;
-    m_txt4->move (x, 520) ;
+    m_txt4->move (x, 550) ;
 
 
     QString copyright =
@@ -83,7 +83,7 @@ About::About (QWindow*)
     "</HEAD>"
     "<BODY TEXT=\"#006000\" BGCOLOR=\"#E8E8F0\" LINK=\"#0000FF\" VLINK=\"#FF0000\" ALINK=\"#000088\">"
     "<BR>"
-#if defined (__arm__) || defined (__aarch64__)
+#ifdef Q_PROCESSOR_ARM
     "<span style=\"font-size:10pt; color:black;\">"
 #else
     "<span style=\"font-size:11pt; color:black;\">"
@@ -101,16 +101,20 @@ About::About (QWindow*)
     "The Free Software Foundation, Inc.<BR>"
     "51 Franklin Street, Fifth Floor<BR>"
     "Boston, MA 02110-1335 USA<BR><BR>"
-    "Or simply visit:"
+    "Or simply visit the link below:"
     "</span>" ;
 
     m_html = new QTextBrowser (this) ;
     m_html->setHtml (copyright) ;
-    m_html->resize (390, 330) ;
+    m_html->resize (390, 340) ;
     m_html->move (15, 170) ;
 
-    m_visit = new QPushButton (m_url, this) ;
-    m_visit->move (120, 460) ;
+ //   const QString m_url = "www.gnu.org/licenses/gpl-3.0.html" ;
+    m_visit = new QPushButton ("www.gnu.org/licenses/gpl-3.0.html", this) ;
+    int width = 270 ;
+    m_visit->resize (width, 24) ;
+    x = this->width()/2 - width/2 ;
+    m_visit->move (x, 515) ;
 
     connect (m_visit, &QPushButton::clicked, this, &About::onUrlButtonClicked) ;
     connect (m_close, &QPushButton::clicked, this, &About::onCloseButtonClicked) ;

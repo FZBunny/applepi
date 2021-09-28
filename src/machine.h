@@ -47,7 +47,7 @@
 // #include "tape.h"
 // #include "analog_input.h"
 /*
-#ifdef __WXMSW__
+#ifdef Q_OS_WINDOWS
 #  include "win-speaker.h"
 #else
 #  include "speaker.h"
@@ -77,7 +77,7 @@ typedef struct HistoryEntry {
 
 //       6502 processor status bits (in register "P")
 /*
-#ifdef __WXMSW__
+#ifdef Q_OS_WINDOWS
 #   define N  0x80  // Negative
 #   define V  0x40  // oVerflow
 #   define UN 0x20  // ... bit 5 is UNused

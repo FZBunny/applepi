@@ -46,7 +46,7 @@
 
 
 
-#ifdef __WXMSW__
+#ifdef Q_OS_WINDOWS
 #  include "win-speaker.h"
 #else
 #  include "lin-speaker.h"
@@ -129,6 +129,7 @@ private:
     int     m_barHeight ;
     int     m_ledWidth ;
     bool    m_firstTimerEvent ;
+    int     m_scaleButtonKludge ;
 
     ApplepiButton* m_powerButton ;
     ApplepiButton* m_floppy1Button ;

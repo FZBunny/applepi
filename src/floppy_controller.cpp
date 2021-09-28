@@ -42,7 +42,7 @@
 #include <QtCore/QIODevice>
 #include <QDebug>
 
-#ifndef __WXMSW__
+#ifndef Q_OS_WINDOWS
 #  include <unistd.h>
 #endif
 #include <stdio.h>

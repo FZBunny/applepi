@@ -27,7 +27,7 @@
 
 
 
-#ifndef __WXMSW__
+#ifndef Q_OS_WINDOWS
   #include <unistd.h>
 #endif
 //#include <fcntl.h>

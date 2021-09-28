@@ -155,7 +155,7 @@ static const int textBufferOffsets[24] = {
 
 void MainWindow::onCopyScreen (void)
 {
-#ifdef __WXMSW__
+#ifdef Q_OS_WINDOWS
     QString newLine("\r\n") ;
 #else
     QString newLine("\n") ;

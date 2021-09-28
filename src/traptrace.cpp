@@ -56,6 +56,13 @@ TrapTrace::TrapTrace (MainWindow* parent) :  QDialog (parent)
     const QSize buttonSize (90, 28) ;
     const QSize textSize (52,26) ;
 
+#ifdef Q_PROCESSOR_ARM               // We assume an arm processor means we're running PiOS;
+    QFont font1 = this->font() ;     // PiOS seems to use larger fonts than most other distros
+    int ptSize = font1.pointSize() ;
+    font1.setPointSize (ptSize-1) ;
+    this->setFont (font1) ;
+#endif
+
 
 //---------  T R A P  -----------
 
@@ -191,7 +198,7 @@ TrapTrace::TrapTrace (MainWindow* parent) :  QDialog (parent)
 
     QString  tmpString ;
     CFG->Get ("lines2dump", &tmpString) ;
-//qStdOut() << "TrapTrace::TrapTrace  lines2dump=" << tmpString << endl ;
+
     m_requestedDumpLinesBox->selectAll() ;
     m_requestedDumpLinesBox->insert (tmpString) ;
     MAC->setLines2Dump (tmpString) ;

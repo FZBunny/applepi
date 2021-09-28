@@ -30,7 +30,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#ifndef __WXMSW__
+#ifndef Q_OS_WINDOWS
 #  include <unistd.h>
 #endif
 

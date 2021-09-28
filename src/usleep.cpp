@@ -31,7 +31,7 @@
 
 #include <QtCore/qglobal.h>
 
-#ifdef __WXMSW__
+#ifdef Q_OS_WINDOWS
 
 #include <chrono>
 #include <thread>
