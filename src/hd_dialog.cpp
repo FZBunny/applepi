@@ -143,7 +143,7 @@ void HardDriveDialog::onEjectInsertButtonClick (void)
 void HardDriveDialog::insertVolume (void)
 {
     QString newPath ;
-    QString filter ("Disk Files (*.img *.IMG);;Any *") ;
+    QString filter ("Disk Files (*.img *.IMG *.2mg *.2MG);;Any *") ;
     QString originalPath = m_filenameField->text() ;
 
     while (true) {

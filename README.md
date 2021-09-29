@@ -16,8 +16,8 @@ sudo apt install ./applepi-(whichever)
 
 - When you do boot a floppy disk image, you will hear a series of 'tick' sounds.  These are a kind-of lame attempt to mimic the sound of head seeks as the drive moves from track to track. They will be replaced by proper recorded sounds someday.
 - A note about games:  if a game fails to boot, put it in the 'Floppy 2' drive, and boot dos3. Then enter   ``` RUN HELLO,D2 ``` . If that fails (it won't), catalog disk 2 to find the game's file name: ``` CATALOG,D2 ``` ; then ``` BRUN ``` whatever the name is.   
+- See "NOTES.md" for a (short!) list of known bugs and shortcomings.
 
-- (The 'help' files are incomplete, and out-of-date.  Upates coming soon.)
   
   
 Not a lot more here yet, but here's a perty picture:
