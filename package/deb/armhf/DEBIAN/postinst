@@ -1,0 +1,34 @@
+#!/bin/bash
+
+sayLater() {
+    echo 
+    echo You may copy the file to your desktop later with:
+    echo cp  /usr/share/applepi/applepi.desktop  $DESKTOP
+    echo 
+}
+
+
+if [ $SUDO_UID ]; then
+    DESKTOP=/home/$SUDO_USER/Desktop
+
+    echo
+    echo \*
+    echo \* Would you like the applepi desktop file placed on your desktop? \(Y/n\)
+    echo \*
+
+    read -s -n 1 REPLY
+    LEN=${#REPLY}
+
+    if [ $LEN = 0 ] || [ $REPLY = 'y' ] || [ $REPLY = 'Y' ]; then
+        cp /usr/share/applepi/applepi.desktop $DESKTOP
+        chown $SUDO_UID:$SUDO_UID $DESKTOP/applepi.desktop
+        echo; echo Copied.; echo
+    else
+        sayLater
+    fi
+else
+    sayLater
+fi
+
+exit 0
+

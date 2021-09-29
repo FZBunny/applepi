@@ -22,117 +22,103 @@ usage() {
 
 
 if [ $(id -u) != 0 ]; then
-
-    if [ $# = 0 ]; then                # ------------- 1st pass, as user
-        ARCH=$(uname -m)
-        if   [ $ARCH = armv7l ]; then
-            DIR=armhf
-        elif [ $ARCH = aarch64 ]; then
-            DIR=arm64
-        elif [ $ARCH = x86_64 ]; then
-            DIR=amd64
-        else
-            echo
-            echo \*\*\* This machine\'s architecture \($ARCH\) is not recognized.
-            echo \*\*\* You will have to create a new package directory for it,
-            echo \*\*\* and specify that directory name on the command line:
-            echo \*\*\* ./roll-debian  directoryname
-            echo
-            exit 1
-        fi
-    else
-        if [ $# = 1 ]; then
-            DIR=$1
-        else
-            usage
-        fi
-    fi
-
-    if [ ! -d $DIR ]; then
-        echo ; echo \*\*\*  No such directory: $DIR; echo
-        exit 1
-    fi
-
-    ID=$(id  | cut -d'(' -f2 | cut -d')' -f1)
-    GRP=$(id | cut -d'(' -f3 | cut -d')' -f1)
-
-    sudo $0  $DIR $ID $GRP  # (Run this script again, as root)
-
-    echo; echo Done.; echo
-
-
-else                                   # ------------- 2nd pass, as root
-
-
-    # --- Check that user & group are valid
-
-    TEST=$(id $2 2>/dev/null)
-    if [ ${#TEST} = 0 ]; then
-        echo \*\*\* No such user, \"$2\".
-        usage
-    fi
-
-    TEST=$(grep $3 /etc/group)
-    if [ ${#TEST} = 0 ]; then
-        echo \*\*\* No such group, \"$3\".
-        usage
-    fi
-
-
-    # --- Check for files & dirs
-
-    EXEC=../../bin/applepi
-    HELP=../../help
-    CONTROL=$1/DEBIAN/control
-    SHARE=$1/usr/share/applepi
-    BIN=$1/usr/bin
-
-    if [ ! -f $CONTROL ]; then
-        echo; echo \*\*\*  Can\'t find $CONTROL; echo
-        exit 1
-    fi
-
-    if [ ! -f $EXEC ]; then
-        echo; echo \*\*\*  Can\'t find $EXEC;  echo
-        exit 1
-    fi
-
-    if [ ! -d $HELP ]; then
-        echo; echo \*\*\*  Can\'t find directory $HELP; echo
-        exit 1
-    fi
-
-
-    # --- Copy files & make them owned by root
-
-    mkdir -p $SHARE
-    mkdir -p $BIN
-
-    rm -f $SHARE/*
-    rm -f $BIN/*
-
-    cp $HELP/*  $SHARE
-    cp $EXEC    $BIN
-
-    chown 0.0 $SHARE
-    chown 0.0 $SHARE/*
-    chown 0.0 $BIN/*
-
-
-    # --- Get the current version number from the source code
-    # --- and put it in the debian 'control' file 
-
-
-    VERSION=$(cut -d'"' -f2 ../../src/version.h)
-    sed -i -e"s/Version:.*/Version: $VERSION/g"  $1/DEBIAN/control
-
-
-    # --- Create the .deb file with the current version number
-
-
-    /usr/bin/dpkg-deb --build $1  applepi-"$VERSION"_$1.deb
-
-    chown -R $2:$3  $1     # Restore ownership of all files
-
+    echo
+    echo \*\*\* $0 must be run by sudo.
+    echo
+    exit 1
 fi
+
+
+# --- Check architecture
+
+if [ $# = 0 ]; then
+    ARCH=$(uname -m)
+    if   [ $ARCH = armv7l ]; then
+        DIR=armhf
+    elif [ $ARCH = aarch64 ]; then
+        DIR=arm64
+    elif [ $ARCH = x86_64 ]; then
+        DIR=amd64
+    else
+        echo
+        echo \*\*\* This machine\'s architecture \($ARCH\) is not recognized.
+        echo \*\*\* You will have to create a new package directory for it,
+        echo \*\*\* and specify that directory name on the command line:
+        echo \*\*\* ./roll-debian  directoryname
+        echo
+        exit 1
+    fi
+else
+    if [ $# = 1 ]; then
+        DIR=$1
+    else
+        usage
+    fi
+fi
+
+if [ ! -d $DIR ]; then
+    echo ; echo \*\*\*  No such directory: $DIR; echo
+    exit 1
+fi
+
+
+# --- Check for files & dirs
+
+EXEC=../../bin/applepi
+HELP=../../help
+CONTROL=$DIR/DEBIAN/control
+SHARE=$DIR/usr/share/applepi
+BIN=$DIR/usr/bin
+
+if [ ! -f $CONTROL ]; then
+    echo; echo \*\*\*  Can\'t find $CONTROL; echo
+    exit 1
+fi
+
+if [ ! -f $EXEC ]; then
+    echo; echo \*\*\*  Can\'t find $EXEC;  echo
+    exit 1
+fi
+
+if [ ! -d $HELP ]; then
+    echo; echo \*\*\*  Can\'t find directory $HELP; echo
+    exit 1
+fi
+
+
+# --- Copy files & make them owned by root
+
+mkdir -p $SHARE
+mkdir -p $BIN
+
+rm -f $SHARE/*
+rm -f $BIN/*
+
+cp $HELP/*  $SHARE
+cp $EXEC    $BIN
+
+chown 0.0 $SHARE
+chown 0.0 $SHARE/*
+chown 0.0 $BIN/*
+
+
+# --- Get the current version number from the source code
+# --- and put it in the debian 'control' file 
+
+VERSION=$(cut -d'"' -f2 ../../src/version.h)
+sed -i -e"s/Version:.*/Version: $VERSION/g"  $DIR/DEBIAN/control
+
+
+# --- Create the .deb file with the current version number
+
+PKGNAME=applepi-"$VERSION"_$DIR.deb
+/usr/bin/dpkg-deb --build $DIR  $PKGNAME
+
+
+# --- Clean up.
+
+chown -R $SUDO_UID:$SUDO_GID  $DIR $PKGNAME    # Restore ownership of files
+rm -rf $DIR/usr                                # Get rid of temporary files
+
+exit 0
 
