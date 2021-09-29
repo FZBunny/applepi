@@ -10,7 +10,7 @@ To get a copy, go to "Releases" on the right of this page, download a .deb file,
 ```sh
 sudo apt install ./applepi-(whichever)
 ```
- to install.    (Note that the "./" is necessary.)   
+ ##### (Note that the "./" is necessary.)   
  
 - Of course, an Apple II of any kind isn't much use without a disk or two. To find disk-image files on the 'web, google "apple ii disk images".  For Apple disk masters, try https://www.apple.asimov.net/images/masters/;  for games, try http://virtualapple.org/. 
 
