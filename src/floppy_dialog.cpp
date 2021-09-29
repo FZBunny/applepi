@@ -152,7 +152,7 @@ void FloppyDialog::ejectFloppy (void)
 void FloppyDialog::insertFloppy (void)
 {
     QString newPath ;
-    QString filter ("Disk Files (*.dsk *.DSK);;Any *") ;
+    QString filter ("Disk Files (*.dsk *.DSK *.po *.PO);;Any *") ;
     QString originalPath = m_filenameField->text() ;
 
     while (true) {
