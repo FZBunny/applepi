@@ -1,5 +1,5 @@
 #### A warning when building from source  
-DO NOT use "qmake -project" to recreate the .pro file. The source code contains more than one definition of "main", four belonging to some small utilities.  Qmake can handle only a single main.  I'm still trying to find a clean way of integrationg these utilities into the project.  Using "qmake -makefile" is fine, but know that the current Makefile may have a few manually added tweaks. (I really should go through the .pro syntax docs again.)  
+DO NOT use "qmake -project" to recreate the .pro file. (You will, however, need to do "qmake -makefile" to create a Makefile.)  The source code contains more than one definition of "main", four belonging to some small utilities.  Qmake can handle only a single main.  I'm still trying to find a clean way of integrationg these utilities into the project.   
 
 #### Shortcomings and known bugs
 
