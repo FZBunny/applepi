@@ -1,5 +1,5 @@
 
-#####  - Go to "Releases" on the right of the screen for installable files. Pi users want the "..armhf.deb" file. -
+#####  - Go to "Releases" on the right for installable files. Pi users want the "..armhf.deb" file. -
 ![Screenshot of ApplePi](https://github.com/FZBunny/applepi/blob/main/images/Screenshot_2021-09-21_08-52-27.png)
 
 "ApplePi" is an apple IIe emulator for the Raspberry Pi, but can be built on most Linux distributions. (See "NOTES.md" for a build warning.)
