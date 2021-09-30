@@ -9,3 +9,4 @@ DO NOT use "qmake -project" to recreate the .pro file. The source code contains 
 - Applepi does not always play well with the later versions of ProDOS utility disks.  The utility programs will often ignore both "HD" drives. Under investigation. Nearest thing to a workaround is to use ProDOS 1.0 utilities. This is true only of the utility programs themselves; BASIC works fine on all versions of ProDOS.
 - There are four mildly annoying, though not always obvious, one-pixel-high horizontal lines in the display.  Under investigation.
 - ApplePi emulates a 65C02 (not the original 6502) processor, whether or not the IIe enhanced model is selected. This saves code, and few will care.  
+- Cassette tape I/O is temporarily disabled. A workaround for the format differences between monitor and BASIC formats is being devised.
