@@ -1,5 +1,6 @@
 [Desktop Entry]
 Type=Application
+Categories=Games;
 Terminal=false
 Icon=/usr/share/applepi/apple.png
 Name[en]=ApplePi

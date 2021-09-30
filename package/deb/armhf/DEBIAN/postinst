@@ -11,6 +11,8 @@ sayLater() {
 if [ $SUDO_UID ]; then
     DESKTOP=/home/$SUDO_USER/Desktop
 
+    /usr/bin/xdg-desktop-menu install --novendor /usr/share/applepi/applepi.desktop
+
     echo
     echo \*
     echo \* Would you like the applepi desktop file placed on your desktop? \(Y/n\)
@@ -20,8 +22,8 @@ if [ $SUDO_UID ]; then
     LEN=${#REPLY}
 
     if [ $LEN = 0 ] || [ $REPLY = 'y' ] || [ $REPLY = 'Y' ]; then
-        cp /usr/share/applepi/applepi.desktop $DESKTOP
-        chown $SUDO_UID:$SUDO_UID $DESKTOP/applepi.desktop
+        /usr/bin/cp /usr/share/applepi/applepi.desktop $DESKTOP
+        /usr/bin/chown $SUDO_UID:$SUDO_UID $DESKTOP/applepi.desktop
         echo; echo Copied.; echo
     else
         sayLater
