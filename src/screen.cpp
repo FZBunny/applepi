@@ -294,8 +294,8 @@ void Screen::drawLine_40 (uchar *characters, int dstX, int dstY)
     for (int i=0; i<40; i++) {
         quint8 c =  characters[i] ;
         if (m_flash && (RdAltChar == OFF) && (c > 0x3f) && (c < 0x80))  c -= 0x40 ;
-        int srcPixmapOffset = 16 * c ;              // draw a single character
-        painter.drawPixmap (dstX+(14*i)+2, dstY+2, *cSet, 0, srcPixmapOffset, 14, 16) ;
+        int srcPixmapOffset = 16 * c ;
+        painter.drawPixmap (dstX+(14*i)+2, dstY+2, *cSet, 0, srcPixmapOffset, 14, 16) ; // draw a single character
     }
 }
 
@@ -321,18 +321,29 @@ void Screen::draw40Column (int firstLine, quint8 *loresData)
 
 //   Draw a single 80-column line on the screen
 
-void Screen::drawLine_80 (QPixmap* charsPixmap, int x, int y, quint8 *main, quint8 *aux)
+void Screen::drawLine_80 (int x, int y, quint8 *main, quint8 *aux)
 {
     int i, charOffM, charOffA, dest_xM, dest_xA ;
     QPainter painter(&m_screenBuffer) ;
 
+    quint8 RdAltChar = MAC->m_ss[0x01e] ;
+    QPixmap* cSet ;
+    if (RdAltChar) cSet = &m_pixmap_80ColumnAlternate ;
+    else           cSet = &m_pixmap_80ColumnPrimary ;
+
+    quint8 c ;
     for (i=0; i<40; i++) {
-        charOffM = 16 * main[i] ;
-        charOffA = 16 * aux[i] ;
+        c = main[i] ;
+        if (m_flash && (RdAltChar == OFF) && (c > 0x3f) && (c < 0x80))  c -= 0x40 ;
+        charOffM = 16 * c ;
+        c = aux[i] ;
+        if (m_flash && (RdAltChar == OFF) && (c > 0x3f) && (c < 0x80))  c -= 0x40 ;
+        charOffA = 16 * c ;
+
         dest_xA = x + i*14 ;
         dest_xM = dest_xA + 7 ;
-        painter.drawPixmap (dest_xA, y, *charsPixmap, 0, charOffA, 7, 16) ;
-        painter.drawPixmap (dest_xM, y, *charsPixmap, 0, charOffM, 7, 16) ;
+        painter.drawPixmap (dest_xA, y, *cSet, 0, charOffA, 7, 16) ;
+        painter.drawPixmap (dest_xM, y, *cSet, 0, charOffM, 7, 16) ;
     }
 }
 
@@ -345,11 +356,6 @@ void Screen::draw80Column (int firstLine)
     int    h, line, off, x, y ;
     quint8  *mainScreen, *auxScreen ;
 
-    quint8 RdAltChar = MAC->m_ss[0x01e] ;
-    QPixmap* cSet ;
-    if (RdAltChar) cSet = &m_pixmap_80ColumnAlternate ;
-    else           cSet = &m_pixmap_80ColumnPrimary ;
-
     x = 0 ;
     h = 16 ;
 
@@ -359,7 +365,7 @@ void Screen::draw80Column (int firstLine)
     for (line=firstLine; line<24; line++) {
         y = h*line ;
         off = screen_RdTEXT_offsets[line] ;
-        drawLine_80 (cSet, x, y, mainScreen+off, auxScreen+off) ;
+        drawLine_80 (x, y, mainScreen+off, auxScreen+off) ;
     }
 }
 

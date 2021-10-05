@@ -55,7 +55,7 @@ private:
 
     void refreshScreen (void) ;
     void drawLine_40 (quint8 *srcOffsetArray, int dstX, int dstY) ;
-    void drawLine_80 (QPixmap* characters, int x, int y, quint8 *main, quint8 *aux) ;
+    void drawLine_80 (int x, int y, quint8 *main, quint8 *aux) ;
     void draw40Column (int firstLine, quint8 *screen) ;
     void draw80Column (int firstLine) ;
     inline void put_7_bits (QPainter& painter, quint8* screenData, int x, int y, int col, int off) ;
