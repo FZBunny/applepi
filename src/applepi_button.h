@@ -26,6 +26,8 @@
 *****************************************************************************/
 
 
+#ifndef APPLEPI_BUTTON_H
+#define APPLEPI_BUTTON_H
 
 #include <QPushButton>
 
@@ -38,3 +40,5 @@ public:
 private:
     void keyPressEvent(QKeyEvent *e) ;
 } ;
+
+#endif

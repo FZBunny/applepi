@@ -39,6 +39,7 @@
 
 #include "mainwindow.h"
 #include "disassembler.h"
+#include "applepi_button.h"
 
 class MainWindow ;
 
@@ -60,8 +61,6 @@ class TrapTrace: public QDialog
  //       void  cleanupAddress (QLineEdit* text) ;
         void keyPressEvent(QKeyEvent *) ;
 
-        void  onTrap0Entered (void) ;
-
         void  editAddress (QLineEdit* box) ;
         void  onTrap0Edited (void) ;
         void  onTrap1Edited (void) ;
@@ -74,6 +73,7 @@ class TrapTrace: public QDialog
         void  onTrap2Finshed (void) ;
         void  onTrap3Finshed (void) ;
 
+        void  onTrap0Entered (void) ;
         void  onTrap1Entered (void) ;
         void  onTrap2Entered (void) ;
         void  onTrap3Entered (void) ;
@@ -87,8 +87,10 @@ class TrapTrace: public QDialog
         void  onTrap3CheckBox   (void) ;
         void  onHistoryCheckBox (void) ;
 
-        void  onTraceStartEntered (void) ;
-        void  onTraceEndEntered   (void) ;
+        void  onTraceStartEdited (void) ;
+        void  onTraceStartFinshed (void) ;
+        void  onTraceEndEdited   (void) ;
+        void  onTraceEndFinshed   (void) ;
 
         void  onTraceButtonClicked (void) ;
         void  onSingleStepClicked  (void) ;
@@ -121,12 +123,12 @@ class TrapTrace: public QDialog
         QCheckBox*   m_trap2_checkBox ;
         QCheckBox*   m_history_checkBox ;
         QLineEdit*   m_requestedDumpLinesBox ;
-        QPushButton* m_singleStepButton ;
-        QPushButton* m_runFreeButton ;
-        QPushButton* m_haltButton ;
-        QPushButton* m_traceButton ;
         QCheckBox*   m_ss_fetch_checkBox ;
         QCheckBox*   m_ss_store_checkBox ;
+        ApplepiButton* m_singleStepButton ;
+        ApplepiButton* m_runFreeButton ;
+        ApplepiButton* m_haltButton ;
+        ApplepiButton* m_traceButton ;
 
         quint16       m_startAddr ;
         int           m_lineHeight ;

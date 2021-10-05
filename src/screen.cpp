@@ -84,8 +84,10 @@ Screen::Screen (QWidget *parent) : QWidget (parent)
 
 void Screen::initialize (void)
 {
-    m_pixmap_40ColumnPrimary16 = QPixmap(xpm_40ColChars) ;
-    m_pixmap_80ColumnPrimary16 = QPixmap(xpm_80ColChars) ;
+    m_pixmap_40ColumnPrimary   = QPixmap(xpm_40ColChars) ;
+    m_pixmap_40ColumnAlternate = QPixmap(xpm_40ColCharsEnhanced) ;
+    m_pixmap_80ColumnPrimary   = QPixmap(xpm_80ColChars) ;
+    m_pixmap_80ColumnAlternate = QPixmap(xpm_80ColCharsEnhanced) ;
 
     m_pixmap_xpm_hires_0 = QPixmap(xpm_hires_0) ;
     m_pixmap_xpm_hires_1 = QPixmap(xpm_hires_1) ;
@@ -163,7 +165,8 @@ void Screen::initialize (void)
     m_screenBuffer = QPixmap (m_pixelsWidth, m_pixelsHeight) ;
     m_screenBuffer.fill (Qt::black) ;
 
- //   m_usingSlowTimer = false ;
+    m_flashCounter = 0 ;
+    m_flash = false ;
 
     m_refreshTimer = new QTimer() ;
     connect (m_refreshTimer, &QTimer::timeout, this, &Screen::refreshScreen) ;
@@ -279,13 +282,20 @@ void Screen::splashScreen (void)
 
 //   Draw a single 40-column line on the screen
 
-void Screen::drawLine_40 (QPixmap& charsPixmap, uchar *characters, int dstX, int dstY)
+void Screen::drawLine_40 (uchar *characters, int dstX, int dstY)
 {
     QPainter painter (&m_screenBuffer) ;
 
+    quint8 RdAltChar = MAC->m_ss[0x01e] ;
+    QPixmap* cSet ;
+    if (RdAltChar) cSet = &m_pixmap_40ColumnAlternate ;
+    else           cSet = &m_pixmap_40ColumnPrimary ;
+
     for (int i=0; i<40; i++) {
-        int srcPixmapOffset = 16 * characters[i] ;              // draw a single character
-        painter.drawPixmap (dstX+(14*i)+2, dstY+2, charsPixmap, 0, srcPixmapOffset, 14, 16) ;
+        quint8 c =  characters[i] ;
+        if (m_flash && (RdAltChar == OFF) && (c > 0x3f) && (c < 0x80))  c -= 0x40 ;
+        int srcPixmapOffset = 16 * c ;              // draw a single character
+        painter.drawPixmap (dstX+(14*i)+2, dstY+2, *cSet, 0, srcPixmapOffset, 14, 16) ;
     }
 }
 
@@ -300,12 +310,57 @@ void Screen::draw40Column (int firstLine, quint8 *loresData)
     for (line=firstLine; line<24; line++) {
         y = h*line ;
         offSet = screen_RdTEXT_offsets[line] ;
-        drawLine_40 (m_pixmap_40ColumnPrimary16, loresData+offSet, 0, y) ;  // draw a line of 40 characters
+        drawLine_40 (loresData+offSet, 0, y) ;  // draw a line of 40 characters
     }
 
     QPainter painter ;
     painter.drawPixmap (QPoint(0,0), m_screenBuffer) ;
 
+}
+
+
+//   Draw a single 80-column line on the screen
+
+void Screen::drawLine_80 (QPixmap* charsPixmap, int x, int y, quint8 *main, quint8 *aux)
+{
+    int i, charOffM, charOffA, dest_xM, dest_xA ;
+    QPainter painter(&m_screenBuffer) ;
+
+    for (i=0; i<40; i++) {
+        charOffM = 16 * main[i] ;
+        charOffA = 16 * aux[i] ;
+        dest_xA = x + i*14 ;
+        dest_xM = dest_xA + 7 ;
+        painter.drawPixmap (dest_xA, y, *charsPixmap, 0, charOffA, 7, 16) ;
+        painter.drawPixmap (dest_xM, y, *charsPixmap, 0, charOffM, 7, 16) ;
+    }
+}
+
+
+
+//   Refresh 80-column text-only screen
+
+void Screen::draw80Column (int firstLine)
+{
+    int    h, line, off, x, y ;
+    quint8  *mainScreen, *auxScreen ;
+
+    quint8 RdAltChar = MAC->m_ss[0x01e] ;
+    QPixmap* cSet ;
+    if (RdAltChar) cSet = &m_pixmap_80ColumnAlternate ;
+    else           cSet = &m_pixmap_80ColumnPrimary ;
+
+    x = 0 ;
+    h = 16 ;
+
+    mainScreen = MAC->m_ram + 0x400 ;
+    auxScreen  = MAC->m_aux + 0x400 ;
+
+    for (line=firstLine; line<24; line++) {
+        y = h*line ;
+        off = screen_RdTEXT_offsets[line] ;
+        drawLine_80 (cSet, x, y, mainScreen+off, auxScreen+off) ;
+    }
 }
 
 
@@ -336,48 +391,6 @@ void Screen::drawLoRes (int nLines, quint8 *screen)
         }
     }
 
-}
-
-
-
-//   Draw a single 80-column line on the screen
-
-void Screen::drawLine_80 (QPixmap& charsPixmap, int x, int y, quint8 *main, quint8 *aux)
-{
-    int i, charOffM, charOffA, dest_xM, dest_xA ;
-    QPainter painter(&m_screenBuffer) ;
-
-    for (i=0; i<40; i++) {
-        charOffM = 16 * main[i] ;
-        charOffA = 16 * aux[i] ;
-        dest_xA = x + i*14 ;
-        dest_xM = dest_xA + 7 ;
-        painter.drawPixmap (dest_xA, y, charsPixmap, 0, charOffA, 7, 16) ;
-        painter.drawPixmap (dest_xM, y, charsPixmap, 0, charOffM, 7, 16) ;
-    }
-//    QWidget::update (x,y,  m_pixelsWidth, 16) ;
-}
-
-
-
-//   Refresh 80-column text-only screen
-
-void Screen::draw80Column (void)
-{
-    int    h, line, off, x, y ;
-    quint8  *mainScreen, *auxScreen ;
-
-    x = 0 ;
-    h = 16 ;
-
-    mainScreen = MAC->m_ram + 0x400 ;
-    auxScreen  = MAC->m_aux + 0x400 ;
-
-    for (line=0; line<24; line++) {
-        y = h*line ;
-        off = screen_RdTEXT_offsets[line] ;
-        drawLine_80 (m_pixmap_80ColumnPrimary16, x, y, mainScreen+off, auxScreen+off) ;
-    }
 }
 
 
@@ -556,9 +569,6 @@ void Screen::paintEvent (QPaintEvent* e)
 void Screen::refreshScreen (void)
 {
 //putchar('.'); fflush(stdout) ;
- //   int timeoutsPerSecond = 1000/m_timerPeriod ;  // NB: we depend on 'timeoutsPerSecond' being an multiple of 5
- //   if (--m_flashCounter == 0) m_flashCounter = timeoutsPerSecond ;
- //   if ((m_flashCounter%5) == 0) m_flash = !m_flash ;
 
     quint8  *loresData, *hiresData ;
 
@@ -566,8 +576,19 @@ void Screen::refreshScreen (void)
     quint8 rdMixed    = MAC->m_ss[0x01b] ;
     quint8 page2      = MAC->m_ss[0x01c] ;
     quint8 rdHiRes    = MAC->m_ss[0x01d] ;
+    quint8 RdAltChar  = MAC->m_ss[0x01e] ;
     quint8 rd80Col    = MAC->m_ss[0x01f] ;
     quint8 rdDblHiRes = MAC->m_ss[0x07f] ;
+
+    int flashCount = 5 ;
+    if (RdAltChar) {
+         m_flash = false ;               // (Nothing in alt.char set flashes.)
+    } else {
+        if (m_flashCounter-- <= 0) {
+             m_flashCounter = flashCount ;
+             m_flash = !m_flash ;
+        }
+    }
 
     if (page2) {
         loresData = MAC->m_ram+0x800 ;
@@ -596,7 +617,7 @@ void Screen::refreshScreen (void)
 
     if (rdText) {                     // RdTEXT
         if (rd80Col) {
-            draw80Column() ;
+            draw80Column (0) ;
         } else {
             draw40Column (0, loresData) ;
         }
@@ -604,7 +625,8 @@ void Screen::refreshScreen (void)
         if (rdHiRes) {         // hi-res
             if (rdMixed) {
                 drawHiRes (hiresData) ;
-                draw40Column (20, loresData) ;
+                if (rd80Col) draw80Column (20) ;
+                else         draw40Column (20, loresData) ;
             } else {
                 drawHiRes (hiresData) ;
             }

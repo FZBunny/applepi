@@ -25,17 +25,19 @@
 
 *****************************************************************************/
 
-
+//using namespace std ;
+//#include  <iomanip>
 
 #include "traptrace.h"
 #include "machine.h"
 
 
-
 TrapTrace::TrapTrace (MainWindow* parent) :  QDialog (parent)
 {
     this->setWindowTitle ("Trap and Trace") ;
-
+    
+    MAC->enableTrace (false) ;
+    
     m_parent = parent ;
     int width = 650 ;
     int height = 235 ;
@@ -45,7 +47,6 @@ TrapTrace::TrapTrace (MainWindow* parent) :  QDialog (parent)
     int x, y ;
     CENTER_DIALOG
     
-    this->setWindowTitle ("Trap & Trace") ;
     this->setAttribute (Qt::WA_DeleteOnClose) ;
 
     MAC->setTrapTraceDialogPointer (this) ;  // (machine has to know how to tell us a trap has been hit)
@@ -221,12 +222,14 @@ TrapTrace::TrapTrace (MainWindow* parent) :  QDialog (parent)
     m_traceStartBox->move (traceButton_X+20,traceStartBox_Y) ;
     m_traceStartBox->resize (addressBoxSize) ;
     m_traceStartBox->setAlignment (Qt::AlignCenter) ;
+    m_traceStartBox->setValidator (m_hexValidator) ;
     get16bitConfigData ((char*)"trace_start_address", m_traceStartBox) ;
 
     m_traceEndBox = new QLineEdit ("0000", box2) ;
     m_traceEndBox->move (traceButton_X+20,traceStartBox_Y+30) ;
     m_traceEndBox->resize (addressBoxSize) ;
     m_traceEndBox->setAlignment (Qt::AlignCenter) ;
+    m_traceEndBox->setValidator (m_hexValidator) ;
     get16bitConfigData ((char*)"trace_end_address", m_traceEndBox) ;
 
     m_ss_fetch_checkBox  = new QCheckBox ("Trace SS fetches", box2) ;
@@ -234,15 +237,18 @@ TrapTrace::TrapTrace (MainWindow* parent) :  QDialog (parent)
     m_ss_fetch_checkBox->move (ssTraceFetch_X, ssTraceFetch_Y) ;
     m_ss_store_checkBox->move (ssTraceFetch_X, ssTraceFetch_Y+25) ;
 
-    m_traceButton = new QPushButton  ("Start Trace", box2) ;
+    m_traceButton = new ApplepiButton  ("Start Trace", box2) ;
     m_traceButton->move (traceButton_X,traceStartBox_Y+75) ;
     m_traceButton->resize (buttonSize) ;
 
-    connect (m_ss_fetch_checkBox,   &QCheckBox::stateChanged, this, &TrapTrace::onSs_fetch_checkBox) ;
-    connect (m_ss_store_checkBox,   &QCheckBox::stateChanged, this, &TrapTrace::onSs_store_checkBox) ;
+    connect (m_ss_fetch_checkBox, &QCheckBox::stateChanged, this, &TrapTrace::onSs_fetch_checkBox) ;
+    connect (m_ss_store_checkBox, &QCheckBox::stateChanged, this, &TrapTrace::onSs_store_checkBox) ;
 
-    connect (m_traceStartBox, &QLineEdit::textEdited, this, &TrapTrace::onTraceStartEntered) ;
-    connect (m_traceEndBox,   &QLineEdit::textEdited, this, &TrapTrace::onTraceEndEntered) ;
+    connect (m_traceStartBox, &QLineEdit::textEdited,      this,  &TrapTrace::onTraceStartEdited) ;
+    connect (m_traceStartBox, &QLineEdit::editingFinished, this,  &TrapTrace::onTraceStartFinshed) ;
+
+    connect (m_traceEndBox, &QLineEdit::textEdited,      this,  &TrapTrace::onTraceEndEdited) ;
+    connect (m_traceEndBox, &QLineEdit::editingFinished, this,  &TrapTrace::onTraceEndFinshed) ;
 
     connect (m_traceButton,   &ApplepiButton::clicked, this, &TrapTrace::onTraceButtonClicked) ;
 
@@ -310,9 +316,11 @@ void TrapTrace::editAddress (QLineEdit* box)
 
 QString* TrapTrace::finishAddress (QLineEdit* box)
 {
-//printf ("finishAddress\n") ;
     QString* text = new QString (box->text()) ;
-    *text = text->toUpper() ;
+    quint16 value = text->toUShort (NULL, 16) ;
+    char buffer[8] ;
+    sprintf (buffer, "%4.4X", value) ;
+    *text = buffer ;
     box->selectAll() ;
     box->insert (*text) ;
 
@@ -471,26 +479,43 @@ void TrapTrace::onHistoryCheckBox (void)
 
 
 
-void TrapTrace::onTraceStartEntered (void)
+
+
+
+void TrapTrace::onTraceStartEdited (void)
 {
-    QString str = m_traceStartBox->text() ;
-    CFG->Set ("trace_start_address", str) ;
-    quint16 addr = str.toUShort (nullptr, 16) ;
+printf ("onTraceStartEdited\n") ;
+    editAddress (m_traceStartBox) ;
+}
+
+
+void TrapTrace::onTraceStartFinshed (void)
+{
+    QString* text = finishAddress (m_traceStartBox) ;
+    CFG->Set ("trace_start_address", *text) ;
+    quint16 addr = text->toUShort (nullptr, 16) ;
     MAC->setTraceStart (addr) ;
 }
 
 
-void TrapTrace::onTraceEndEntered (void)
+void TrapTrace::onTraceEndEdited (void)
 {
-    QString str = m_traceEndBox->text() ;
-    CFG->Set ("trace_end_address", str) ;
-    quint16 addr = str.toUShort (nullptr, 16) ;
+    editAddress (m_traceEndBox) ;
+}
+
+
+void TrapTrace::onTraceEndFinshed (void)
+{
+    QString* text = finishAddress (m_traceEndBox) ;
+    CFG->Set ("trace_end_address", *text) ;
+    quint16 addr = text->toUShort (nullptr, 16) ;
     MAC->setTraceEnd (addr) ;
 }
 
 
 void TrapTrace::onTraceButtonClicked (void)
 {
+printf ("onTraceButtonClicked: traceIsOn=%i\n", MAC->traceIsOn()) ;
     if (MAC->traceIsOn()) {
         MAC->enableTrace (false) ;
         m_traceButton->setText ("Start Trace") ;

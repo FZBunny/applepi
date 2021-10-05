@@ -97,7 +97,9 @@ void HdController::offsetKludge (void)
         if (buffer[n]==0x01 && buffer[n+1]==0x38 && buffer[n+2]==0xb0 && buffer[n+3]==0x003) break ;
     }
 
-    m_offset[m_driveIndex] = n ;
+    if (n < BLOCKSIZE-3) m_offset[m_driveIndex] = n ;
+    else                 m_offset[m_driveIndex] = 0 ; // If we don't find the starting bytes at all, just assume that it
+                                                      // starts with someting else at location 0.  (What else can we do?)
 }
 
 
@@ -209,9 +211,9 @@ int HdController::IO (void)
     quint8 operation = MAC->m_ram[0x42] ;
     if (MAC->m_ram[0x43] & 0x80) m_driveIndex = 1 ;
     else                         m_driveIndex = 0 ;
-//printf ("HdController::IO  operation=%i\n", operation) ;
+//ProcessorState *s = MAC->processorState() ;
+//printf ("HdController::IO  PC=%4.4X  operation=%i\n", s->pc.pc_16, operation) ;
     int stat = 0 ;
-//    m_file[m_driveIndex].ClearLastError() ;
 
     switch (operation) {
        case 0:                         // Status
@@ -261,6 +263,8 @@ int HdController::status (void)        //  (See 'ProDos Tech. Notes', note 21 fo
              // XXXXX FIXME:  I/O to main or aux RAM?   XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 int HdController::readBlock (quint16 offset, int block)
 {
+//ProcessorState *p = MAC->processorState() ;
+//printf ("1 readBlock  PC=%4.4x  block=%i, offset=%4.4X\n", p->pc.pc_16, block, offset) ;
     int n = 0 ;
     int stat = 0 ;
     headStepDelay (block) ;
@@ -278,6 +282,7 @@ int HdController::readBlock (quint16 offset, int block)
 
 int HdController::readBlock (quint8* buffer, int block, int driveIndex)
 {
+//printf ("2 readBlock  block=%i, driveIndex=%i\n", block, driveIndex) ;
     if (driveIndex < 0) driveIndex = 0 ;
     if (driveIndex > 1) driveIndex = 1 ;
     m_driveIndex = driveIndex ;
@@ -290,6 +295,7 @@ int HdController::readBlock (quint8* buffer, int block, int driveIndex)
         m_file[m_driveIndex].seek (block*BLOCKSIZE + m_offset[m_driveIndex]) ;
         n = m_file[m_driveIndex].read ((char*)buffer, BLOCKSIZE) ;
         if (n != BLOCKSIZE) stat = IOERROR ;
+//xdump (buffer, 256, 0) ;
     }
     return stat ;
 }
@@ -347,7 +353,7 @@ quint8 HdController::getDiskSize (quint8 byteNumber)
 
 void HdController::headStepDelay (int block)
 {
-    if (m_fileSize[m_driveIndex] < 90000) { // Is this a 3.5" floppy?
+//    if (m_fileSize[m_driveIndex] < 90000) { // Is this a 3.5" floppy?
         int newTrack = block/10 ;  // actually, there were 8-12 blocks/track; we just use an average...)
         if (newTrack > 800) newTrack -= 800 ;
 
@@ -357,9 +363,9 @@ void HdController::headStepDelay (int block)
         int ttseekTime = 10 ;      //  Track-to-track seek time  (10 ms IS JUST A GUESS!) XXXXX
         int totalMsec = ttseekTime * trackDelta ;
         quickSleep (1000*totalMsec) ;
-    } else {
-                                   //  Must be a hard drive;  should we insert any delays here? XXXXX
-    }
+//    } else {
+//                                   //  Must be a hard drive;  should we insert any delays here? XXXXX
+//    }
 }
 
 // XXXXXXXXXXXXXXXXXXXXXXX  SMARTPORT IS UNFINISHED XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX

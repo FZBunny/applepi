@@ -142,7 +142,7 @@ MainWindow::MainWindow (void)
     else              scaleButtonText = "Small Screen" ;
     m_scaleButton = new ApplepiButton (scaleButtonText, this) ;
 
-    m_scaleButtonKludge = 1 ;                                  // Choose which kludge to apply to the sceeen-scale
+    m_scaleButtonKludge = 2 ;                                  // Choose which kludge to apply to the sceeen-scale
                                                                // button; on some distros, the text overflows
     if (m_scaleButtonKludge == 1) {
         QFont sbFont = m_scaleButton->font() ;                 // 1... Embiggen the button to fit the text
@@ -305,7 +305,7 @@ QString MainWindow::installRom (void)
         }
     }
 
-    m_romLabel->setText (romLabel) ;
+    m_romLabel->setText (QString("Model:  ") + romLabel) ;
     return romLabel ;
 }
 

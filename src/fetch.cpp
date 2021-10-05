@@ -280,6 +280,7 @@ quint8 Machine::fetch_sspage (quint16 p)
                     break ;
                 case 0xe:                      // C01E  read ALTCHAR switch
                     c = RdALTCHAR ;
+//printf ("m_savedPC=%4.4X fetched RdALTCHAR\n", m_savedPC) ;
                     break ;
                 case 0xf:                      // C01F  read 80COL switch
                     c = Rd80COL ;
@@ -461,7 +462,7 @@ https://git.redump.net/mame/commit/?id=e019d58dfeb770c18c97a03275498bca9424d580
             c = fetchFloppy_5_25Inch (loNibble) ;
             break ;
         case 0xf:                 //  slot 7      C0F0 - C0FF
-printf ("Slot7 ss: fetch from %4.4X at PC=%4.4X\n", p, m_savedPC) ;
+//printf ("Slot7 ss: fetch from %4.4X at PC=%4.4X\n", p, m_savedPC) ;
             m_romSlot = 7 ;
             break ;
     }
@@ -514,7 +515,7 @@ void Machine::fetchFromBankSwitches (quint16 p)
 //qint8 Machine::fetchFloppy_5_25Inch (int loNibble) { return 0; } ;
 
 
-qint8 Machine::fetchFloppy_5_25Inch (int loNibble)  //  Read or write the 5-1/4" floppy drives
+qint8 Machine::fetchFloppy_5_25Inch (int loNibble)  //  Read or write a single byte from/to a 5-1/4" floppy drive
 {
     quint8 c = 0 ;
 
@@ -598,8 +599,7 @@ quint8 Machine::fetch_HD_ROM (int slotNumber, quint8 p)
         A = m_hardDrive->IO() ;
         if (A) P |= C ;
         else   P &= C ^ 0xff ;
-        c = RTS ;
-        return c ;
+        return RTS ;
     }
 
     // If the saved PC == our ROM entry point+3, it's a "smartport" call.

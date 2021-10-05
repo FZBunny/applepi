@@ -368,10 +368,6 @@ typedef struct HistoryEntry {
 #define ON  0xff
 #define OFF 0
 
-//#define APPLE2     0x38
-//#define APPLE2PLUS 0xea
-//#define APPLE2E    0x06
-
 #define FAKE_BRK 0xff
 
 #define HISTORY_LEN 100000
@@ -398,7 +394,7 @@ class Machine : public QThread
 public:
 
     Machine (MainWindow* parent) ;
-//    ~Machine(void) ;
+    ~Machine() {} ;
 
     void initialize (bool powerIsOn) ;
 
@@ -452,15 +448,12 @@ public:
 
 //    int  getHistoryIndex (void) ;
 
-    bool getProcessorState (int index, ProcessorState *h) ;
+    ProcessorState *processorState (void) ;
 
 
     FloppyDiskController* m_floppy ;
     
-    quint8 fetch (quint16 p) ; // Hack:  made public to allow use in 'floppy_controller.cpp' XXXXXX Fix me?  Or not? XXXXXX
-
-    bool     m_throttle ;        // Set to throttle CPU
-    uint     m_cpuSleep ;        // If  m_throttle, sleep this many milliSecs
+    quint8 fetch (quint16 p) ;  // Hack:  made public to allow use in 'floppy_controller.cpp' XXXXXX Fix me?  Or not? XXXXXX
 
     quint8  m_rom[0x10000] ;    // Our motherboard ROM
     quint8  m_ram[0x10000] ;    // Main RAM

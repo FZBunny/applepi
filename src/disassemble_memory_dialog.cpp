@@ -203,6 +203,7 @@ void DisassembleMemory::onDoItButtonClicked (void)
         }
     }
     printf ("\n") ;
+    fflush (stdout) ;
 
 }
 

@@ -27,6 +27,8 @@
 
 
 
+#ifndef ANALOG_INPUT_H
+#define ANALOG_INPUT_H
 
 
 class AnalogInput
@@ -58,4 +60,4 @@ private:
     int limitCycles[4] ;
 } ;
 
-
+#endif

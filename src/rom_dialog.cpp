@@ -75,6 +75,9 @@ RomDialog::RomDialog (MainWindow* parent) : QDialog (parent)
     m_apple2Plus      = new QRadioButton ("Apple][+",this) ;
     m_apple2e         = new QRadioButton ("Apple//e", this) ;
     m_apple2eEnhanced = new QRadioButton ("Apple//e enhanced", this) ;
+
+    m_apple2eEnhanced->setDisabled (true) ; // XXXXXXXXX  temporary until if figure out what is wrong XXXXXXXXXXXXXXX
+
     m_externalFile    = new QRadioButton ("Select an external ROM file", this) ;
 
     m_apple2->move (m_buttonX, m_buttonY) ;

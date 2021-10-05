@@ -96,7 +96,7 @@ private:
     void embarassingKludge(void) ;
 
     bool     checkDiskType (int driveIndex) ;
-    uint     logicalToPhysicalSector (void) ;
+    uint     logicalSector (void) ;
     uint     getFileOffset (void) ;
     quint8  addressData (quint8 xx, quint8 yy) ;
     quint8  read (void) ;
@@ -147,6 +147,9 @@ private:
     const quint8 m_dataProlog[3]    = {0xd5, 0xaa, 0xad} ;
     const quint8 m_epilogs[3]       = {0xde, 0xaa, 0xeb} ;
 
+    int m_delayByte ;
+    int m_delayInterSector ;
+    int m_delayPostAddress ;
 
     Machine* m_parent ;
 

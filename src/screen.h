@@ -54,10 +54,10 @@ public:
 private:
 
     void refreshScreen (void) ;
-    void drawLine_40 (QPixmap& srcCharsPixmap, quint8 *srcOffsetArray, int dstX, int dstY) ;
-    void drawLine_80 (QPixmap& characters, int x, int y, quint8 *main, quint8 *aux) ;
+    void drawLine_40 (quint8 *srcOffsetArray, int dstX, int dstY) ;
+    void drawLine_80 (QPixmap* characters, int x, int y, quint8 *main, quint8 *aux) ;
     void draw40Column (int firstLine, quint8 *screen) ;
-    void draw80Column (void) ;
+    void draw80Column (int firstLine) ;
     inline void put_7_bits (QPainter& painter, quint8* screenData, int x, int y, int col, int off) ;
     void drawLoRes (int nLines, quint8 *screen) ;
     void drawHiRes (quint8 *screen) ;
@@ -72,10 +72,15 @@ private:
     const int SLOW = 200 ;   // mSec delay for slow timer (for double hi-res)
     const int FAST = 50 ;    // "            " fast timer (for everything else)
 
+    bool      m_flash ;         // Flag for flashing characters on screen
+    int       m_flashCounter ;  // Counter for selecting which flash mask to apply
+
     uint     m_scale ;
     QPixmap  m_screenBuffer ;
-    QPixmap  m_pixmap_40ColumnPrimary16 ;
-    QPixmap  m_pixmap_80ColumnPrimary16 ;
+    QPixmap  m_pixmap_40ColumnPrimary ;
+    QPixmap  m_pixmap_40ColumnAlternate ;
+    QPixmap  m_pixmap_80ColumnPrimary ;
+    QPixmap  m_pixmap_80ColumnAlternate ;
     QPixmap  m_pixmap_xpm_hires_0 ;
     QPixmap  m_pixmap_xpm_hires_1 ;
     QPixmap  m_pixmap_empty_hires_line ;

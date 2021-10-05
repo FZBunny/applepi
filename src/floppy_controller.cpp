@@ -107,6 +107,9 @@ FloppyDiskController::FloppyDiskController (Machine* parent)
 // qStdOut() << "FloppyDiskController::FloppyDiskController    m_diskInDriveFlag[" << i << "]=" << m_diskInDriveFlag[i] << endl  << endl ;
     }
 
+    m_delayByte = 0 ;
+    m_delayInterSector  = 0 ;
+    m_delayPostAddress = 0 ;
     m_currentDrive = 0 ;
 }
 
@@ -659,7 +662,7 @@ BYTE CImageBase::ms_SectorNumber[NUM_SECTOR_ORDERS][0x10] =
 ****/
 
 
-uint FloppyDiskController::logicalToPhysicalSector (void)
+uint FloppyDiskController::logicalSector (void)
 {
     static const int  dos3LogicalToPhysicalSector[16] = {
         0, 13, 11,  9,  7,  5,  3,  1,
@@ -732,8 +735,19 @@ quint8 FloppyDiskController::read (void)
 //printf ("bix=%i\n", bix) ; fflush(stdout) ;
     static quint8  addrCsum0, addrCsum1 ;
 
+//    if (++m_delayByte < 2) {
+//        m_bufferIndex[m_currentDrive]-- ;
+//        return 0xff ;
+//    }
+    m_delayByte = 0 ;
+
     switch (bix) {
         case -17:
+//            if (++m_delayInterSector < 20) {
+//                m_bufferIndex[m_currentDrive]-- ;
+//                return 0 ;
+//            }
+//            m_delayInterSector = 0 ;
             c = 0xd5 ;                                 // address field prologue
             break ;
         case -16:
@@ -760,12 +774,12 @@ quint8 FloppyDiskController::read (void)
             addrCsum1 ^= c ;
             break ;
         case -10:                                      // sector
-            c = logicalToPhysicalSector() >> 1 ;
+            c = logicalSector() >> 1 ;
             c |= 0xaa ;
             addrCsum0 ^= c ;
             break ;
         case -9:
-            c = logicalToPhysicalSector() | 0xaa ;
+            c = logicalSector() | 0xaa ;
             addrCsum1 ^= c ;
             break ;
         case -8:                                       // address field checksum
@@ -784,6 +798,11 @@ quint8 FloppyDiskController::read (void)
             c = 0xeb ;
             break ;
         case -3:
+//            if (++m_delayPostAddress < 20) {
+//                m_bufferIndex[m_currentDrive]-- ;
+//                return 0xff ;
+//            }
+//            m_delayPostAddress = 0 ; */
             c = 0xd5 ;                                 // data field prologue
             break ;
         case -2:
@@ -794,7 +813,6 @@ quint8 FloppyDiskController::read (void)
             break ;
         case 0:                                        // *** data ***
             int i ;
-// qDebug() << "quint8 FloppyDiskController::read   m_currentDrive=" << m_currentDrive ;
             if (m_diskInDriveFlag[m_currentDrive] == false) {
                 c = 0 ;
             } else {
@@ -802,13 +820,9 @@ quint8 FloppyDiskController::read (void)
                 quint8* b = m_buffer[m_currentDrive] ;           // 'b' for Buffer
                 quint8* e = m_encodedBuffer[m_currentDrive] ;    // 'e' for Encoded buffer
                 int fileOffset = getFileOffset() ;
-// int tt2 = m_trackTimes2[m_currentDrive] ;
-// printf ("Read: track %2.2i sector %2.2i\n", m_trackTimes2[m_currentDrive]/2, m_sector[m_currentDrive]) ; fflush(stdout) ;
                 m_file[m_currentDrive].seek (fileOffset) ;
                 m_file[m_currentDrive].read ((char*)b, SECTORSIZE) ;
 
-//printf ("track %i sector %i\n", m_trackTimes2[m_currentDrive]/2, m_sector[m_currentDrive]) ; fflush(stdout) ;
-// xdump (b, SECTORSIZE, 0) ;
                 for (i=0; i<86; i++) {       // e[0] .. e[85]
                     c = 0 ;
                     if (b[i] & 2)    c |= 0x01 ;
@@ -834,7 +848,7 @@ quint8 FloppyDiskController::read (void)
                     csum ^= eor ;
                 }
                 e[i] = writeTranslateTable[csum] ;
-            }     // note drop thru to default...
+            }     // note drop thru to default; this is deliberate...
         default:  // cases 1..342 (fileOffset 342 is the data field checksum)
 DBUG(0x1000) ("Q6L  reading;  m_bufferIndex = %4d;  c=%2.2X\n", m_bufferIndex[m_currentDrive], c) ;
             if ((bix<-18) || (bix>345)) {
@@ -856,6 +870,7 @@ DBUG(0x1000) ("Q6L  reading;  m_bufferIndex = %4d;  c=%2.2X\n", m_bufferIndex[m_
             if (m_sector[m_currentDrive] > 15) {
                 m_sector[m_currentDrive] = 0 ;
             }
+//printf ("track %i new (m_sector[%i]=%i\n", m_trackTimes2[m_currentDrive]/2, m_currentDrive, m_sector[m_currentDrive]) ;
             break ;
     }
 
@@ -959,7 +974,6 @@ DBUG(0x1000) ("Q6L  writing;  bix = %4d;  c=%2.2X\n", bix, c) ;
                     m_dataPrologCounter++ ;
                     m_writingData = true ;
                     m_bufferIndex[m_currentDrive] = 0 ;
-//printf ("m_writingData is true\n") ;
                     return ;
                 }
                 break ;
@@ -1024,7 +1038,7 @@ DBUG(0x1000) ("Q6L  writing;  bix = %4d;  c=%2.2X\n", bix, c) ;
 }
 
 
-//     Read or write data
+//     Read or write a single byte of data
 
 unsigned char FloppyDiskController::Q6L (void)
 {

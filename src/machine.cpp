@@ -75,12 +75,6 @@ Machine::Machine (MainWindow* parent)
     }
 }
 
-/***
-Machine::~Machine (void)
-{
-
-}
-***/
 
 void Machine::initialize (bool power)
 {
@@ -2071,10 +2065,6 @@ void Machine::run (void)
         }
         
         if (m_trace && (m_savedPC >= m_tracelo) && (m_savedPC <= m_tracehi)) {
-//if ((m_savedPC>=0xc27d) && (m_savedPC<=0xc28e)) continue ;    // XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-//if ((m_savedPC>=0xfca8) && (m_savedPC<=0xfcb3)) continue ;
-//if ((m_savedPC>=0xc600) && (m_savedPC<=0xc6ff)) continue ;
-//if ((m_savedPC>=0x159d) && (m_savedPC<=0x15a0)) continue ;
             quint8 opcode = fetch (m_savedPC) ;
             quint8 c1     = fetch (m_savedPC+1) ;
             quint8 c2     = fetch (m_savedPC+2) ;
@@ -2093,13 +2083,10 @@ void Machine::run (void)
 //}
 
 
-/***
-bool Machine::getProcessorState (int index, ProcessorState *h)
-{
-    if (index<0 || index>=HISTORY_LEN) return false ;
 
-    *h = m_history[index] ;
-    return true ;
+ProcessorState* Machine::processorState (void)
+{
+   return &m_registers ;
 }
-***/
+
 

@@ -268,9 +268,11 @@ void Machine::store_sspage (quint8 c, quint16 p)
                     break ;
                 case 0xe:                      // C00E  RdALTCHAR off (primary character set)
                     RdALTCHAR = OFF ;
+//printf ("m_savedPC=%4.4X stored CLRALTCHAR\n", m_savedPC) ;
                     break ;
                 case 0xf:                      // C00F  RdALTCHAR on  (alternate character set)
                     RdALTCHAR = ON ;
+//printf ("m_savedPC=%4.4X stored SETALTCHAR\n", m_savedPC) ;
                     break ;
             }
             break ;
