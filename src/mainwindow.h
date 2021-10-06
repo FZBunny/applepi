@@ -117,6 +117,7 @@ private:
     QLabel* m_romLabel ;
 
     QTimer*  m_floppyCheckTimer ;
+    QTimer*  m_oneSecondTimer ;
 
     int    m_floppyMotorCountDown[2] ;
     int    m_HDActivityCountDown[2] ;
@@ -205,6 +206,7 @@ private:
     void setCPuTimer (void) ;
 
     void onDiskDriveCheckTimer (void) ;
+    void setProdosDateTime (void) ;
 
     void onSelectRom      (void) ;
     void onUseInternalRom (void) ;

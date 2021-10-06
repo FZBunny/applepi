@@ -68,6 +68,7 @@ private:
     QRadioButton*  m_apple2e ;
     QRadioButton*  m_apple2eEnhanced ;
     QRadioButton*  m_externalFile ;
+    QRadioButton*  m_buttonOnEntry ;
 
     QPushButton*   m_fileButton ;
     QPushButton*   m_cancelButton ;

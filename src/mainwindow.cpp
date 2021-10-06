@@ -42,6 +42,8 @@ using namespace std ;
 #include <QPushButton>
 #include <QKeyEvent>
 #include <QDebug>
+#include <QDate>
+#include <QTime>
 
 #include "defs.h"
 #include "machine.h"
@@ -197,8 +199,11 @@ MainWindow::MainWindow (void)
 
     m_floppyCheckTimer = new QTimer() ;
     connect (m_floppyCheckTimer, &QTimer::timeout, this, &MainWindow::onDiskDriveCheckTimer) ;
-
     m_floppyCheckTimer->start (200) ;
+
+    m_oneSecondTimer = new QTimer() ;
+    connect (m_oneSecondTimer, &QTimer::timeout, this, &MainWindow::setProdosDateTime) ;
+    m_oneSecondTimer->start (1000) ;
 
     m_floppyMotorCountDown[0] = 0 ;
     m_floppyMotorCountDown[1] = 0 ;
@@ -625,6 +630,35 @@ void MainWindow::onDiskDriveCheckTimer (void)
         if (m_HDActivityCountDown[1] == 0) m_hd2Button->setIcon (m_led_dim_red) ;
     }
 
+}
+
+
+// Just a gimmick to maintain correct time & date for ProDOS...
+// (This is run by "m_oneSecondTimer" once every second.)
+
+void MainWindow::setProdosDateTime (void)
+{
+    QTime timeOfDay = QTime::currentTime() ;
+    if (timeOfDay.second() == 0) {
+        quint8* p = MAC->m_ram ;
+        static const quint8 JMP = 0x4c ;
+        if ((p[0xbf00] == JMP)                   // Are we running ProDOS?
+            && (p[0xbf03] == JMP)
+            && (p[0xbf09] == JMP)
+            && (p[0xbf0c] == JMP) ) {            // ... almost certainly.
+            QDate date = QDate::currentDate() ;  // (See ProDOS 8 Tech.Ref.Manual page 106)
+            int year = date.year() ;
+            year = year % 100 ;                  // Only last 2 digits of year are used.
+            quint8 byte = (year & 0x7f) << 1 ;
+            byte |= date.month() >> 3 ;
+            p[0xbf91] = byte ;
+            byte = ((date.month() << 5) & 0xe0) | date.day() ;
+            p[0xbf90] = byte ;
+            p[0xbf93] = timeOfDay.hour() ;
+            p[0xbf92] = timeOfDay.minute() ;
+//printf ("%2.2x %2.2x   %2.2x %2.2x\n", p[0xbf90], p[0xbf91], p[0xbf92], p[0xbf93]) ;
+        }
+    }
 }
 
 

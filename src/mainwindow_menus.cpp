@@ -74,10 +74,12 @@ void MainWindow::createMenus (void)
 // "Edit" menu  ------------------------------------
 
     m_copyText = new QAction (tr("Copy Screen Text to Clipboard"), this) ;
+    m_copyText->setShortcut (QKeySequence(tr("Ctrl+c"))) ;
     m_editMenu->addAction (m_copyText) ;
     connect (m_copyText, &QAction::triggered, this, &MainWindow::onCopyScreen) ;
 
     m_pasteTextToKeyboardInput = new QAction (tr("Paste Text to Keyboard"), this) ;
+    m_pasteTextToKeyboardInput->setShortcut (QKeySequence(tr("Ctrl+v"))) ;
     m_editMenu->addAction (m_pasteTextToKeyboardInput) ;
     connect (m_pasteTextToKeyboardInput, &QAction::triggered, this, &MainWindow::pasteToKeyboard) ;
 

@@ -407,6 +407,7 @@ void TrapTrace::onLinesToDumpEntered (void)
 void TrapTrace::onSingleStepClicked (void)
 {
     MAC->singleStep() ;
+    fflush (stdout) ;
 }
 
 

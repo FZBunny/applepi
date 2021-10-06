@@ -76,7 +76,7 @@ RomDialog::RomDialog (MainWindow* parent) : QDialog (parent)
     m_apple2e         = new QRadioButton ("Apple//e", this) ;
     m_apple2eEnhanced = new QRadioButton ("Apple//e enhanced", this) ;
 
-    m_apple2eEnhanced->setDisabled (true) ; // XXXXXXXXX  temporary until if figure out what is wrong XXXXXXXXXXXXXXX
+//    m_apple2eEnhanced->setDisabled (true) ; // XXXXXXXXX  temporary until if figure out what is wrong XXXXXXXXXXXXXXX
 
     m_externalFile    = new QRadioButton ("Select an external ROM file", this) ;
 
@@ -124,23 +124,29 @@ RomDialog::RomDialog (MainWindow* parent) : QDialog (parent)
         switch (m_internalRomNumber) {
           case APPLE2:
             m_apple2->setChecked(true) ;
+            m_buttonOnEntry = m_apple2 ;
             break ;
           case APPLE2PLUS:
             m_apple2Plus->setChecked(true) ;
+            m_buttonOnEntry = m_apple2Plus ;
             break ;
           case APPLE2E:
             m_apple2e->setChecked(true) ;
+            m_buttonOnEntry = m_apple2e ;
             break ;
           case APPLE2E_ENHANCED:
             m_apple2eEnhanced->setChecked(true) ;
+            m_buttonOnEntry = m_apple2eEnhanced ;
             break ;
           default:
             m_apple2e->setChecked(true) ;
+             m_buttonOnEntry = m_apple2e ;
             break ;
         }
     } else {
         m_fileButton->setEnabled(true) ;
         m_externalFile->setChecked(true) ;
+        m_buttonOnEntry = m_externalFile ;
     }
 
     connect (m_apple2,          &QRadioButton::toggled, this, &RomDialog::onApple2Original) ;
@@ -204,12 +210,14 @@ void RomDialog::onSelectRomFile (void)
     QString filter ("ROM files (*.ROM *.rom *.BIN *.bin);;Any *") ;
     QString test = QFileDialog::getOpenFileName (this, "Open a 5.25\" floppy disk image", m_romPath, filter) ;
     if (test.length()) {
-printf ("test.length()=%i\n", test.length()) ;
+//printf ("test.length()=%i\n", test.length()) ;
         m_romPath = test ;
         QFileInfo fInfo (m_romPath) ;
         QString name (fInfo.fileName()) ;
         m_romFileName->setText (name) ;
         centerFileName() ;
+    } else {
+        m_buttonOnEntry->setChecked (true) ;
     }
 }
 

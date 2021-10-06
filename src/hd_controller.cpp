@@ -56,10 +56,7 @@ HdController::HdController (Machine* parent)
     CFG->Get ("hd1_volume_path", &m_configuredPath[0]) ;
     CFG->Get ("hd2_volume_path", &m_configuredPath[1]) ;
 
-// qStdOut() << "HdController::HdController " << m_configuredPath[0] << "; drive " << 1 << endl ;
     if (m_configuredPath[0].length()) open (m_configuredPath[0], 0) ;
-
-// qStdOut() << "HdController::HdController " << m_configuredPath[1] << "; drive " << 2 << endl ;
     if (m_configuredPath[1].length()) open (m_configuredPath[1], 1) ;
 }
 
@@ -72,12 +69,12 @@ HdController::HdController (Machine* parent)
 //  For reasons I cannot comprehend, some hard-drive disk images found 
 //  on the web contain mystery junk(?) before the disk boot blocks.
 //  The length of this junk seems to be unpredictable.
-//  So:  we search for the 4 bytes we expect to see as the 1st 4 bytes
+//  So:  we search for the 3 bytes we expect to see as the 1st 4 bytes
 //  the disk:
 //
 //  01      DB   #$01
 //  38      SEC
-//  b0 03   BCS  $0807
+//  b0 xx   BCS  $xxxx
 //
 //  The offset of the "01" byte is saved for use when seeking before
 //  read & writes:  "seek (block*BLOCKSIZE + m_offset[m_driveIndex])"
@@ -93,13 +90,13 @@ void HdController::offsetKludge (void)
         n = m_file[m_driveIndex].read ((char*)buffer, BLOCKSIZE) ;
     }
 
-    for (n=0; n<BLOCKSIZE-3; n++) {
-        if (buffer[n]==0x01 && buffer[n+1]==0x38 && buffer[n+2]==0xb0 && buffer[n+3]==0x003) break ;
+    for (n=0; n<BLOCKSIZE; n++) {
+        if (buffer[n]==0x01 && buffer[n+1]==0x38 && buffer[n+2]==0xb0) break ;
     }
 
-    if (n < BLOCKSIZE-3) m_offset[m_driveIndex] = n ;
-    else                 m_offset[m_driveIndex] = 0 ; // If we don't find the starting bytes at all, just assume that it
-                                                      // starts with someting else at location 0.  (What else can we do?)
+    if (n < BLOCKSIZE) m_offset[m_driveIndex] = n ;
+    else               m_offset[m_driveIndex] = 0 ; // If we don't find the starting bytes at all, just assume that it
+                                                    // starts with someting else at location 0.  (What else can we do?)
 }
 
 
@@ -206,12 +203,12 @@ bool HdController::create (QString &path, int drive, int nBlocks)
 
 int HdController::IO (void)
 {
+
     quint16 buffer = MAC->m_ram[0x45]<<8 | MAC->m_ram[0x44] ;
     int block  = MAC->m_ram[0x47]<<8 | MAC->m_ram[0x46] ;
     quint8 operation = MAC->m_ram[0x42] ;
     if (MAC->m_ram[0x43] & 0x80) m_driveIndex = 1 ;
     else                         m_driveIndex = 0 ;
-//ProcessorState *s = MAC->processorState() ;
 //printf ("HdController::IO  PC=%4.4X  operation=%i\n", s->pc.pc_16, operation) ;
     int stat = 0 ;
 
@@ -222,7 +219,8 @@ int HdController::IO (void)
        case 1:                         // Read
           m_parent->m_parent->HDActivityStarted (m_driveIndex) ;
           stat = readBlock (buffer, block) ;
-//printf ("read: buffer=%4.4x block=%4.4x stat=%i\n", buffer, block, stat) ;
+//ProcessorState *s = MAC->processorState() ;
+//printf ("read: PC=%4.4X  buffer=%4.4x block=%4.4x stat=%i\n", s->pc.pc_16, buffer, block, stat) ;
           break ;
        case 2:                         // Write
           m_parent->m_parent->HDActivityStarted (m_driveIndex) ;
