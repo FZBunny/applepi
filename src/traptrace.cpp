@@ -251,7 +251,6 @@ TrapTrace::TrapTrace (MainWindow* parent) :  QDialog (parent)
     connect (m_traceEndBox, &QLineEdit::editingFinished, this,  &TrapTrace::onTraceEndFinshed) ;
 
     connect (m_traceButton,   &ApplepiButton::clicked, this, &TrapTrace::onTraceButtonClicked) ;
-
 }
 
 
@@ -481,8 +480,6 @@ void TrapTrace::onHistoryCheckBox (void)
 
 
 
-
-
 void TrapTrace::onTraceStartEdited (void)
 {
 printf ("onTraceStartEdited\n") ;
@@ -516,7 +513,6 @@ void TrapTrace::onTraceEndFinshed (void)
 
 void TrapTrace::onTraceButtonClicked (void)
 {
-printf ("onTraceButtonClicked: traceIsOn=%i\n", MAC->traceIsOn()) ;
     if (MAC->traceIsOn()) {
         MAC->enableTrace (false) ;
         m_traceButton->setText ("Start Trace") ;

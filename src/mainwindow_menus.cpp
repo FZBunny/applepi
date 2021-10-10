@@ -304,7 +304,6 @@ void MainWindow::onTrapTrace (void)
     TrapTrace *trapTrace = new TrapTrace (this) ;
     trapTrace->show() ;
 
-    MAC->enableTrace(true) ;            // Tell the CPU that trapping & tracing is permitted.
 }
 
 

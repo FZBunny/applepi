@@ -610,7 +610,7 @@ void Screen::refreshScreen (void)
          && rd80Col)
     {
         if (m_refreshTimer->interval() == FAST) {    // Use a slow refresh speed when displaying double hi-res to
-             m_refreshTimer->setInterval (SLOW) ;    // let Raspberry Pi machines run at less than 100% CPU usage
+             m_refreshTimer->setInterval (SLOW) ;    // give Raspberry Pi CPUs a break.
         }
         writeDoubleHiRes (page2) ;
         QWidget::update (this->rect()) ;
@@ -621,7 +621,7 @@ void Screen::refreshScreen (void)
         }
     }
 
-    if (rdText) {                     // RdTEXT
+    if (rdText) {                     // TEXT
         if (rd80Col) {
             draw80Column (0) ;
         } else {

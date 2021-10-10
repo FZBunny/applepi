@@ -43,55 +43,57 @@
 
 class DisassembleMemory: public QDialog
 {
-    public:
+public:
 
-        DisassembleMemory (QWidget* parent) ;
-        virtual ~DisassembleMemory() {} ;
-
-
-    private:
-
-     //   void  fixTextField   (QLineEdit* ctrl, wxKeyEvent& event, char* cfgKey) ;
-
-        void  cleanupAddress (QLineEdit* text) ;
-
-        void  onStartEntered (void) ;
-        void  onEndEntered   (void) ;
-        void  onDoItButtonClicked (void) ;
-
-        void  get16bitConfigData (char* key, QLineEdit* box) ;
-        void  getBoolConfigData  (char* key, QCheckBox* box) ;
-        
-        QRegExpValidator* m_hexValidator ;
-        QWidget*      m_radioBox1 ;
-        QRadioButton* m_mainButton ;
-        QRadioButton* m_auxButton ;
-        QRadioButton* m_romButton ;
-        QRadioButton* m_nIstructions ;
-        QRadioButton* m_nBytes ;
-        QRadioButton* m_thisAddress ;
-
-        QWidget*  m_radioBox2 ;
-
-        QPushButton* m_doItButton ;
-
-        QLineEdit*  m_startBox ;
-        QLineEdit*  m_endBox ;
+    DisassembleMemory (QWidget* parent) ;
+    virtual ~DisassembleMemory() {} ;
 
 
-        QLabel*     m_startText ;
-        QLabel*     m_endText ;
+private:
 
-        quint16     m_startAddr ;
-        int         m_lineHeight ;
-        int         m_historyIndex ;
-        int         m_nLines ;
-        QFont      *m_panelFont ;
-        QPixmap     m_bufferBits ;
+    void cleanupAddress (QLineEdit* text) ;
 
-        Disassembler *m_disassembler ;
+    void onDoItButtonClicked (void) ;
 
-};
+    void editAddress (QLineEdit* box) ;
+    void onStartEdited   (void) ;
+    void onStartFinished (void) ;
+    void onEndEdited     (void) ;
+    void onEndFinished   (void) ;
+
+    void get16bitConfigData (char* key, QLineEdit* box) ;
+    void getBoolConfigData  (char* key, QCheckBox* box) ;
+    
+    QRegExpValidator* m_hexValidator ;
+    QWidget*      m_radioBox1 ;
+    QRadioButton* m_mainButton ;
+    QRadioButton* m_auxButton ;
+    QRadioButton* m_romButton ;
+    QRadioButton* m_nIstructions ;
+    QRadioButton* m_nBytes ;
+    QRadioButton* m_thisAddress ;
+
+    QWidget*      m_radioBox2 ;
+
+    ApplepiButton* m_doItButton ;
+
+    QLineEdit*  m_startBox ;
+    QLineEdit*  m_endBox ;
+
+
+    QLabel*     m_startText ;
+    QLabel*     m_endText ;
+
+    quint16     m_startAddr ;
+    int         m_lineHeight ;
+    int         m_historyIndex ;
+    int         m_nLines ;
+    QFont      *m_panelFont ;
+    QPixmap     m_bufferBits ;
+
+    Disassembler *m_disassembler ;
+
+} ;
 
 #endif
 

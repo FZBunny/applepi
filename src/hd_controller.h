@@ -34,8 +34,12 @@
 //#include <wx/string.h>
 //#include <wx/filename.h>
 
+#include <QtGlobal>
+#include <QFile>
+#include <QFileInfo>
+
 //#include "mainwindow.h"
-#include "machine.h"
+//#include "machine.h"
 
 class Machine ;
 
@@ -48,8 +52,10 @@ public:
     HdController (Machine* parent) ;
     ~HdController(void) ;
 
+    quint8 fetch_HD_ROM (int slotNumber, quint8 loByte) ; // called from Machine::fetch
+
     bool open   (QString &path, int driveIndex) ;
-    bool  create (QString &path, int drive, int size) ;
+    bool create (QString &path, int drive, int size) ;
     void close  (void) ;
     void close (int drive) ;
     bool isOpen (void) ;
@@ -78,6 +84,7 @@ private:
     const int NODEVICE  = 0x28 ;
     const int WRITE_PROTECTED = 0x2b ;
 
+bool        m_p_is_4 ;
     int         m_driveIndex ;
     QFile       m_file[2] ;
     QFileInfo   m_fileInfo[2] ;

@@ -75,22 +75,26 @@ Config::Config() : QSettings (QSettings::NativeFormat, QSettings::UserScope, "ap
         QString yes("yes") ;
         QString zeros("0000") ;
         QString ffff ("FFFF") ;
+        QString tmpStr ("10,10") ;
 
         Set ("check-key",  checkValue) ;
-        QString tmpStr ("10,10") ;
-        Set ("window_position", tmpStr) ;
-//        Set (QString("window_size"),     QSize(MIN_MAINWINDOW_WIDTH,MIN_MAINWINDOW_HEIGHT)) ;
-        Set (QString("window_scale"), (uint)1) ;
-        Set ("use_internal_rom", yes) ;
-        Set ("internal_rom_number", (uint)2) ;
-        Set ("rom_path", defaultDir) ;
+        Set ("disassemble_start_address", zeros) ;
+        Set ("disassemble_end", zeros) ;
+//        Set ("disassemble_mem_type", uint(1)) ;
+//        Set ("disassemble_end_criterion", uint(1)) ;
+        Set ("history_dump", (uint)0) ;
+        tmpStr = "0" ;
         Set ("floppy1_path", defaultDir) ;
         Set ("floppy2_path", defaultDir) ;
         Set ("hd1_volume_path", defaultDir) ;
         Set ("hd2_volume_path", defaultDir) ;
+        Set ("internal_rom_number", (uint)2) ;
+        Set ("lines2dump", tmpStr) ;
+        Set ("rom_path", defaultDir) ;
+        Set ("speaker_volume", (uint)20) ;
         Set ("tape_path",    defaultDir) ;
-        Set ("text_echo_path", defaultDir) ;
         Set ("tape_write_protect",    (uint)0) ;
+        Set ("text_echo_path", defaultDir) ;
         Set ("trace_start_address", zeros) ;
         Set ("trace_end_address",   ffff) ;
         Set ("trap0_address", zeros) ;
@@ -101,13 +105,10 @@ Config::Config() : QSettings (QSettings::NativeFormat, QSettings::UserScope, "ap
         Set ("trap1_enable",  (uint)0) ;
         Set ("trap2_enable",  (uint)0) ;
         Set ("trap3_enable",  (uint)0) ;
-        tmpStr = "0" ;
-        Set ("lines2dump", tmpStr) ;
         Set ("text_echo_path", defaultDir) ;
-        Set ("history_dump", (uint)0) ;
-        Set ("disassemble_start_address", zeros) ;
-        Set ("disassemble_end", zeros) ;
-        Set ("speaker_volume", (uint)20) ;
+        Set ("use_internal_rom", yes) ;
+        Set ("window_position", tmpStr) ;
+        Set ("window_scale", (uint)1) ;
 
         m_settings->sync() ;
     }

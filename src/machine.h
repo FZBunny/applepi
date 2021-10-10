@@ -428,9 +428,6 @@ public:
     void ss_setFetchSnoop (bool flag) ;
     void ss_setStoreSnoop (bool flag) ;
 
-    quint8 fetch_HD_ROM (int slotNumber, quint8 p) ;
-    quint8 fetch_HD_ROM (void) ;
-
     qint8  fetchFloppy_5_25Inch (int loNibble) ;
     void   storeFloppy_5_25Inch (quint8 offset, quint8 c) ;
 
@@ -445,15 +442,15 @@ public:
     void setFloppySound (quint8& sound, int  len) ;
     bool getFloppySound (quint8* sound, int* len) ;
 
-
-//    int  getHistoryIndex (void) ;
-
     ProcessorState *processorState (void) ;
+    quint16 savedPC (void) ;
 
 
     FloppyDiskController* m_floppy ;
     
     quint8 fetch (quint16 p) ;  // Hack:  made public to allow use in 'floppy_controller.cpp' XXXXXX Fix me?  Or not? XXXXXX
+    quint8* lower48k (quint16 p, bool write) ;
+    quint8* store_highMem (quint16 p) ;
 
     quint8  m_rom[0x10000] ;    // Our motherboard ROM
     quint8  m_ram[0x10000] ;    // Main RAM
@@ -469,36 +466,23 @@ private:
 //    virtual void *Entry (void) ;
 
     void run (void) ;
+    void cycles (int n) ;
 
     void addmem (quint16 p) ;
     void submem (quint16 p) ;
 
     void dumpHistory (void) ;
 
-    void cycles (int n) ;
-//    quint64  microseconds (void) ;
-
-// void fudgeStartTime (void) ;
-
-//    void captureCout(quint16 c) ;
-//    void closeCapture(void) ;
-
-//    void closeSlot1Out() ;
-//    void closeSlot1In(void) ;
-
-    quint8* lower48k (quint16 p, bool write) ;
-
     quint8  fetch_sspage (quint16 p) ;
     quint8  fetch_lower48k (quint16 p) ;
     quint8  fetch_ioSpace (quint16 p) ;
     void    ss_fetch_snoop (quint16 p) ;
-    quint8  fetch_highMem (quint16 p) ;
+    quint8* fetch_highMem (quint16 p) ;
     void    fetchFromBankSwitches (quint16 p) ;
     void    storeToBankSwitches (quint16 p) ;
 
     void    store (quint8 c, quint16 p) ;
     void    store_ioSpace (quint8 c, quint16 p) ;
-    void    store_highMem (quint8 c, quint16 p) ;
     void    store_sspage (quint8 c, quint16 p) ;
     void    ss_store_snoop (quint8, quint16 p) ;
     void    printInstruction (quint8 opcode, quint8 c1, quint8 c2) ;
@@ -557,7 +541,7 @@ private:
     HistoryEntry   m_history [HISTORY_LEN] ;
 
     int            m_romSlot ;            // slot# of active peripheral card; 0 if none enabled.
-    quint8*       m_slotRomPointer ;     // pointer to the active peripheral ROM; used for ROM addresses $c800-$cfff
+    quint8*        m_slotRomPointer ;     // pointer to the active peripheral ROM; used for ROM addresses $c800-$cfff
 
 } ;
 

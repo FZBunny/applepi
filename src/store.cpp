@@ -77,28 +77,25 @@ void Machine::store (quint8 c, quint16 p)
         return ;
     }
 
-    store_highMem (c, p) ;            // d000 - ffff   Bank-switched area
+    *store_highMem(p) = c ;          // d000 - ffff   ank-switched area
 
 }
 
 
-void Machine::store_highMem (quint8 c, quint16 p)
+// Address is in range $D000 - $FFFF
+// Return a pointer to main or auxiliary RAM, or NULL if attempting to store to ROM.
+
+quint8* Machine::store_highMem (quint16 p)  // (p = d000...ffff)
 {
-    quint8*      memory = m_ram ;
-    if (RdALTZP)  memory = m_aux ;
+    quint8*       memory = m_ram + p ;
+    if (RdALTZP)  memory = m_aux + p ;
 
     if (m_highRamWrite) {
-        if (p < 0xE000) {
-            if (RdBNK2) {
-                memory[p - 0x1000] = c ;
-            } else {
-                memory[p] = c ;
-            }
-        } else {
-            memory[p] = c ;
-        }
+        if (RdBNK2 && (p < 0xE000)) memory -= 0x1000 ;  // map c000-cfff to d000-dfff
+    } else {
+        memory = NULL ;
     }
-
+    return memory ;
 }
 
 
@@ -193,11 +190,10 @@ void Machine::store_ioSpace (quint8 c, quint16 p)
         store_sspage (c,p) ;
     } else {
         if (p == 0xcfff) {         // (Reference of 0xCFFF turns off all peripheral ROM in range 0xC800-0xCFFE)
-//printf ("0xCFFF stored to at %4.4X\n", m_savedPC) ;
             m_romSlot = 0 ;
             RdSLOTCXROM = OFF ;
         } else {
-            printf ("PC=%4.4X  : ** ILLEGAL store of c=%2.2X to ROM near %4.4X\n", PC, c, p) ;
+            printf ("*** ILLEGAL store at PC=%4.4X: tried to store c=%2.2X to ROM at %4.4X\n", PC, c, p) ;
         }
     }
 }
@@ -207,18 +203,13 @@ void Machine::store_ioSpace (quint8 c, quint16 p)
 
 void Machine::store_sspage (quint8 c, quint16 p)
 {
-    if ((p < 0xc000) || (p > 0xc0ff)) {
-        printf ("Bad call to store_sspage near PC=0x%4.4X, to loc=0x%4.4X\n", PC, p) ;
-        return ;
-    }
-
     if (m_snoopSSStores) ss_store_snoop (c, p) ;
 
     int hiNibble = (p & 0x00f0) >> 4 ;
     int loNibble = p & 0x000f ;
 
     switch (hiNibble) {
-        case 0:                                // C000 .. C00F :        These switches are write-only.
+        case 0:                                // C000 .. C00F :        These switches are write-only (except C000)
             switch (loNibble) {
                 case 0:                        // C000  Rd80STORE off (enables $C002-$C005 for aux ram)
                     Rd80STORE = OFF ;
@@ -242,7 +233,7 @@ void Machine::store_sspage (quint8 c, quint16 p)
                     RdSLOTCXROM = OFF ;
 //printf ("X on  pc=%4.4X\n", m_savedPC) ;
                     break ;
-                case 7:                        // C007  SETINTCXROM  (read internal rom $C100-$CFFF)
+                case 7:                        // C007  SETINTCXROM   (read internal rom $C100-$CFFF)
                     RdSLOTCXROM = ON ;
 //printf ("X off pc=%4.4X\n", m_savedPC) ;
                     break ;
@@ -252,18 +243,18 @@ void Machine::store_sspage (quint8 c, quint16 p)
                 case 9:                        // C009  ALTZP on      (aux. stack and zero page)
                     RdALTZP = ON ;
                     break ;
-                case 0xa:                      // C00A  RdC3ROM off  (rom in slot 3)
+                case 0xa:                      // C00A  RdC3ROM off   (rom in slot 3)
 //printf ("set C3 off pc=%4.4x\n", m_savedPC) ;
                     RdC3ROM = OFF ;
                     break ;
-                case 0xb:                      // C00B  RdC3ROM on   (internal rom)
+                case 0xb:                      // C00B  RdC3ROM on    (internal rom)
 //printf ("set C3 on  pc=%4.4x\n", m_savedPC) ;
                     RdC3ROM = ON ;
                     break ;
-                case 0xc:                      // C00C  Rd80COL off  (40 column display)
+                case 0xc:                      // C00C  Rd80COL off   (40 column display)
                     Rd80COL = OFF ;
                     break ;
-                case 0xd:                      // C00D  Rd80COL on   (80 column display)
+                case 0xd:                      // C00D  Rd80COL on    (80 column display)
                     Rd80COL = ON ;
                     break ;
                 case 0xe:                      // C00E  RdALTCHAR off (primary character set)

@@ -64,6 +64,8 @@ quint8 Machine::fetch (quint16 p)
 {
 
 // return m_rom[p] ; // =============== Uncomment to run CPU-test ROMS ====================
+// Go to  https://github.com/Klaus2m5/6502_65C02_functional_tests/blob/master/bin_files/65C02_extended_opcodes_test.lst
+// for test-rom image.
 
     quint8  c ;
     quint8 *memory = m_ram ;        // Default to main RAM 
@@ -83,7 +85,7 @@ quint8 Machine::fetch (quint16 p)
         return c ;
     }
 
-    c = fetch_highMem (p) ;          // d000 - ffff   ROM & bank-switched RAM
+    c = *fetch_highMem (p) ;         // d000 - ffff   ROM & bank-switched RAM
 
     return c ;
 
@@ -168,7 +170,7 @@ quint8 Machine::fetch_ioSpace (quint16 p)     //  Addresses c000 - cfff
                 break ;
               case 7:                                                           // Slot 7 $C7xx   (Hard or 3.5" drive)
                 if (m_hardDrive->isOpen(0)) {
-                    c = fetch_HD_ROM (slotNumber, loByte) ;
+                    c = m_hardDrive->fetch_HD_ROM (slotNumber, loByte) ;
 //printf ("HD drive 1 is open\n") ;
                 }
                 else {
@@ -189,23 +191,21 @@ quint8 Machine::fetch_ioSpace (quint16 p)     //  Addresses c000 - cfff
 
 
 // Address is in range $D000 - $FFFF
+// Return a pointer to main or auxiliary RAM, or to ROM.
 
-quint8 Machine::fetch_highMem (quint16 p)
+quint8* Machine::fetch_highMem (quint16 p)
 {
-    quint8  c ;
     quint8 *memory ;
 
     if (RdLCRAM) {
         if (RdALTZP) memory = m_aux ;
         else         memory = m_ram ;
-        if ((p < 0xe000) && RdBNK2)  p -= 0x1000 ;  // map c000-cfff to d000-dfff
+        if ((p < 0xe000) && RdBNK2) memory -= 0x1000 ;  // map c000-cfff to d000-dfff
     } else {
         memory = m_rom ;
     }
 
-    c = memory[p] ;
-
-    return c ;
+    return memory + p ;
 
 }
 
@@ -482,8 +482,7 @@ https://git.redump.net/mame/commit/?id=e019d58dfeb770c18c97a03275498bca9424d580
 // [ pp 5-23 and 5-24 contain details on writing to soft-switches ]
 // [ $C080-$C08F which are unavailable elsewhere.                 ]
 //
-
-void Machine::fetchFromBankSwitches (quint16 p)
+void Machine::fetchFromBankSwitches (quint16 p)                  // C080 .. C08F; set bank switches
 {
     quint16  pLoBits = p & 0x0003 ;   // Mask for bits 0 & 1; note that we ignore bit 2.
 
@@ -572,104 +571,6 @@ qint8 Machine::fetchFloppy_5_25Inch (int loNibble)  //  Read or write a single b
 
     return c ;
 }
-
-
-//  Fake the existence of a hard-drive controller ROM & associated controller.
-//  This allows I/O with HD images up to 32MBytes, and
-//  also works nicely with 3.5" (usually 800K) floppy images.
-// (See section 6.3.1 of the ProDOS 8 Technical Reference Manual.)
-
-quint8 Machine::fetch_HD_ROM (int slotNumber, quint8 p)
-{
-    static int BRK = 0 ;
-    static int NOP = 0xea ;
-    static int RTS = 0x60 ;
-
-    int slotAddr = 0xc000 | (slotNumber & 0x07) << 8 ;                        // The slot address of our fake ROM
-    p &= 0xff ;                                                               // (c700 for slot 7)
-    quint8 c = 0 ;
-    quint16 entryPoint = 0xc000 | (slotNumber << 8) | (dummy_HD_rom[0xff]) ; // Entry point for non-"smartport" calls
-
- //printf ("1... fetch_HD_ROM: m_savedPC=%4.4x  p=%2.2x c=%2.2x\n", m_savedPC, p, c) ;
-
-    // If the saved PC == our ROM entry point,
-    // it's a PRODOS I/O call (status, read, write, or format)
-
-    if (m_savedPC == entryPoint) {
-        A = m_hardDrive->IO() ;
-        if (A) P |= C ;
-        else   P &= C ^ 0xff ;
-        return RTS ;
-    }
-
-    // If the saved PC == our ROM entry point+3, it's a "smartport" call.
-
-    quint16 dispatchAddr = entryPoint + 3 ;                                  // Dispatch address for smartport calls
-
-    if (m_savedPC == dispatchAddr) {                  // XXXXXXXXXX  FIXME  check for main/aux RAM  XXXXXXXXXXXXXXXXXXXXXXX
-    
-        quint8  aLo = m_ram [S+0x101] ;
-        quint8  aHi = m_ram [S+0x102] ;
-        quint16 cmdPtr = (aHi<<8) + aLo + 1 ;
-        quint8  pLo = m_ram [cmdPtr+1] ;
-        quint8  pHi = m_ram [cmdPtr+2] ;
-        quint16 paramPtr = (pHi<<8) + pLo ;
-        quint8  cmd = m_ram [cmdPtr] ;
-printf ("\nMachine::fetch_HD_ROM: m_savedPC=%4.4x cmdPtr=%4.4x cmd=%2.2x  paramPtr=%4.4x\n",  m_savedPC, cmdPtr, cmd, paramPtr) ;
-        if (cmd & 0x40) {               // This is an "extended" call.  We don't do extended.
-            printf ("*** 'extended' smartPort call made from 0x%4.4x\n", m_savedPC) ;
-            P |= C ;
-            return BRK ;   // No idea what effect this will have...
-        }
-
-        bool setCarry = m_hardDrive->smartPort (cmd, m_ram, paramPtr) ;
-        if (setCarry) P |= C ;
-        else          P &= C ^ 0xff ; 
-        quint16 retAddr = m_ram[S + 0x101] ;  // Add 3 to the return address on the stack
-        retAddr |= m_ram[S + 0x102] << 8 ;     // to skip the 3-byte parameter list
-        retAddr += 3 ;
-        m_ram[S + 0x101] = retAddr ;
-        m_ram[S + 0x102] = retAddr >> 8 ;
-        c = RTS ;
-        return c ;
-    }
-
-
-//        PC = m_ram[++S + 0x100] | (m_ram[++S + 0x100]<<8) ;     // Pop the PC from the stack, and move
-//        PC += 3 ;                                               // it past the 3-byte calling params.
-//        c = m_ram [PC] ;                                        // Then return the next opcode.
-//
-//printf ("\nMachine::fetch_HD_ROM: m_savedPC=%4.4x cmdPtr=%4.4x cmd=%2.2x   paramPtr=%4.4x\n",  m_savedPC, cmdPtr, cmd, paramPtr) ;
-//printf ("S=01%2.2x\n", S) ;
-//xdump (m_ram+0x1e0, 32, 0x1f0) ;
-//xdump (m_ram+cmdPtr-3, 8, cmdPtr-3) ;
-//xdump (m_ram+paramPtr, 16, paramPtr) ;
-
-
-    // If the saved PC == the 1st byte of the HD ROM, our fake Apple II could be booting from our fake drive.
-    // If not, ProDos is just fetching information from the ROM.
-
-    if (m_savedPC == slotAddr) {               // ON BOOT:  Read the first block on the hard drive
-        m_hardDrive->offsetKludge() ;          // into $0800 - 0x9ff
-        m_hardDrive->readBlock (m_ram+0x0800, 0, 0) ; 
-        X  = (slotAddr&0x0f00) >> 4 ;
-        PC = 0x0801 ;                          // Then jump to $0801
-        c  = NOP ;                             // The code on the 1st block takes care of the rest.
-    } else if (p == 0xfc) {   
-        c = m_hardDrive->getDiskSize(0) ;      // Size of disk, low byte  
-    } else if (p == 0xfd) {  
-        c = m_hardDrive->getDiskSize(1) ;      // Size of disk, high byte 
-    } else if (p == 0xfe) {  
-        c = m_hardDrive->fetchStatusByteFE() ;
-    } else {
-        c = dummy_HD_rom[p] ;
-    }
- //printf ("2: fetch_HD_ROM: m_savedPC=%4.4x  p=%2.2x c=%2.2x\n", m_savedPC, p, c) ;
- 
-    return c ;
-
-}
-
 
 
 // Snoop on fetches fom the "soft switch" page :$C000 ... $C0FF

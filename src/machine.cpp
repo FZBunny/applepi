@@ -948,9 +948,7 @@ void Machine::run (void)
                 break ;
             case 0x1e:        // ASL absolute,X
                 ABSOLUTX(p) ;
-//printf ("p=%4.4X c1=%2.2X;    ", p, m_ss[p-0xC000]) ;
                 ASLMEM(p) ;
-//printf ("c2=%2.2X\n", m_ss[p-0xC000]) ;
                 cycles(7) ;
                 break ;
             case 0x1f:        // BBR1                 * 65C02 (Rockwell and WDC only) *
@@ -1300,7 +1298,7 @@ void Machine::run (void)
                 addmem(p) ;
                 cycles(6) ;
                 break ;
-            case 0x62:         //  --- Unimplented opcode, but the 65C02 skips the following byte.  I think. 
+            case 0x62:         //  --- Unimplemented opcode, but the 65C02 skips the following byte.  I think. 
                 UNIMPLEMENTED
                 PC++ ;
                 cycles(2) ;
@@ -2076,17 +2074,14 @@ void Machine::run (void)
 }
 
 
-
-//int Machine::getHistoryIndex (void)
-//{
-//    return m_historyIndex ;
-//}
-
-
-
 ProcessorState* Machine::processorState (void)
 {
    return &m_registers ;
 }
 
+
+quint16 Machine::savedPC (void)
+{
+    return m_savedPC ;
+}
 

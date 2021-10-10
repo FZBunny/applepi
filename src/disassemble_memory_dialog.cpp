@@ -53,7 +53,7 @@ DisassembleMemory::DisassembleMemory (QWidget* parent) :  QDialog (parent)
     int box2_X = 160 ;
     int box2_Y = 130 ;
 
-    m_doItButton = new QPushButton ("Disassemble", this) ;
+    m_doItButton = new ApplepiButton ("Disassemble", this) ;
     m_doItButton->move (100,windowHeight-50) ;
 
     QFrame* box1 = new QFrame (this) ;
@@ -107,9 +107,12 @@ DisassembleMemory::DisassembleMemory (QWidget* parent) :  QDialog (parent)
     m_thisAddress->move  (10, 50) ;
     m_nIstructions->setChecked (true) ;
 
-    connect (m_doItButton, &QPushButton::clicked,       this, &DisassembleMemory::onDoItButtonClicked) ;
-    connect (m_startBox,   &QLineEdit::editingFinished, this, &DisassembleMemory::onStartEntered) ;
-    connect (m_endBox,     &QLineEdit::editingFinished, this, &DisassembleMemory::onEndEntered) ;
+    connect (m_doItButton, &ApplepiButton::clicked, this, &DisassembleMemory::onDoItButtonClicked) ;
+
+    connect (m_startBox, &QLineEdit::textEdited,      this, &DisassembleMemory::onStartEdited) ;
+    connect (m_startBox, &QLineEdit::editingFinished, this, &DisassembleMemory::onStartFinished) ;
+    connect (m_endBox,   &QLineEdit::textEdited,      this, &DisassembleMemory::onEndEdited) ;
+    connect (m_endBox,   &QLineEdit::editingFinished, this, &DisassembleMemory::onEndFinished) ;
 
     m_disassembler = new Disassembler (MAC->m_rom, false) ;
 
@@ -141,7 +144,7 @@ void DisassembleMemory::cleanupAddress (QLineEdit* box)
 }
 
 
-void DisassembleMemory::onStartEntered (void)
+void DisassembleMemory::onStartFinished (void)
 {
     cleanupAddress (m_startBox) ;
     QString str = m_startBox->text() ;
@@ -153,7 +156,7 @@ void DisassembleMemory::onStartEntered (void)
 }
 
 
-void DisassembleMemory::onEndEntered (void)
+void DisassembleMemory::onEndFinished (void)
 {
     cleanupAddress (m_endBox) ;
     QString str = m_endBox->text() ;
@@ -162,6 +165,34 @@ void DisassembleMemory::onEndEntered (void)
     longAddr = str.toULong (NULL, 16) ;
     quint16 addr = longAddr ;
     MAC->setTraceEnd (addr) ;
+}
+
+
+void DisassembleMemory::onStartEdited (void)
+{
+    editAddress (m_startBox) ;
+}
+
+
+void DisassembleMemory::onEndEdited (void)
+{
+    editAddress (m_endBox) ;
+}
+
+
+void DisassembleMemory::editAddress (QLineEdit* box)
+{
+    QString text = box->text() ;
+    int pos = box->cursorPosition() ;
+    int len = text.length() ;
+    if (pos > 4) {
+        text = text.remove (0,1) ;
+        box->setText (text) ;
+    } else {
+        if (len > 4) text = text.remove (len-1,1) ;
+        box->setText (text) ;
+        box->setCursorPosition (pos) ;
+    }
 }
 
 
