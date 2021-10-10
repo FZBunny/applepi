@@ -47,47 +47,6 @@
 
 
 
-
-quint8 dummy_HD_rom[] =   //     A mostly-fictitious 256-byte ROM for faking 3.5" floppy & hard drives.
-{                                                    // ProDos uses bytes 1, 3, & 5 to identify the device
-    0x00, 0x20, 0x00, 0x00, 0x00, 0x03, 0x00, 0x01,  // as a disk controller.
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  // Byte 7 is also inspected; if non-zero, it's not a "smart"
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  // drive controller.  (Ours is dumb as a brick.)
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  // (See section 6.3.1 of the ProDOS 8 Technical Reference Manual.)
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xcf, 0x10   // The "0x10" at $ff tells ProDos that the I/O entry point is $Cn10,
-} ;                                                  // where "n" is the slot number of the device. (The entry point is
-                                                     // faked in fn. "fetch_HD_ROM".)
-
-
-
-
 HdController::HdController (Machine* parent)
 {
     m_parent = parent ;
@@ -108,94 +67,79 @@ m_p_is_4 = false ;
 
 quint8 HdController::fetch_HD_ROM (int slotNumber, quint8 p)
 {
-    if ((p==0x11) || (p==0x12)) return 0 ;  // Ignore 2 fetches after $Cn10 entry; just a side-effect of history data
-                                            // gathering in last few lines of fn. "Machine::run".
-printf ("fetch_HD_ROM p=%2.2x\n", p) ;
-    static int BRK = 0 ;
+    if ((p==0x11) || (p==0x12)) return 0 ;  // Ignore 2 fetches after $Cn10 entry; just a side-effect of last
+                                            // few lines of fn. "Machine::run" saving history data.
+// printf ("fetch_HD_ROM p=%2.2x\n", p) ;
     static int NOP = 0xea ;
     static int RTS = 0x60 ;
-    ProcessorState* ps = MAC->processorState() ;
-
     int slotAddr = 0xc000 | (slotNumber & 0x07) << 8 ;          // The slot address of our fake ROM
     p &= 0xff ;                                                 // (c700 for slot 7)
     quint8 c = 0 ;
     quint16 entryPoint = 0xc000 | (slotNumber << 8) | 0x10 ;    // Entry point for non-smartport calls
     quint16 dispatchAddr = entryPoint + 3 ;                     // Dispatch address for smartport calls
+    ProcessorState* ps = MAC->processorState() ;
 
-    // If the saved PC == our ROM entry point,
-    // it's a PRODOS I/O call (status, read, write, or format)
-
-    if (MAC->savedPC() == entryPoint) {
-        ps->Areg = IO() ;
-        if (ps->Areg) ps->Pstat |= C ;
-        else          ps->Pstat &= C ^ 0xff ;
-        return RTS ;
+    switch (p) {
+        case 0:                                            // Boot?
+            if (MAC->savedPC() == slotAddr) {              // Yes. On boot, read the first block on the hard drive
+                offsetKludge() ;                           // into $0800 - 0x9ff...
+                readBlock (MAC->m_ram+0x0800, 0, 0) ; 
+                ps->Xreg  = slotNumber << 4 ;
+                ps->pc.pc_16 = 0x0801 ;                    // Then jump to $0801
+                c  = NOP ;                                 // (The code on the 1st block takes care of the rest.)
+            } else {
+                return 0 ;
+            }
+            break ;
+        case 1:          // ROM code inspects bytes 1, 3, & 5 when searching for a drive to boot from.
+            c=0x20 ;
+            break ;
+        case 3:          //  " "
+            c = 0x00 ;
+            break ;
+        case 5:          //  " "
+            c = 0x03 ;
+            break ;
+        case 7:
+            c = 0x3c ;   // ProDOS inspects byte 7; any non-zero value says we're not a smartport.
+            break ;      // ('3c' seems to tell it we're a hard drive controller. *shrug*)
+        case 0x10:
+            if (MAC->savedPC() == entryPoint) {            // ProDOS call
+                ps->Areg = IO() ;
+                if (ps->Areg) ps->Pstat |= C ;
+                else          ps->Pstat &= C ^ 0xff ;
+                return RTS ;
+            } else {
+                c = 0 ;
+            }
+            break ;
+        case 0x13:                                         // ProDOS 'smartport' call
+            if (MAC->savedPC() == dispatchAddr) { 
+        //        smartPort() ;
+                c = RTS ;
+            } else {
+                c = 0 ;
+            }
+            break ;
+        case 0xfc:
+            c = getDiskSize(0) ;  // Size of disk, low byte 
+            break ;
+        case 0xfd:
+            c = getDiskSize(1) ;  // Size of disk, high byte 
+            break ;
+        case 0xfe:  
+            c = fetchStatusByteFE() ;
+            break ;
+        case 0xff:
+            c = 0x10 ;
+            break ;
+        default:
+        c = 0 ;
+            break ;
     }
 
-    // If the saved PC == our ROM entry point+3, it's a "smartport" call.
-
-    if (MAC->savedPC() == dispatchAddr) {                  // XXXXXXXXXX  FIXME  check for main/aux RAM  XXXXXXXXXXXXXXXXXXXXXXX
-        quint8  aLo = MAC->m_ram [ps->Sptr+0x101] ;
-        quint8  aHi = MAC->m_ram [ps->Sptr+0x102] ;
-        quint16 cmdPtr = (aHi<<8) + aLo + 1 ;
-        quint8  pLo = MAC->m_ram [cmdPtr+1] ;
-        quint8  pHi = MAC->m_ram [cmdPtr+2] ;
-        quint16 paramPtr = (pHi<<8) + pLo ;
-        quint8  cmd = MAC->m_ram [cmdPtr] ;
-printf ("fetch_HD_ROM: *smartport* call  MAC->savedPC()=%4.4x cmdPtr=%4.4x cmd=%2.2x  paramPtr=%4.4x\n",  MAC->savedPC(), cmdPtr, cmd, paramPtr) ;
-        if (cmd & 0x40) {               // This is an "extended" call.  We don't do extended.
-            printf ("*** 'extended' smartPort call made from 0x%4.4x\n", MAC->savedPC()) ;
-            ps->Pstat |= C ;
-            return BRK ;   // No idea what effect this will have...
-        }
-
-        bool setCarry = smartPort (cmd, MAC->m_ram, paramPtr) ;
-        if (setCarry) ps->Pstat |= C ;
-        else          ps->Pstat &= C ^ 0xff ; 
-        quint16 retAddr = MAC->m_ram[ps->Sptr + 0x101] ;  // Add 3 to the return address on the stack
-        retAddr |= MAC->m_ram[ps->Sptr + 0x102] << 8 ;    // to skip the 3-byte parameter list
-        retAddr += 3 ;
-        MAC->m_ram[ps->Sptr + 0x101] = retAddr ;
-        MAC->m_ram[ps->Sptr + 0x102] = retAddr >> 8 ;
-
-        return RTS ;
-    }
-
-    // If the saved PC == the 1st byte of the HD ROM, our fake Apple II is booting from our fake drive.
-    // If not, ProDos is just fetching information from the ROM.
-
-    if (MAC->savedPC() == slotAddr) {               // ON BOOT:  Read the first block on the hard drive
-        offsetKludge() ;                            // into $0800 - 0x9ff...
-        readBlock (MAC->m_ram+0x0800, 0, 0) ; 
-        ps->Xreg  = (slotAddr&0x0f00) >> 4 ;
-        ps->pc.pc_16 = 0x0801 ;                     // Then jump to $0801
-        c  = NOP ;                                  // (The code on the 1st block takes care of the rest.)
-    } else if (p == 0xfc) {   
-        c = getDiskSize(0) ;      // Size of disk, low byte  
-    } else if (p == 0xfd) {  
-        c = getDiskSize(1) ;      // Size of disk, high byte 
-    } else if (p == 0xfe) {  
-        c = fetchStatusByteFE() ;
-    } else {
-        c = dummy_HD_rom[p] ;
-//printf ("2: fetch_HD_ROM: MAC->savedPC()=%4.4x  p=%2.2x c=%2.2x\n", MAC->savedPC(), p, c) ;
-    }
- //printf ("3: fetch_HD_ROM: MAC->savedPC()=%4.4x  p=%2.2x c=%2.2x\n", MAC->savedPC(), p, c) ;
-
-if (p==4) {
-    if (m_p_is_4) {
-        m_p_is_4 = false ;
-        c = 10 ;
-printf ("returning %i\n", c) ;
-    } else {
-        m_p_is_4 = true ;
-        c = 16;
-printf ("returning %i\n", c) ;
-    }
-}
     return c ;
-
-}
+} 
 
 
 // This overload of readBlock is called from 'MainWindow::setHDLabel'   
@@ -204,7 +148,7 @@ printf ("returning %i\n", c) ;
 
 int HdController::readBlock (quint8* buffer, int block, int driveIndex)
 {
-printf ("three-param readBlock  block=%i, driveIndex=%i\n", block, driveIndex) ;
+//printf ("three-param readBlock  block=%i, driveIndex=%i\n", block, driveIndex) ;
     if (driveIndex < 0) driveIndex = 0 ;
     if (driveIndex > 1) driveIndex = 1 ;
     m_driveIndex = driveIndex ;
@@ -217,7 +161,34 @@ printf ("three-param readBlock  block=%i, driveIndex=%i\n", block, driveIndex) ;
         m_file[m_driveIndex].seek (block*BLOCKSIZE + m_offset[m_driveIndex]) ;
         n = m_file[m_driveIndex].read ((char*)buffer, BLOCKSIZE) ;
         if (n != BLOCKSIZE) stat = IOERROR ;
-//xdump (buffer, 256, 0) ;
+    }
+    return stat ;
+}
+
+
+// This overload of readBlock is called from fn. "IO" during nornmal I/O.
+ 
+int HdController::readBlock (quint16 offset, int block)
+{
+    quint8* p ; 
+    if (offset > 0xd000) p = MAC->lower48k (offset, true) ;
+    else                 p = MAC->store_highMem (offset) ;
+
+    if (p == NULL) {  // (This will happen if attempting to read into ROM.)
+        printf ("\n*** Error:  Attempting to read a disk block into ROM ***\n\n") ;
+        return IOERROR ;
+    }
+
+    int n = 0 ;
+    int stat = 0 ;
+    headStepDelay (block) ;
+    if (isOpen()) {
+        m_file[m_driveIndex].seek (block*BLOCKSIZE + m_offset[m_driveIndex]) ;
+        n = m_file[m_driveIndex].read ((char*)p, BLOCKSIZE) ;
+        if (n != BLOCKSIZE) stat = IOERROR ;
+    } else {
+        memset (MAC->m_ram+offset, 0, BLOCKSIZE) ;
+        stat = NODEVICE ;
     }
     return stat ;
 }
@@ -259,7 +230,6 @@ int HdController::IO (void)
 
     return stat ;
 }
-
 
 
 bool HdController::open (QString &path, int driveIndex)
@@ -326,42 +296,6 @@ void HdController::close (int driveIndex)
     m_file[m_driveIndex].close() ;
 }
 
-// XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX  UNFINISHED  XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-/***
-bool HdController::create (QString &path, int drive, int nBlocks)
-{
-
-    m_driveIndex = drive - 1 ;
-    if (m_file[m_driveIndex].isOpen()) {
-        errno = EBUSY ;
-        return errno ;
-    }
-
-    m_writeable[m_driveIndex] = true ;
-
-    bool ok = m_file[m_driveIndex].open (QIODevice::NewOnly) ;
-    if ( ! ok) return false ;
-
-    m_configuredPath[m_driveIndex] = path ;
-
-    int n = m_file[m_driveIndex].Write (&bootBlock, BLOCKSIZE) ;  // Write the boot bock to block 0
-    if (n != BLOCKSIZE) {
-        return m_file[m_driveIndex].GetLastError() ;
-    }
-
-    quint8 zeros[BLOCKSIZE] ;
-    memset (zeros, 0, BLOCKSIZE) ;
-    for (int i=0; i<nBlocks-1; i++) {
-        m_file[m_driveIndex].Write (zeros, BLOCKSIZE) ;
-    }
-    m_file[m_driveIndex].Flush() ;
-    m_file[m_driveIndex].seek(0) ;
-    m_offset[m_driveIndex] = 0 ;
-// XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX  UNFINISHED  XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-
-    return false ;
-}
-***/
 
 int HdController::status (void)        //  (See 'ProDos Tech. Notes', note 21 for status returns)
 {
@@ -378,36 +312,6 @@ int HdController::status (void)        //  (See 'ProDos Tech. Notes', note 21 fo
     MAC->setY ((length >> 8) & 0xff) ;
 
 //printf ("HdController::status MAC->m_ram[$42]=%2.2x MAC->m_ram[$43]=%2.2x; status=%2.2x\n", MAC->m_ram[0x42], MAC->m_ram[0x43], stat) ;
-    return stat ;
-}
-
-
-// This overload of readBlock is called from fn. "IO" during nornmal I/O.
- 
-int HdController::readBlock (quint16 offset, int block)
-{
-ProcessorState *ps = MAC->processorState() ;
-printf ("two-param readBlock  savedPC=%4.4x PC=%4.4x   block=%i, offset=%4.4X\n", MAC->savedPC(), ps->pc.pc_16, block, offset) ;
-    quint8* p ; 
-    if (offset > 0xd000) p = MAC->lower48k (offset, true) ;
-    else                 p = MAC->store_highMem (offset) ;
-
-    if (p == NULL) {  // (This will happen if attempting to read into ROM.)
-        printf ("\n*** Error:  Attempting to read a disk block into ROM ***\n\n") ;
-        return IOERROR ;
-    }
-
-    int n = 0 ;
-    int stat = 0 ;
-    headStepDelay (block) ;
-    if (isOpen()) {
-        m_file[m_driveIndex].seek (block*BLOCKSIZE + m_offset[m_driveIndex]) ;
-        n = m_file[m_driveIndex].read ((char*)p, BLOCKSIZE) ;
-        if (n != BLOCKSIZE) stat = IOERROR ;
-    } else {
-        memset (MAC->m_ram+offset, 0, BLOCKSIZE) ;
-        stat = NODEVICE ;
-    }
     return stat ;
 }
 
@@ -468,20 +372,102 @@ quint8 HdController::getDiskSize (quint8 byteNumber)
 
 void HdController::headStepDelay (int block)
 {
-//    if (m_fileSize[m_driveIndex] < 90000) { // Is this a 3.5" floppy?
+    if (m_fileSize[m_driveIndex] < 90000) { // Is this a 3.5" floppy?
         int newTrack = block/10 ;  // actually, there were 8-12 blocks/track; we just use an average...)
         if (newTrack > 800) newTrack -= 800 ;
 
         int trackDelta = abs (newTrack-m_previousTrack[m_driveIndex]) ;
         m_previousTrack[m_driveIndex] = newTrack ;
 
-        int ttseekTime = 10 ;      //  Track-to-track seek time  (10 ms IS JUST A GUESS!) XXXXX
+        int ttseekTime = 50 ;      //  Track-to-track seek time  (millisecond number IS JUST A GUESS!) XXXXX
         int totalMsec = ttseekTime * trackDelta ;
-        quickSleep (1000*totalMsec) ;
-//    } else {
-//                                   //  Must be a hard drive;  should we insert any delays here? XXXXX
-//    }
+        usleep (1000*totalMsec) ;
+    } else {
+                                   //  Must be a hard drive;  should we insert any delays here? XXXXX
+    }
 }
+
+
+//                         An annoying kludge...
+//
+//  Find the offset, in bytes, to the beginning of the actual disk data
+//  contained in the disk image.
+//
+//  For reasons I cannot comprehend, some hard-drive disk images found 
+//  on the web contain mystery junk(?) before the disk boot blocks.
+//  The length of this junk seems to be unpredictable.
+//  So:  we search for the 3 bytes we expect to see as the 1st 4 bytes
+//  the disk:
+//
+//  01      DB   #$01
+//  38      SEC
+//  b0 xx   BCS  $xxxx
+//
+//  The offset of the "01" byte is saved for use when seeking before
+//  read & writes:  "seek (block*BLOCKSIZE + m_offset[m_driveIndex])"
+
+
+void HdController::offsetKludge (void)
+{
+    quint8 buffer[BLOCKSIZE] ;
+    int n = 0 ;
+
+    if (isOpen()) {
+        m_file[m_driveIndex].seek (0) ;
+        n = m_file[m_driveIndex].read ((char*)buffer, BLOCKSIZE) ;
+    }
+
+    for (n=0; n<BLOCKSIZE; n++) {
+        if (buffer[n]==0x01 && buffer[n+1]==0x38 && buffer[n+2]==0xb0) break ;
+    }
+
+    if (n < BLOCKSIZE) m_offset[m_driveIndex] = n ;
+    else               m_offset[m_driveIndex] = 0 ; // If we don't find the starting bytes at all, just assume that it
+                                                    // starts with someting else at location 0.  (What else can we do?)
+}
+
+
+
+
+
+
+// XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX  UNFINISHED  XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+/***
+bool HdController::create (QString &path, int drive, int nBlocks)
+{
+
+    m_driveIndex = drive - 1 ;
+    if (m_file[m_driveIndex].isOpen()) {
+        errno = EBUSY ;
+        return errno ;
+    }
+
+    m_writeable[m_driveIndex] = true ;
+
+    bool ok = m_file[m_driveIndex].open (QIODevice::NewOnly) ;
+    if ( ! ok) return false ;
+
+    m_configuredPath[m_driveIndex] = path ;
+
+    int n = m_file[m_driveIndex].Write (&bootBlock, BLOCKSIZE) ;  // Write the boot bock to block 0
+    if (n != BLOCKSIZE) {
+        return m_file[m_driveIndex].GetLastError() ;
+    }
+
+    quint8 zeros[BLOCKSIZE] ;
+    memset (zeros, 0, BLOCKSIZE) ;
+    for (int i=0; i<nBlocks-1; i++) {
+        m_file[m_driveIndex].Write (zeros, BLOCKSIZE) ;
+    }
+    m_file[m_driveIndex].Flush() ;
+    m_file[m_driveIndex].seek(0) ;
+    m_offset[m_driveIndex] = 0 ;
+// XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX  UNFINISHED  XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+    return false ;
+}
+***/
+
 
 // XXXXXXXXXXXXXXXXXXXXXXX  SMARTPORT IS UNFINISHED XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
@@ -489,12 +475,31 @@ void HdController::headStepDelay (int block)
 //  Returns "carry" value as a boolean:  false (carry=0) on success, true (carry=1) on error.
 //  See "Apple IIgs Firmware Reference", chapter 7.
 
-bool HdController::smartPort (quint8 cmd, quint8* memory, quint16 paramPtr)
+/***
+bool HdController::smartPort (void)
 {
+
     bool status ;
     quint8 paramCount = memory[paramPtr] ;
     quint8 unitNumber = memory[paramPtr+1] ;
-printf ("HdController::smartPort - cmd=%i; paramCount=%2.2x unitNumber=%2.2x\n", cmd, paramCount, unitNumber) ;
+
+//------------------
+    quint8  aLo = MAC->m_ram [ps->Sptr+0x101] ;
+    quint8  aHi = MAC->m_ram [ps->Sptr+0x102] ;
+    quint16 cmdPtr = (aHi<<8) + aLo + 1 ;
+    quint8  pLo = MAC->m_ram [cmdPtr+1] ;
+    quint8  pHi = MAC->m_ram [cmdPtr+2] ;
+    quint16 paramPtr = (pHi<<8) + pLo ;
+    quint8  cmd = MAC->m_ram [cmdPtr] ;
+//printf ("fetch_HD_ROM: *smartport* call  MAC->savedPC()=%4.4x cmdPtr=%4.4x cmd=%2.2x  paramPtr=%4.4x\n",  MAC->savedPC(), cmdPtr, cmd, paramPtr) ;
+    if (cmd & 0x40) {               // This is an "extended" call.  We don't do extended.
+        printf ("*** 'extended' smartPort call made from 0x%4.4x\n", MAC->savedPC()) ;
+        ps->Pstat |= C ;
+        return BRK ;   // No idea what effect this will have...
+    }
+//------------------------------
+
+//printf ("HdController::smartPort - cmd=%i; paramCount=%2.2x unitNumber=%2.2x\n", cmd, paramCount, unitNumber) ;
 
     switch (cmd) {
         case 0:
@@ -524,9 +529,9 @@ printf ("HdController::smartPort - cmd=%i; paramCount=%2.2x unitNumber=%2.2x\n",
     }
 
     return status ;
+
+return 0 ;
 }
-
-
 bool HdController::smartPortStatus (quint8* memory, quint16 paramPtr)
 {
     quint8 unitNumber = memory[paramPtr+1] ;
@@ -534,7 +539,7 @@ bool HdController::smartPortStatus (quint8* memory, quint16 paramPtr)
     m_driveIndex = unitNumber ;
     quint16 statusListPtr = (memory[paramPtr+3]<<8) + memory[paramPtr+2] ;
     quint8 statusCode = memory[paramPtr+4] ;
-printf ("HdController::smartPortStatus - statusListPtr=%4.4x statusCode=%2.2x\n", statusListPtr, statusCode) ;
+//printf ("HdController::smartPortStatus - statusListPtr=%4.4x statusCode=%2.2x\n", statusListPtr, statusCode) ;
 
 
     switch (statusCode) {
@@ -564,6 +569,13 @@ printf ("HdController::smartPortStatus - statusListPtr=%4.4x statusCode=%2.2x\n"
 
     return true ;
 }
+
+***/
+
+
+
+
+
 // p. 143
 
 /*****
@@ -606,42 +618,3 @@ Stat_list byte 0     Number of devices
 *****/
 
 
-
-
-//                         An annoying kludge...
-//
-//  Find the offset, in bytes, to the beginning of the actual disk data
-//  contained in the disk image.
-//
-//  For reasons I cannot comprehend, some hard-drive disk images found 
-//  on the web contain mystery junk(?) before the disk boot blocks.
-//  The length of this junk seems to be unpredictable.
-//  So:  we search for the 3 bytes we expect to see as the 1st 4 bytes
-//  the disk:
-//
-//  01      DB   #$01
-//  38      SEC
-//  b0 xx   BCS  $xxxx
-//
-//  The offset of the "01" byte is saved for use when seeking before
-//  read & writes:  "seek (block*BLOCKSIZE + m_offset[m_driveIndex])"
-
-
-void HdController::offsetKludge (void)
-{
-    quint8 buffer[BLOCKSIZE] ;
-    int n = 0 ;
-
-    if (isOpen()) {
-        m_file[m_driveIndex].seek (0) ;
-        n = m_file[m_driveIndex].read ((char*)buffer, BLOCKSIZE) ;
-    }
-
-    for (n=0; n<BLOCKSIZE; n++) {
-        if (buffer[n]==0x01 && buffer[n+1]==0x38 && buffer[n+2]==0xb0) break ;
-    }
-
-    if (n < BLOCKSIZE) m_offset[m_driveIndex] = n ;
-    else               m_offset[m_driveIndex] = 0 ; // If we don't find the starting bytes at all, just assume that it
-                                                    // starts with someting else at location 0.  (What else can we do?)
-}

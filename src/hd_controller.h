@@ -70,7 +70,7 @@ public:
     int writeBlock (quint16 buffer, int block) ;
     int format (void) ;
 
-    bool smartPort (quint8 cmd, quint8* m_ram, quint16 paramPtr) ;
+    bool smartPort (void) ;
     bool smartPortStatus (quint8* m_ram, quint16 paramPtr) ;
 
     void    headStepDelay (int block) ;

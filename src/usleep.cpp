@@ -82,7 +82,7 @@ quint64 microseconds (void)   // This function is good for 584,000+ years...
 
 // Sleep for 'uSecs' microseconds, while ignoring signals.
 
-void quickSleep (quint64 uSecs)
+void quickSleep (quint64 uSecs)    // XXXXX   NOT CURRENTLY CALLED - DELETE ?     XXXXX
 {
     struct timespec tReq, tRem ;
     tReq.tv_sec = 0 ;

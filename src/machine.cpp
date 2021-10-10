@@ -701,7 +701,7 @@ void Machine::run (void)
             m_previousCycles = m_nCycles ;
             quint64 now = microseconds() ;
             quint64 then = now + sliceCycles - (now % sliceCycles) ;
-            while (microseconds() < then) quickSleep (5) ;
+            while (microseconds() < then) usleep (5) ;
         }
         
         // See if we hit a trap.
