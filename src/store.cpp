@@ -344,40 +344,6 @@ void Machine::store_sspage (quint8 c, quint16 p)
                     break ;
                 case 7:
                     break ;
-/***
-From mame - MAME - Multiple Arcade Machine Emulator - redump ...
-https://git.redump.net/mame/commit/?id=e019d58dfeb770c18c97a03275498bca9424d580
-
-+		case 0x68:	// STATEREG
-+			m_altzp = (data & 0x80);
-+			m_page2 = (data & 0x40);
-+			m_ramrd = (data & 0x20);
-+			m_ramwrt = (data & 0x10);
-+			m_lcram = (data & 0x08) ? false : true;
-+			m_lcram2 = (data & 0x04);
-+			m_intcxrom = (data & 0x01);
-+
-+			// update the aux state
-+			auxbank_update();
-+
-+			// update LC state
-+			if (m_lcram)
-+			{
-+				m_lcbank->set_bank(1);
-+				m_lcaux->set_bank(1);
-+				m_lc00->set_bank(1);
-+				m_lc01->set_bank(1);
-+			}
-+			else
-+			{
-+				m_lcbank->set_bank(0);
-+				m_lcaux->set_bank(0);
-+				m_lc00->set_bank(0);
-+				m_lc01->set_bank(0);
-+			}
-+			break;
-
-***/
                 case 8:                            // ProDos 8 v2.0.3 does a 'TRB  $C068' with A=01, but most docs
                     STATEREG = c ;                 // say $C068 is implemented only on the IIgs and later...
                     if (c & 0x01) RdSLOTCXROM  = ON ;
@@ -394,6 +360,7 @@ https://git.redump.net/mame/commit/?id=e019d58dfeb770c18c97a03275498bca9424d580
                     else          RdPAGE2  = OFF ;
                     if (c & 0x80) RdALTZP  = ON ;
                     else          RdALTZP  = OFF ;
+printf ("Store to C068:  m_savedPC=%4.4x c=%2.2x\n", m_savedPC, c) ;
                     break ;
                 case 9:
                     break ;
@@ -412,25 +379,26 @@ https://git.redump.net/mame/commit/?id=e019d58dfeb770c18c97a03275498bca9424d580
             }
             break ;
         case 7:                                // C070 .. C07F  Analog Input Reset
-//            paddles.reset() ; XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+//            paddles.reset() ;
             break ;
         case 8:
              storeToBankSwitches (p) ;         // Do something with high mem bank switches
              break ;
-        case 9:                        // Slot 1 ROM
+        case 9:                        // Slot 1      C090 - C09F  (Printer I/O)
+//if (loNibble == 0) putchar(c) ;
             break ;
-        case 0xa:                      // Slot 2 ROM
+        case 0xa:                      // Slot 2      C0A0 - C0AF
             break ;
-        case 0xb:                      // Slot 3 ROM
+        case 0xb:                      // Slot 3      C0B0 - C0BF
             break ;
-        case 0xc:                      // Slot 4 ROM
+        case 0xc:                      // Slot 4      C0C0 - C0CF
             break ;
-        case 0xd:                      // Slot 5 ROM
+        case 0xd:                      // Slot 5      C0D0 - C0DF
             break ;
-        case 0xe:                      // Slot 6 ROM .. Our floppy disk drive (See 'fetch_sspage')
+        case 0xe:                      // Slot 6      C0E0 - C0EF  Our floppy disk drive (See 'fetch_sspage')
             storeFloppy_5_25Inch (loNibble, c) ;
             break ;
-        case 0xf:                      // Slot 7
+        case 0xf:                      // Slot 7      C0F0 - C0FF
             break ;
     }
 }

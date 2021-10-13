@@ -63,13 +63,13 @@ m_p_is_4 = false ;
 
 //                            --- ENTRY POINT TO HD CONTROLLER CODE ---
 //
-// "fetch_HD_ROM" is called from Machine::fetch_ioSpace when fetching a byte from our fictitious slot 7 ROM
+// "fetch_HD_ROM" is called from "Machine::fetch_ioSpace" when fetching a byte from our fictitious slot 7 ROM
 
 quint8 HdController::fetch_HD_ROM (int slotNumber, quint8 p)
 {
     if ((p==0x11) || (p==0x12)) return 0 ;  // Ignore 2 fetches after $Cn10 entry; just a side-effect of last
                                             // few lines of fn. "Machine::run" saving history data.
-// printf ("fetch_HD_ROM p=%2.2x\n", p) ;
+//printf ("fetch_HD_ROM p=%2.2x\n", p) ;
     static int NOP = 0xea ;
     static int RTS = 0x60 ;
     int slotAddr = 0xc000 | (slotNumber & 0x07) << 8 ;          // The slot address of our fake ROM
@@ -88,21 +88,21 @@ quint8 HdController::fetch_HD_ROM (int slotNumber, quint8 p)
                 ps->pc.pc_16 = 0x0801 ;                    // Then jump to $0801
                 c  = NOP ;                                 // (The code on the 1st block takes care of the rest.)
             } else {
-                return 0 ;
+                c = 0 ;
             }
             break ;
         case 1:          // ROM code inspects bytes 1, 3, & 5 when searching for a drive to boot from.
-            c=0x20 ;
+            c = 0x20 ;
             break ;
-        case 3:          //  " "
+        case 3:          //  "ditto "
             c = 0x00 ;
             break ;
-        case 5:          //  " "
+        case 5:          //  "ditto"
             c = 0x03 ;
             break ;
         case 7:
-            c = 0x3c ;   // ProDOS inspects byte 7; any non-zero value says we're not a smartport.
-            break ;      // ('3c' seems to tell it we're a hard drive controller. *shrug*)
+            c = 0x3c ;   // ProDOS inspects byte 7; a zero value would indicate we're a "smartport" controller.
+            break ;      // '3c' seems to tell it we're a dumb hard drive controller. (And we're dumb as a brick.)
         case 0x10:
             if (MAC->savedPC() == entryPoint) {            // ProDOS call
                 ps->Areg = IO() ;
@@ -142,58 +142,6 @@ quint8 HdController::fetch_HD_ROM (int slotNumber, quint8 p)
 } 
 
 
-// This overload of readBlock is called from 'MainWindow::setHDLabel'   
-// upon power-on to get the ProDOS disk labels of any disks in the two
-// drives, and from 'fetch_HD_ROM' (above) once upon boot.
-
-int HdController::readBlock (quint8* buffer, int block, int driveIndex)
-{
-//printf ("three-param readBlock  block=%i, driveIndex=%i\n", block, driveIndex) ;
-    if (driveIndex < 0) driveIndex = 0 ;
-    if (driveIndex > 1) driveIndex = 1 ;
-    m_driveIndex = driveIndex ;
-    
-    int n = 0 ;
-    int stat = 0 ;
-    headStepDelay (block) ;
-
-    if (m_file[m_driveIndex].isOpen()) {
-        m_file[m_driveIndex].seek (block*BLOCKSIZE + m_offset[m_driveIndex]) ;
-        n = m_file[m_driveIndex].read ((char*)buffer, BLOCKSIZE) ;
-        if (n != BLOCKSIZE) stat = IOERROR ;
-    }
-    return stat ;
-}
-
-
-// This overload of readBlock is called from fn. "IO" during nornmal I/O.
- 
-int HdController::readBlock (quint16 offset, int block)
-{
-    quint8* p ; 
-    if (offset > 0xd000) p = MAC->lower48k (offset, true) ;
-    else                 p = MAC->store_highMem (offset) ;
-
-    if (p == NULL) {  // (This will happen if attempting to read into ROM.)
-        printf ("\n*** Error:  Attempting to read a disk block into ROM ***\n\n") ;
-        return IOERROR ;
-    }
-
-    int n = 0 ;
-    int stat = 0 ;
-    headStepDelay (block) ;
-    if (isOpen()) {
-        m_file[m_driveIndex].seek (block*BLOCKSIZE + m_offset[m_driveIndex]) ;
-        n = m_file[m_driveIndex].read ((char*)p, BLOCKSIZE) ;
-        if (n != BLOCKSIZE) stat = IOERROR ;
-    } else {
-        memset (MAC->m_ram+offset, 0, BLOCKSIZE) ;
-        stat = NODEVICE ;
-    }
-    return stat ;
-}
-
-
 int HdController::IO (void)
 {
     quint16 buffer = MAC->m_ram[0x45]<<8 | MAC->m_ram[0x44] ;
@@ -228,6 +176,66 @@ int HdController::IO (void)
           break ;
     }
 
+    return stat ;
+}
+
+
+// This overload of readBlock is called from 'MainWindow::setHDLabel'   
+// upon power-on to get the ProDOS disk labels of any disks in the two
+// drives, and from 'fetch_HD_ROM' (above), once, upon boot.
+
+int HdController::readBlock (quint8* buffer, int block, int driveIndex)
+{
+//printf ("three-param readBlock  block=%i, driveIndex=%i\n", block, driveIndex) ;
+    if (driveIndex < 0) driveIndex = 0 ;
+    if (driveIndex > 1) driveIndex = 1 ;
+    m_driveIndex = driveIndex ;
+    
+    int n = 0 ;
+    int stat = 0 ;
+    headStepDelay (block) ;
+
+    if (m_file[m_driveIndex].isOpen()) {
+        m_file[m_driveIndex].seek (block*BLOCKSIZE + m_offset[m_driveIndex]) ;
+        n = m_file[m_driveIndex].read ((char*)buffer, BLOCKSIZE) ;
+        if (n != BLOCKSIZE) stat = IOERROR ;
+    }
+    return stat ;
+}
+
+
+// This overload of readBlock is called from fn. "IO" during nornmal I/O.
+ 
+int HdController::readBlock (quint16 addr, int block)
+{
+
+//printf ("readBlock blk %i to %4.4X\n", block, addr) ;
+//ProcessorState* ps = MAC->processorState() ;
+//quint8 Sptr = ps->Sptr ;
+//printf ("Sptr=1%2.2x\n", Sptr) ;
+//xdump (MAC->m_ram+0x1e0, 0x20, 0x1e0) ;
+//printf ("\n") ;
+
+    quint8* p ; 
+    if (addr > 0xd000) p = MAC->lower48k (addr, true) ;
+    else               p = MAC->store_highMem (addr) ;
+
+    if (p == NULL) {  // (This will happen if attempting to read into ROM.)
+        printf ("\n*** Error:  Attempting to read a disk block into ROM ***\n\n") ;
+        return IOERROR ;
+    }
+
+    int n = 0 ;
+    int stat = 0 ;
+    headStepDelay (block) ;
+    if (isOpen()) {
+        m_file[m_driveIndex].seek (block*BLOCKSIZE + m_offset[m_driveIndex]) ;
+        n = m_file[m_driveIndex].read ((char*)p, BLOCKSIZE) ;
+        if (n != BLOCKSIZE) stat = IOERROR ;
+    } else {
+        memset (MAC->m_ram+addr, 0, BLOCKSIZE) ;
+        stat = NODEVICE ;
+    }
     return stat ;
 }
 
@@ -359,8 +367,8 @@ quint8 HdController::getDiskSize (quint8 byteNumber)
     p1++ ;
 
     quint8 n ;
-    if (byteNumber & 1) n = *p1 ;
-    else                n = *p0 ;
+    if (byteNumber) n = *p1 ;
+    else            n = *p0 ;
 //printf ("p[%i]=%2.2x\n", byteNumber, n) ;
     return n ;
 }

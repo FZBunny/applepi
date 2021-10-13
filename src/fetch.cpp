@@ -131,9 +131,11 @@ quint8 Machine::fetch_ioSpace (quint16 p)     //  Addresses c000 - cfff
                 m_romSlot = 0 ;
                 break ;
               case 1:                                                           // Slot 1 $C1xx
-                c = EMPTY_SLOT ;
+//m_ss[6] = 0xff ;
+                c = epson_ROM[p] ;
+//printf ("epson p=%4.4x c=%2.2x\n", p, c) ;
                 m_slotRomPointer = NULL ;
-                m_romSlot = 0 ;
+                m_romSlot = 1 ;
                 break ;
               case 2:                                                           // Slot 2 $C2xx
                 c = EMPTY_SLOT ;
@@ -164,19 +166,16 @@ quint8 Machine::fetch_ioSpace (quint16 p)     //  Addresses c000 - cfff
                 break ;
               case 6:                                                           // Slot 6 $C6xx   (Disk II; 5.25" drive)
                 c = floppy_5_25Inch_ROM[loByte] ;
-//printf ("C6xx fetch:  p=%4.4x, c=%2.2x\n", p, c) ;
                 m_slotRomPointer = NULL ;
                 m_romSlot = 6 ;
                 break ;
               case 7:                                                           // Slot 7 $C7xx   (Hard or 3.5" drive)
                 if (m_hardDrive->isOpen(0)) {
                     c = m_hardDrive->fetch_HD_ROM (slotNumber, loByte) ;
-//printf ("HD drive 1 is open\n") ;
                 }
                 else {
                     c = EMPTY_SLOT ;
                 }
-//printf ("m_hardDrive->isOpen(0)=%i;  c=%2.2X\n", m_hardDrive->isOpen(0), c) ;
                 m_slotRomPointer = NULL ;
                 m_romSlot = 7 ;
 
@@ -249,15 +248,13 @@ quint8 Machine::fetch_sspage (quint16 p)
                     c = RdRAMWRT ;
                     break ;
                 case 5:                        // C015  read RdSLOTCXROM switch
-                    c = RdSLOTCXROM ;
-//printf ("RdSLOTCXROM = %2.2x  m_savedPC=%4.4X\n", RdSLOTCXROM, m_savedPC) ;
+                    c = RdSLOTCXROM ;//printf ("RdSLOTCXROM = %2.2x  m_savedPC=%4.4X\n", RdSLOTCXROM, m_savedPC) ;
                     break ;
                 case 6:                        // C016  read ALTZP switch
                     c = RdALTZP ;
                     break ;
                 case 7:                        // C017  read RdC3ROM switch
                     c = RdC3ROM ;
-//printf ("C3==%2.2x,  pc=%4.4x\n", c, m_savedPC) ;
                     break ;
                 case 8:                        // C018  read Rd80STORE switch
                     c = Rd80STORE ;
@@ -280,11 +277,9 @@ quint8 Machine::fetch_sspage (quint16 p)
                     break ;
                 case 0xe:                      // C01E  read ALTCHAR switch
                     c = RdALTCHAR ;
-//printf ("m_savedPC=%4.4X fetched RdALTCHAR\n", m_savedPC) ;
                     break ;
                 case 0xf:                      // C01F  read 80COL switch
-                    c = Rd80COL ;
-//printf ("Rd80COL==%2.2x, pc=%4.4x\n", c, m_savedPC) ;    
+                    c = Rd80COL ;   
                     break ;
             }
             break ;
@@ -375,40 +370,6 @@ quint8 Machine::fetch_sspage (quint16 p)
                 case 7:                        // C067  Analog input 3
 //                    AI3 = paddles.readPaddle(3) ;
                     break ;
-/***
-From mame - MAME - Multiple Arcade Machine Emulator - redump ...
-https://git.redump.net/mame/commit/?id=e019d58dfeb770c18c97a03275498bca9424d580
-
-+		case 0x68:	// STATEREG
-+			m_altzp = (data & 0x80);
-+			m_page2 = (data & 0x40);
-+			m_ramrd = (data & 0x20);
-+			m_ramwrt = (data & 0x10);
-+			m_lcram = (data & 0x08) ? false : true;
-+			m_lcram2 = (data & 0x04);
-+			m_intcxrom = (data & 0x01);
-+
-+			// update the aux state
-+			auxbank_update();
-+
-+			// update LC state
-+			if (m_lcram)
-+			{
-+				m_lcbank->set_bank(1);
-+				m_lcaux->set_bank(1);
-+				m_lc00->set_bank(1);
-+				m_lc01->set_bank(1);
-+			}
-+			else
-+			{
-+				m_lcbank->set_bank(0);
-+				m_lcaux->set_bank(0);
-+				m_lc00->set_bank(0);
-+				m_lc01->set_bank(0);
-+			}
-+			break;
-
-***/
                 case 8:                        // C068 STATEREG
                     c = 0 ;                         // ( ProDos 8 v2.0.3 does a 'TRB  $C068', but most docs )
                     if (RdSLOTCXROM)   c =  0x01 ;  // ( say 'STATEREG' is implemented only on the IIgs and later... )
@@ -419,6 +380,7 @@ https://git.redump.net/mame/commit/?id=e019d58dfeb770c18c97a03275498bca9424d580
                     if (RdRAMRD)       c |= 0x20 ;
                     if (RdPAGE2)       c |= 0x40 ;
                     if (RdALTZP)       c |= 0x80 ;
+printf ("fetch fm C068:  m_savedPC=%4.4x c=%2.2x\n", m_savedPC, c) ;
                     break ;
                 case 9:
                     break ;
@@ -441,7 +403,7 @@ https://git.redump.net/mame/commit/?id=e019d58dfeb770c18c97a03275498bca9424d580
        case 8:                                 // C080 .. C08F  Bank Switching
             fetchFromBankSwitches(p) ;
             break ;
-        case 9:                   //  slot 1      C090 - C09F  (Serial card I/O)
+        case 9:                   //  slot 1      C090 - C09F  (Printer I/O)
             m_romSlot = 1 ;
             break ;
         case 0xa:                 //  slot 2      C0A0 - C0AF
@@ -603,7 +565,7 @@ void Machine::ss_fetch_snoop (quint16 p)
 /* 58 */  "CLRAN0",     "?",          "CLRAN1",     "?",          "?",          "SETAN2",     "DBLHIRESON",  "DBLHIRESOFF",// 5F
 /* 60 */  "TAPEIN",     "RDBTN0",     "RDBTN1",     "?",          "PADDL0",     "PADDL1",     "PADDL2",      "PADDL3",     // 67
 /* 68 */  "STATEREG",   "?",          "?",          "?",          "?",          "?",          "?",           "?",          // 6F
-/* 70 */  "?",          "?",          "?",          "?",          "?",          "?",          "?",           "?",          // 77
+/* 70 */  "PTRIG",      "?",          "?",          "?",          "?",          "?",          "?",           "?",          // 77
 /* 78 */  "?",          "?",          "?",          "?",          "?",          "?",          "RDIOUDIS",    "RdDBLHIRES", // 7F
 /* 80 */  "RORamBK2",   "RRomWRamBK2","RORomBK2",   "RWRamBK2",   "RORamBK2",   "RRomWRamBK2","RORomBK2",    "RWRamBK2",   // 87
 /* 88 */  "RORamBK1",   "RRomWRamBK1","RORomBK1",   "RWRamBK1",   "RORamBK1",   "RRomWRamBK1","RORomBK1",    "RWRamBK1",   // 8F

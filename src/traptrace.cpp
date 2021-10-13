@@ -482,7 +482,7 @@ void TrapTrace::onHistoryCheckBox (void)
 
 void TrapTrace::onTraceStartEdited (void)
 {
-printf ("onTraceStartEdited\n") ;
+//printf ("onTraceStartEdited\n") ;
     editAddress (m_traceStartBox) ;
 }
 
