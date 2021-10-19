@@ -98,13 +98,13 @@ public:
     void onHd1Button     (void) ;
     void onHd2Button     (void) ;
     void setVolume       (int volume) ;
-void onDialChanged   (void) ;
+    void onDialChanged   (void) ;
 
 private:
 
     void moveEvent (QMoveEvent *event) ;
 
-    void  keyPressEvent (QKeyEvent *event) override ;
+    virtual void  keyPressEvent (QKeyEvent *event) override ;
 
     Speaker*   m_speaker ;
     Screen*    m_screen ;
@@ -112,6 +112,7 @@ private:
     bool    m_powerButtonState ;
     bool    m_currentlyPastingText ;
     bool    m_upperCaseOnly ;
+    bool    m_capsLockOn ;
 
     QString m_romString ;
     QLabel* m_romLabel ;
@@ -218,7 +219,7 @@ private:
     void toggleScale (void) ;
     
     void onScreenScale   (void) ;
-    void onKeyboardcase     (void) ;
+    void onKeyboardcase  (void) ;
     void onEchoToConsole (void) ;
     void onEchoToFile    (void) ;
 

@@ -30,6 +30,7 @@
 
 #include "machine.h"
 #include "device_roms.h"
+#include "printer.h"
 
 /*
 #ifdef Q_OS_WINDOWS
@@ -41,7 +42,7 @@
 
 //#include "tape.h"
 //#include "serial_card.h"
-//#include "debugging_dumps.h"
+#include "debugging_dumps.h"
 
 
 #define DBUG(bits) if(m_debugFlags & bits)
@@ -93,6 +94,7 @@ quint8 Machine::fetch (quint16 p)
 
 
 #define EMPTY_SLOT 0xFF
+#define RTS 0x60
 
 
 quint8 Machine::fetch_ioSpace (quint16 p)     //  Addresses c000 - cfff
@@ -130,10 +132,8 @@ quint8 Machine::fetch_ioSpace (quint16 p)     //  Addresses c000 - cfff
               case 0:
                 m_romSlot = 0 ;
                 break ;
-              case 1:                                                           // Slot 1 $C1xx
-//m_ss[6] = 0xff ;
-                c = epson_ROM[p] ;
-//printf ("epson p=%4.4x c=%2.2x\n", p, c) ;
+              case 1:                                                           // Slot 1 $C1xx   (Printer)
+                c = m_printer->fetch_Printer_ROM (slotNumber, loByte) ;
                 m_slotRomPointer = NULL ;
                 m_romSlot = 1 ;
                 break ;
@@ -380,7 +380,7 @@ quint8 Machine::fetch_sspage (quint16 p)
                     if (RdRAMRD)       c |= 0x20 ;
                     if (RdPAGE2)       c |= 0x40 ;
                     if (RdALTZP)       c |= 0x80 ;
-printf ("fetch fm C068:  m_savedPC=%4.4x c=%2.2x\n", m_savedPC, c) ;
+//printf ("fetch from C068:  m_savedPC=%4.4x c=%2.2x\n", m_savedPC, c) ;
                     break ;
                 case 9:
                     break ;
@@ -405,6 +405,7 @@ printf ("fetch fm C068:  m_savedPC=%4.4x c=%2.2x\n", m_savedPC, c) ;
             break ;
         case 9:                   //  slot 1      C090 - C09F  (Printer I/O)
             m_romSlot = 1 ;
+//printf ("A=%2.2x\n", A) ;
             break ;
         case 0xa:                 //  slot 2      C0A0 - C0AF
             m_romSlot = 2 ;

@@ -67,9 +67,7 @@ m_p_is_4 = false ;
 
 quint8 HdController::fetch_HD_ROM (int slotNumber, quint8 p)
 {
-    if ((p==0x11) || (p==0x12)) return 0 ;  // Ignore 2 fetches after $Cn10 entry; just a side-effect of last
-                                            // few lines of fn. "Machine::run" saving history data.
-//printf ("fetch_HD_ROM p=%2.2x\n", p) ;
+//printf ("1... fetch_HD_ROM p=%2.2x\n", p) ;
     static int NOP = 0xea ;
     static int RTS = 0x60 ;
     int slotAddr = 0xc000 | (slotNumber & 0x07) << 8 ;          // The slot address of our fake ROM
@@ -79,11 +77,15 @@ quint8 HdController::fetch_HD_ROM (int slotNumber, quint8 p)
     quint16 dispatchAddr = entryPoint + 3 ;                     // Dispatch address for smartport calls
     ProcessorState* ps = MAC->processorState() ;
 
+    // Ignore 2 fetches after $Cn10 entry; just a side-effect of last
+    // few lines of fn. "Machine::run" saving history data.
+    if ((MAC->savedPC()==entryPoint) && ((p==0x11) || (p==0x12))) return 0 ;
+
     switch (p) {
         case 0:                                            // Boot?
             if (MAC->savedPC() == slotAddr) {              // Yes. On boot, read the first block on the hard drive
                 offsetKludge() ;                           // into $0800 - 0x9ff...
-                readBlock (MAC->m_ram+0x0800, 0, 0) ; 
+                readBlock (MAC->m_ram+0x0800, 0, 0) ;
                 ps->Xreg  = slotNumber << 4 ;
                 ps->pc.pc_16 = 0x0801 ;                    // Then jump to $0801
                 c  = NOP ;                                 // (The code on the 1st block takes care of the rest.)
@@ -94,10 +96,10 @@ quint8 HdController::fetch_HD_ROM (int slotNumber, quint8 p)
         case 1:          // ROM code inspects bytes 1, 3, & 5 when searching for a drive to boot from.
             c = 0x20 ;
             break ;
-        case 3:          //  "ditto "
+        case 3:          // - ditto
             c = 0x00 ;
             break ;
-        case 5:          //  "ditto"
+        case 5:          // - ditto
             c = 0x03 ;
             break ;
         case 7:
@@ -105,7 +107,9 @@ quint8 HdController::fetch_HD_ROM (int slotNumber, quint8 p)
             break ;      // '3c' seems to tell it we're a dumb hard drive controller. (And we're dumb as a brick.)
         case 0x10:
             if (MAC->savedPC() == entryPoint) {            // ProDOS call
+//printf ("A... fetch_HD_ROM\n") ;
                 ps->Areg = IO() ;
+//printf ("B... fetch_HD_ROM\n") ;
                 if (ps->Areg) ps->Pstat |= C ;
                 else          ps->Pstat &= C ^ 0xff ;
                 return RTS ;
@@ -134,21 +138,36 @@ quint8 HdController::fetch_HD_ROM (int slotNumber, quint8 p)
             c = 0x10 ;
             break ;
         default:
+//printf ("fetch_HD_ROM, p=%2.2x\n", p) ;
         c = 0 ;
             break ;
     }
 
     return c ;
 } 
-
+/**
+fetch_HD_ROM, p=17
+fetch_HD_ROM, p=37
+fetch_HD_ROM, p=4c
+fetch_HD_ROM, p=02
+fetch_HD_ROM, p=0b
+**/
 
 int HdController::IO (void)
 {
-    quint16 buffer = MAC->m_ram[0x45]<<8 | MAC->m_ram[0x44] ;
-    int block  = MAC->m_ram[0x47]<<8 | MAC->m_ram[0x46] ;
-    quint8 operation = MAC->m_ram[0x42] ;
-    if (MAC->m_ram[0x43] & 0x80) m_driveIndex = 1 ;
-    else                         m_driveIndex = 0 ;
+//    quint16 buffer = MAC->m_ram[0x45]<<8 | MAC->m_ram[0x44] ;
+//    int block  = MAC->m_ram[0x47]<<8 | MAC->m_ram[0x46] ;
+//    quint8 operation = MAC->m_ram[0x42] ;
+//    if (MAC->m_ram[0x43] & 0x80) m_driveIndex = 1 ;
+//    else                         m_driveIndex = 0 ;
+//printf ("HdController::IO\n") ;
+    quint16 buffer = MAC->fetch(0x45)<<8 | MAC->fetch(0x44) ;
+    int block = MAC->fetch(0x47) << 8 | MAC->fetch(0x46) ;
+    quint8 operation = MAC->fetch(0x42) ;
+    if (MAC->fetch(0x43) & 0x80)  m_driveIndex = 1 ;
+    else                          m_driveIndex = 0 ;
+
+//ProcessorState *s = MAC->processorState() ;
 //printf ("HdController::IO  PC=%4.4X  operation=%i\n", s->pc.pc_16, operation) ;
     int stat = 0 ;
 
@@ -204,11 +223,10 @@ int HdController::readBlock (quint8* buffer, int block, int driveIndex)
 }
 
 
-// This overload of readBlock is called from fn. "IO" during nornmal I/O.
+// This overload of readBlock is called from fn. "IO" during nornmal ProDOS I/O.
  
 int HdController::readBlock (quint16 addr, int block)
 {
-
 //printf ("readBlock blk %i to %4.4X\n", block, addr) ;
 //ProcessorState* ps = MAC->processorState() ;
 //quint8 Sptr = ps->Sptr ;
@@ -217,11 +235,11 @@ int HdController::readBlock (quint16 addr, int block)
 //printf ("\n") ;
 
     quint8* p ; 
-    if (addr > 0xd000) p = MAC->lower48k (addr, true) ;
+    if (addr < 0xd000) p = MAC->lower48k (addr, true) ;
     else               p = MAC->store_highMem (addr) ;
 
-    if (p == NULL) {  // (This will happen if attempting to read into ROM.)
-        printf ("\n*** Error:  Attempting to read a disk block into ROM ***\n\n") ;
+    if (p == NULL) {
+        fprintf (stderr, "\n*** Error:  Attempting to read a disk block into ROM ***\n\n") ;
         return IOERROR ;
     }
 
@@ -231,11 +249,17 @@ int HdController::readBlock (quint16 addr, int block)
     if (isOpen()) {
         m_file[m_driveIndex].seek (block*BLOCKSIZE + m_offset[m_driveIndex]) ;
         n = m_file[m_driveIndex].read ((char*)p, BLOCKSIZE) ;
-        if (n != BLOCKSIZE) stat = IOERROR ;
+        if (n != BLOCKSIZE) {
+            fprintf (stderr, "\n*** I/O error reading block %i from hard drive image.\n", block) ;
+            stat = IOERROR ;
+        }
     } else {
-        memset (MAC->m_ram+addr, 0, BLOCKSIZE) ;
-        stat = NODEVICE ;
+        stat = IOERROR ;
     }
+ //   } else {
+ //       memset (MAC->m_ram+addr, 0, BLOCKSIZE) ;
+ //       stat = NODEVICE ;
+ //   }
     return stat ;
 }
 
@@ -309,7 +333,7 @@ int HdController::status (void)        //  (See 'ProDos Tech. Notes', note 21 fo
 {
     int stat = 0 ;
 
-    if (MAC->m_ram[0x43] & 0x80) m_driveIndex = 1 ;
+    if (MAC->fetch(0x43) & 0x80) m_driveIndex = 1 ;
     else                         m_driveIndex = 0 ;
 
     if (m_file[m_driveIndex].isOpen() == false) return NODEVICE ;
@@ -492,13 +516,13 @@ bool HdController::smartPort (void)
     quint8 unitNumber = memory[paramPtr+1] ;
 
 //------------------
-    quint8  aLo = MAC->m_ram [ps->Sptr+0x101] ;
-    quint8  aHi = MAC->m_ram [ps->Sptr+0x102] ;
-    quint16 cmdPtr = (aHi<<8) + aLo + 1 ;
-    quint8  pLo = MAC->m_ram [cmdPtr+1] ;
-    quint8  pHi = MAC->m_ram [cmdPtr+2] ;
-    quint16 paramPtr = (pHi<<8) + pLo ;
-    quint8  cmd = MAC->m_ram [cmdPtr] ;
+//    quint8  aLo = MAC->m_ram [ps->Sptr+0x101] ;
+//    quint8  aHi = MAC->m_ram [ps->Sptr+0x102] ;
+//    quint16 cmdPtr = (aHi<<8) + aLo + 1 ;
+//    quint8  pLo = MAC->m_ram [cmdPtr+1] ;
+//    quint8  pHi = MAC->m_ram [cmdPtr+2] ;
+//    quint16 paramPtr = (pHi<<8) + pLo ;
+//    quint8  cmd = MAC->m_ram [cmdPtr] ;
 //printf ("fetch_HD_ROM: *smartport* call  MAC->savedPC()=%4.4x cmdPtr=%4.4x cmd=%2.2x  paramPtr=%4.4x\n",  MAC->savedPC(), cmdPtr, cmd, paramPtr) ;
     if (cmd & 0x40) {               // This is an "extended" call.  We don't do extended.
         printf ("*** 'extended' smartPort call made from 0x%4.4x\n", MAC->savedPC()) ;

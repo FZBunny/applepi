@@ -32,8 +32,8 @@
 
 #include <sys/time.h>
 
-#include <QtCore/QThread>
-#include <QtCore/QFile>
+#include <QThread>
+#include <QFile>
 
 #include "defs.h"
 #include "mainwindow.h"
@@ -41,6 +41,7 @@
 #include "disassembler.h"
 #include "floppy_controller.h"
 #include "hd_controller.h"
+#include "printer.h"
 #include "traptrace.h"
 #include "usleep.h"
 
@@ -411,6 +412,7 @@ public:
     quint64 getCycles (void) ;
 
     HdController*  m_hardDrive ;
+    Printer*       m_printer ;
 
     void singleStep (void) ;
     void runFree    (void) ;

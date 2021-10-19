@@ -227,6 +227,7 @@ MainWindow::MainWindow (void)
     setFloppyLabel (2) ;
 
     m_firstTimerEvent = true ;
+    m_capsLockOn = false ;
 
     m_tapeButton->setEnabled (false) ;   // ***  Remove this statement after fixing tape.cpp ***
 
@@ -545,51 +546,69 @@ Speaker* MainWindow::speaker (void)
 // ----------------------------------------------------------------------------
 
 
+/***
+Qt::NoModifier	        0x00000000	No modifier key is pressed.
+Qt::ShiftModifier	    0x02000000	A Shift key on the keyboard is pressed.
+Qt::ControlModifier  	0x04000000	A Ctrl key on the keyboard is pressed.
+Qt::AltModifier	        0x08000000	An Alt key on the keyboard is pressed.
+Qt::MetaModifier	    0x10000000	A Meta key on the keyboard is pressed.
+Qt::KeypadModifier	    0x20000000	A keypad button is pressed.
+Qt::GroupSwitchModifier	0x40000000	X11 only (unless activated on Windows by a command line argument). A Mode_switch key on the keyboard is pressed.
+***/
+
 void MainWindow::keyPressEvent (QKeyEvent *e)
 {
-#ifdef Q_PROCESSOR_ARM
-    const quint16 ctrlMod = 0x04 ;
-#else
-    const quint16 ctrlMod = 0x14 ;
-#endif
-    const quint16 passThese[3] = {0xff08,    // Backspace
-                                  0xff0d,    // Enter (carriage return)
-                                  0xffff} ;  // Delete
-    quint16 c = e->nativeVirtualKey() ;
-    quint16 mods = e->nativeModifiers() ;
-// printf ("mods=%8.8x  c=%2.2x\n", mods, c) ;
-    if ((c & 0xff00) == 0xff00) {
-        switch (c) {
-            case 0xff51:
-                c = 0x08 ;   // backspace      (left-arrow)
-                break ;
-            case 0xff1b:
-                c = 0x1b ;   // escape         
-                break ;
-            case 0xff52:
-                c = 0x0b ;   // vertical tab   (up-arrow)
-                break ;
-            case 0xff53:
-                c = 0x15 ;   // shift in       (right-arrow)
-                break ;
-            case 0xff54:
-                c = 0x0a ;   // newline        (down-arrow)
-                break ;
-            default:
-                int i ;
-                for (i=2; i>=0; i--) if (c == passThese[i]) break ;
-                if (i < 0) return ;
-                break ;
-        }
+    int c = e->key() ;
+    Qt::KeyboardModifiers mods = e->modifiers() ;
+
+    switch (c) {
+        case Qt::Key_Control:
+            return ;
+        case Qt::Key_Shift:
+            return ;
+        case Qt::Key_CapsLock:
+            m_capsLockOn = ! m_capsLockOn ;
+//printf ("m_capsLockOn = %i\n", m_capsLockOn) ;
+            return ;
+        case Qt::Key_Escape:
+            c = 0x1b ;
+            break ;
+        case Qt::Key_Return:
+            c = 0x0d ;
+            break ;
+        case Qt::Key_Backspace:
+            c = 0x08 ;
+            break ;
+        case Qt::Key_Left:
+            c = 0x08 ;
+            break ;
+        case Qt::Key_Up:
+            c = 0x0b ;
+            break ;
+        case Qt::Key_Right:
+            c = 0x15 ;
+            break ;
+        case Qt::Key_Down:
+            c = 0x0a ;
+            break ;
     }
 
-    if (mods == ctrlMod) c &= 0x1f ;
-    else                 c &= 0x7f ;
-    if (m_upperCaseOnly && (c>0x60) && (c<0x7b)) c &= 0xdf ;
-// printf ("               c=%2.2x\n", c) ;
-    if (c == 0x16) pasteToKeyboard() ;
-    else           MAC->m_ss[0] =  c | 0x80 ;
+    if ((c>0x40) && (c<0x5b)) {                          // key is A..Z
+        if (mods == Qt::ControlModifier) {
+            c &= 0x1f ;
+        } else {
+            if (! m_upperCaseOnly) {
+                bool shift = (mods == Qt::ShiftModifier) ;
+                bool lowerCase = ! (shift ^ m_capsLockOn) ;
+                if (lowerCase) c += 0x20 ;
+            }
+        }
+    } else {
 
+    }
+
+//printf ("mods=%8.8x  cSave= %8.8x  c=%8.8x\n", mods, cSave, c) ;
+    MAC->m_ss[0] =  (c & 0x7f) | 0x80 ;
 }
 
 
@@ -634,18 +653,19 @@ void MainWindow::onDiskDriveCheckTimer (void)
 
 
 // Just a gimmick to maintain correct time & date for ProDOS...
-// (This is run by "m_oneSecondTimer" once every second.)
+// (This is run by "m_oneSecondTimer" once every second, but
+//  we only set the time once/minute.)
 
 void MainWindow::setProdosDateTime (void)
 {
+    static const quint8 JMP = 0x4c ;
     QTime timeOfDay = QTime::currentTime() ;
     if (timeOfDay.second() == 0) {
         quint8* p = MAC->m_ram ;
-        static const quint8 JMP = 0x4c ;
-        if ((p[0xbf00] == JMP)                   // Are we running ProDOS?
-            && (p[0xbf03] == JMP)
-            && (p[0xbf09] == JMP)
-            && (p[0xbf0c] == JMP) ) {            // ... almost certainly.
+        if ((p[0xbf00] == JMP)                // Are we running ProDOS?
+         && (p[0xbf03] == JMP)
+         && (p[0xbf09] == JMP)
+         && (p[0xbf0c] == JMP) ) {            // ... almost certainly.
             QDate date = QDate::currentDate() ;  // (See ProDOS 8 Tech.Ref.Manual page 106)
             int year = date.year() ;
             year = year % 100 ;                  // Only last 2 digits of year are used.
@@ -656,7 +676,7 @@ void MainWindow::setProdosDateTime (void)
             p[0xbf90] = byte ;
             p[0xbf93] = timeOfDay.hour() ;
             p[0xbf92] = timeOfDay.minute() ;
-//printf ("%2.2x %2.2x   %2.2x %2.2x\n", p[0xbf90], p[0xbf91], p[0xbf92], p[0xbf93]) ;
+    //printf ("%2.2x %2.2x   %2.2x %2.2x\n", p[0xbf90], p[0xbf91], p[0xbf92], p[0xbf93]) ;
         }
     }
 }

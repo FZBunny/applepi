@@ -60,6 +60,7 @@ Machine::Machine (MainWindow* parent)
 {
     m_floppy = new FloppyDiskController (this) ;
     m_hardDrive = new HdController (this) ;
+    m_printer = new Printer (this) ;
 //    m_tape = new Tape (this) ;
 
     m_disassembler = new Disassembler (m_rom, false) ;

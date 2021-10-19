@@ -360,7 +360,7 @@ void Machine::store_sspage (quint8 c, quint16 p)
                     else          RdPAGE2  = OFF ;
                     if (c & 0x80) RdALTZP  = ON ;
                     else          RdALTZP  = OFF ;
-printf ("Store to C068:  m_savedPC=%4.4x c=%2.2x\n", m_savedPC, c) ;
+//printf ("Store to   C068:  m_savedPC=%4.4x c=%2.2x\n", m_savedPC, c) ;
                     break ;
                 case 9:
                     break ;

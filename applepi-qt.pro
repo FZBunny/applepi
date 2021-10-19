@@ -31,7 +31,6 @@ HEADERS += src/about.h \
            src/debugging_dumps.h \
            src/defs.h \
            src/device_roms.h \
-#           src/disassemble.h \
            src/disassembler.h \
            src/disassemble_memory_dialog.h \
            src/floppy_controller.h \
@@ -43,6 +42,7 @@ HEADERS += src/about.h \
            src/mainwindow.h \
            src/mainwindow_menus.h \
            src/paste_to_keyboard.h \
+           src/printer.h \
            src/rom_apple2.h \
            src/rom_apple2e.h \
            src/rom_apple2e_enhanced.h \
@@ -63,7 +63,6 @@ SOURCES += src/about.cpp \
            src/debugging_dumps.cpp \
            src/defs.h \
            src/defs.cpp \
-#           src/disassemble.cpp \
            src/disassembler.cpp \
            src/disassemble_memory_dialog.cpp \
            src/fetch.cpp \
@@ -77,6 +76,7 @@ SOURCES += src/about.cpp \
            src/mainwindow.cpp \
            src/mainwindow_menus.cpp \
            src/paste_to_keyboard.cpp \
+           src/printer.cpp \
            src/rom_dialog.cpp \
            src/screen.cpp \
            src/store.cpp \
