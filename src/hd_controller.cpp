@@ -90,7 +90,7 @@ quint8 HdController::fetch_HD_ROM (int slotNumber, quint8 p)
                 ps->pc.pc_16 = 0x0801 ;                    // Then jump to $0801
                 c  = NOP ;                                 // (The code on the 1st block takes care of the rest.)
             } else {
-                c = 0 ;
+                c = 0xa9 ;
             }
             break ;
         case 1:          // ROM code inspects bytes 1, 3, & 5 when searching for a drive to boot from.
@@ -138,7 +138,7 @@ quint8 HdController::fetch_HD_ROM (int slotNumber, quint8 p)
             c = 0x10 ;
             break ;
         default:
-//printf ("fetch_HD_ROM, p=%2.2x\n", p) ;
+//printf ("2...fetch_HD_ROM, p=%2.2x\n", p) ;
         c = 0 ;
             break ;
     }

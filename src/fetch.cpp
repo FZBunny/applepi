@@ -360,14 +360,18 @@ quint8 Machine::fetch_sspage (quint16 p)
                     break ;
                 case 4:                        // C064  Analog input 0
 //                    AI0 = paddles.readPaddle(0) ;
+                    c = 0xff ;                      // Ain't got no paddles ner none'a them fancy "joy-sticks"...
                     break ;
                 case 5:                        // C065  Analog input 1
 //                    AI1 = paddles.readPaddle(1) ;
+                    c = 0xff ;
                     break ;
                 case 6:                        // C066  Analog input 2
 //                    AI2 = paddles.readPaddle(2) ;
+                    c = 0xff ;
                     break ;
                 case 7:                        // C067  Analog input 3
+                    c = 0xff ;
 //                    AI3 = paddles.readPaddle(3) ;
                     break ;
                 case 8:                        // C068 STATEREG
@@ -425,7 +429,7 @@ quint8 Machine::fetch_sspage (quint16 p)
             c = fetchFloppy_5_25Inch (loNibble) ;
             break ;
         case 0xf:                 //  slot 7      C0F0 - C0FF
-//printf ("Slot7 ss: fetch from %4.4X at PC=%4.4X\n", p, m_savedPC) ;
+printf ("Slot7 ss: fetch from %4.4X at PC=%4.4X\n", p, m_savedPC) ;
             m_romSlot = 7 ;
             break ;
     }
