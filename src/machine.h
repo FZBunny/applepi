@@ -450,7 +450,9 @@ public:
 
     FloppyDiskController* m_floppy ;
     
-    quint8 fetch (quint16 p) ;  // Hack:  made public to allow use in 'floppy_controller.cpp' XXXXXX Fix me?  Or not? XXXXXX
+    quint8 fetch (quint16 p) ;            // Hack:  made public to allow use in 'floppy_controller.cpp' XXXXXX Fix me?  Or not? XXXXXX
+    void   store (quint8 c, quint16 p) ;  // ... same for 'hd_controller.cpp'
+
     quint8* lower48k (quint16 p, bool write) ;
     quint8* store_highMem (quint16 p) ;
 
@@ -483,7 +485,6 @@ private:
     void    fetchFromBankSwitches (quint16 p) ;
     void    storeToBankSwitches (quint16 p) ;
 
-    void    store (quint8 c, quint16 p) ;
     void    store_ioSpace (quint8 c, quint16 p) ;
     void    store_sspage (quint8 c, quint16 p) ;
     void    ss_store_snoop (quint8, quint16 p) ;

@@ -170,15 +170,10 @@ quint8 Machine::fetch_ioSpace (quint16 p)     //  Addresses c000 - cfff
                 m_romSlot = 6 ;
                 break ;
               case 7:                                                           // Slot 7 $C7xx   (Hard or 3.5" drive)
-                if (m_hardDrive->isOpen(0)) {
-                    c = m_hardDrive->fetch_HD_ROM (slotNumber, loByte) ;
-                }
-                else {
-                    c = EMPTY_SLOT ;
-                }
+                c = m_hardDrive->fetch_HD_ROM (slotNumber, loByte) ;
                 m_slotRomPointer = NULL ;
                 m_romSlot = 7 ;
-
+                break ;
               default:
                 break ;
             }

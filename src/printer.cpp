@@ -74,8 +74,8 @@ quint8 Printer::fetch_Printer_ROM (int slotNumber, quint8 p)
     if ((calledFrom==entryPoint) && ((p==0x11) || (p==0x12))) return 0 ;
 
     if ((p==0) && (calledFrom==slotAddr)) {                        // Did someone say "PR#1" ?
-        MAC->m_ram[0x36] = 0x10 ;      // Set the character output vector
-        MAC->m_ram[0x37] = 0xc1 ;      // to point to us, at $C110
+        MAC->m_ram[0x36] = 0x10 ;           // Set the character output vector
+        MAC->m_ram[0x37] = slotAddr >> 8 ;  // to point to us
         ps->Areg = 0 ;
         ps->Pstat &= C ^ 0xff ;
         c = RTS ;

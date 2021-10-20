@@ -70,11 +70,12 @@ quint8 HdController::fetch_HD_ROM (int slotNumber, quint8 p)
 //printf ("1... fetch_HD_ROM p=%2.2x\n", p) ;
     static int NOP = 0xea ;
     static int RTS = 0x60 ;
-    int slotAddr = 0xc000 | (slotNumber & 0x07) << 8 ;          // The slot address of our fake ROM
-    p &= 0xff ;                                                 // (c700 for slot 7)
+    static int SLOOP = 0xfaba ;                               // ROM loop which checks for disk drives to boot from
+    int slotAddr = 0xc000 | (slotNumber & 0x07) << 8 ;        // The slot address of our fake ROM
+    p &= 0xff ;                                               // (c700 for slot 7)
     quint8 c = 0 ;
-    quint16 entryPoint = 0xc000 | (slotNumber << 8) | 0x10 ;    // Entry point for non-smartport calls
-    quint16 dispatchAddr = entryPoint + 3 ;                     // Dispatch address for smartport calls
+    quint16 entryPoint = 0xc000 | (slotNumber << 8) | 0x10 ;  // Entry point for non-smartport calls
+    quint16 dispatchAddr = entryPoint + 3 ;                   // Dispatch address for smartport calls
     ProcessorState* ps = MAC->processorState() ;
 
     // Ignore 2 fetches after $Cn10 entry; just a side-effect of last
@@ -83,12 +84,18 @@ quint8 HdController::fetch_HD_ROM (int slotNumber, quint8 p)
 
     switch (p) {
         case 0:                                            // Boot?
-            if (MAC->savedPC() == slotAddr) {              // Yes. On boot, read the first block on the hard drive
-                offsetKludge() ;                           // into $0800 - 0x9ff...
-                readBlock (MAC->m_ram+0x0800, 0, 0) ;
-                ps->Xreg  = slotNumber << 4 ;
-                ps->pc.pc_16 = 0x0801 ;                    // Then jump to $0801
-                c  = NOP ;                                 // (The code on the 1st block takes care of the rest.)
+            if (MAC->savedPC() == slotAddr) {              // Yes; 
+                if (isOpen(0)) {                           // Disk in drive?
+                    offsetKludge() ;                       // Yes. Read the first block on the hard drive
+                    readBlock (MAC->m_ram+0x0800, 0, 0) ;  // into $0800 - 0x9ff...
+                    ps->Xreg  = slotNumber << 4 ;          // Then jump to $0801
+                    ps->pc.pc_16 = 0x0801 ;                // (The code on the 1st block takes care of the rest.)
+                    c  = NOP ;
+                } else {                                   // No disk in drive; tell ROM to try slot 6.
+                //    MAC->store (0xd6, 0x01) ;
+                    ps->pc.pc_16 = SLOOP ;
+                    c = NOP ;
+                }
             } else {
                 c = 0xa9 ;
             }
@@ -264,6 +271,28 @@ int HdController::readBlock (quint16 addr, int block)
 }
 
 
+int HdController::writeBlock (quint16 buffer, int block)
+{
+//printf ("HdController::writeBlock buffer=%4.4x block=%4.4x\n", buffer, block) ;
+    int n = 0 ;
+    int stat = 0 ;
+    quint8* p ; 
+    if (buffer < 0xd000) p = MAC->lower48k (buffer, true) ;
+    else                 p = MAC->store_highMem (buffer) ;
+    
+    if (isOpen()) {
+        m_file[m_driveIndex].seek (block*BLOCKSIZE + m_offset[m_driveIndex]) ;
+        n = m_file[m_driveIndex].write ((char*)p, BLOCKSIZE) ;
+        m_file[m_driveIndex].flush() ;
+        if (n != BLOCKSIZE) stat = IOERROR ;
+    } else {
+        stat = IOERROR ;
+    }
+
+    return stat ;
+}
+
+
 bool HdController::open (QString &path, int driveIndex)
 {
 // qStdOut() << "HdController::open " << path << "; driveIndex " << driveIndex << endl ;
@@ -344,27 +373,6 @@ int HdController::status (void)        //  (See 'ProDos Tech. Notes', note 21 fo
     MAC->setY ((length >> 8) & 0xff) ;
 
 //printf ("HdController::status MAC->m_ram[$42]=%2.2x MAC->m_ram[$43]=%2.2x; status=%2.2x\n", MAC->m_ram[0x42], MAC->m_ram[0x43], stat) ;
-    return stat ;
-}
-
-
-int HdController::writeBlock (quint16 buffer, int block)
-{
-    int n = 0 ;
-    int stat = 0 ;
-    quint8* p ; 
-    if (buffer > 0xd000) p = MAC->lower48k (buffer, true) ;
-    else                 p = MAC->store_highMem (buffer) ;
-    
-    if (isOpen()) {
-        m_file[m_driveIndex].seek (block*BLOCKSIZE + m_offset[m_driveIndex]) ;
-        n = m_file[m_driveIndex].write ((char*)p, BLOCKSIZE) ;
-        m_file[m_driveIndex].flush() ;
-        if (n != BLOCKSIZE) stat = IOERROR ;
-    } else {
-        stat = NODEVICE ;
-    }
-
     return stat ;
 }
 
