@@ -14,5 +14,5 @@ Later ProDOS utilities frequently crash to the monitor when attempting  to exit 
 - There are four mildly annoying, though not always obvious, one-pixel-high horizontal lines in the display. Under investigation.
 - ApplePi emulates a 65C02 (not the original 6502) processor, whether or not the IIe enhanced model is selected. This saves code, and few will care.  
 - Cassette tape I/O is temporarily disabled. A workaround for the format differences between monitor and BASIC formats will eventually be devised.
-- There is a printer in slot 1, BUT: no dialog to select output yet, just prints to console. Coming soon. Also does not print BASIC code properly; keywords show only 1st character.
+- There is a printer in slot 1, BUT: no dialog to select output yet, just prints to console. Coming soon. Also does not print Applesoft code properly; keywords show only 1st character.  Integer BASIC prints properly, however.  Under investigation.
 - There is no serial I/O emulation. Coming soon. (This can be partially mitigated by echoing screen text to the console or a file on the host O/S.)
