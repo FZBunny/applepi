@@ -4,8 +4,9 @@ DO NOT use "qmake -project" to recreate the .pro file. (You will, however, need 
 #### Shortcomings and known bugs
 
 - The 'help' files are incomplete, and out-of-date.  Updates coming soon.
-- Can not run "Total Replay" (Total Replay v4.01.hdv) hard drive image. ApplePi gets caught in a loop midway through initialization. As this contains an amazing trove of Apple II games, fixing this is currently top priority.
+
 - The 'Apple //e enhanced' emulation has several bugs and anomalies. No ideas when they might be resolved. 
+- No joystick support yet.  Coming soon.
 - The same character-set ROMS are used for all AppleII models. This results in older models anachronistic access to the enhanced character ROM.  I am also not certain that the character ROMS are otherwise accurate.  To be fixed eventually.
 - Applepi does not always play well with the later versions of ProDOS utility disks.   
 Later ProDOS utilities frequently crash to the monitor when attempting  to exit the program.
@@ -13,5 +14,5 @@ Later ProDOS utilities frequently crash to the monitor when attempting  to exit 
 - There are four mildly annoying, though not always obvious, one-pixel-high horizontal lines in the display. Under investigation.
 - ApplePi emulates a 65C02 (not the original 6502) processor, whether or not the IIe enhanced model is selected. This saves code, and few will care.  
 - Cassette tape I/O is temporarily disabled. A workaround for the format differences between monitor and BASIC formats will eventually be devised.
-- There is no printer in slot 1. Coming soon.
-- There is no serial I/O emulation. Coming soon. (These last two can be partially mitigated by echoing screen text to the console or a file on the host O/S.)
+- There is a printer in slot 1, BUT: no dialog to select output yet, just prints to console. Coming soon. Also does not print BASIC code properly; keywords show only 1st character.
+- There is no serial I/O emulation. Coming soon. (This can be partially mitigated by echoing screen text to the console or a file on the host O/S.)

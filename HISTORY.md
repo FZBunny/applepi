@@ -19,3 +19,12 @@ Changed 'm_scaleButtonKludge' value to choose font size for "big screen/small sc
 Added missing hex validator calls to start and end text boxes.   
 Changed start/stop trace button to class 'ApplepiButton'.
 
+#### V 0.1.6
+- **mainwindow.cpp**  
+ Added a bit of (gimmicky) code to update date & time once/second when running ProDOS.
+- **hd_controller.cpp**   
+Added code to make the HD/3.5" floppy controller obey soft switch settings. (Previously only read and wrote main RAM. \*blush\*)  Also fixed typo which prevented "Total Replay" from running.
+- **mainwindow_menus.cpp**   
+Added Ctrl-V shortcut paste-to-keyboard operation. (Ctrl-C must be reserved for 'abort'.)
+- **rom_dialog.cpp**   
+Fixed bug which would cause a segfault.
