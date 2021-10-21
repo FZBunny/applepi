@@ -66,7 +66,6 @@ quint8 Printer::fetch_Printer_ROM (int slotNumber, quint8 p)
     quint16 entryPoint = slotAddr + 0x10 ;
     ProcessorState* ps = MAC->processorState() ;
     quint8 c ;
-    char Areg ;
 
     // Ignore 2 fetches after $Cn00 or $Cn10 entry; just a side-effect
     // of last few lines of fn. "Machine::run" saving history data.
@@ -80,26 +79,21 @@ quint8 Printer::fetch_Printer_ROM (int slotNumber, quint8 p)
         ps->Pstat &= C ^ 0xff ;
         c = RTS ;
     } else if ((p==0x10) && (calledFrom==entryPoint)) {            // Print a single character.
-        Areg = ps->Areg & 0x7f ;
 //printf (" %2.2x:", Areg) ;
-        fputc (Areg, m_out) ;
+        fputc (ps->Areg&0x7f, m_out) ;
+        if ((ps->Areg&0x7f) == '\r') fputc ('\n', m_out) ;
         fflush (m_out) ;
-        if (Areg == '\r') fputc ('\n', m_out) ;
-        if (MAC->m_ss[0] == 0x83) {
-            MAC->m_ss[0] = 0x03 ;      // If a ctrl-C was entered at the keyboard, 
+        if (MAC->m_ss[0] == 0x83) {    // If a ctrl-C was entered at the keyboard,
             MAC->m_ram[0x36] = 0xf0 ;  // restore the char. output vector to COUT1 ($FDF0),
             MAC->m_ram[0x37] = 0xfd ;  // and close the output file.
             close() ;
         }
-        ps->Areg = 0 ;
-        ps->Pstat &= C ^ 0xff ;
         c = RTS ;
-    } else {                                                       // Otherwise, just return a byte from ROM.
+    } else {                                                       // PC isn't Cn00 or Cn10; just return a byte from ROM.
         if (p > 0x4f) p = 0 ;
         c = epson_ROM_fragment[p] ;
     }
 
-//printf ("p=%2.2x c=%2.2x Areg=%2.2x\n", p, c, Areg) ;
     return c ;
 }
 
