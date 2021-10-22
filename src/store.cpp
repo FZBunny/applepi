@@ -378,14 +378,20 @@ void Machine::store_sspage (quint8 c, quint16 p)
                     break ;
             }
             break ;
-        case 7:                                // C070 .. C07F  Analog Input Reset
-//            paddles.reset() ;
+        case 7:                                // C070 .. C07F
+            switch (loNibble) {
+                case 3:                        // Bank switch for RAM > 128K
+                  break ;
+                case 0x0e:                     // Disable IOU
+                  break ;
+                case 0x0f:                     // Enable IOU
+                  break ;
+            }
             break ;
         case 8:
              storeToBankSwitches (p) ;         // Do something with high mem bank switches
              break ;
-        case 9:                        // Slot 1      C090 - C09F  (Printer I/O)
-//if (loNibble == 0) putchar(c) ;
+        case 9:                        // Slot 1      C090 - C09F
             break ;
         case 0xa:                      // Slot 2      C0A0 - C0AF
             break ;

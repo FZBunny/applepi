@@ -163,6 +163,9 @@ private:
     QMenu*    m_debugMenu ;
     QMenu*    m_helpMenu ;
 
+    QString* m_printToFilePrompt ;
+    QString* m_closePrintToFilePrompt ;
+
 // File actions:
     QAction* m_selectRomFile ;
     QAction* m_exit;
@@ -174,6 +177,7 @@ private:
 
 // Preferences  menu:
     QAction* m_keyboardcase ;
+    QAction* m_selectPrint ;
     QAction* m_echoToConsole ;
     QAction* m_echoToFile ;
 
@@ -217,9 +221,10 @@ private:
     void pasteToKeyboard (void) ;
 
     void toggleScale (void) ;
-    
     void onScreenScale   (void) ;
+
     void onKeyboardcase  (void) ;
+    void onSelectPrinter (void) ;
     void onEchoToConsole (void) ;
     void onEchoToFile    (void) ;
 

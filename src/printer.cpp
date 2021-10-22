@@ -37,25 +37,51 @@
 
 Printer::Printer (Machine* mac)
 {
-    m_mac = mac ;
-    m_out = stdout ;
+    m_parent = mac ;
+    m_out = new QFile() ;
+    m_out->open (1, QIODevice::WriteOnly) ;
+    m_writingToFile = false ;
 }
 
 
-int Printer::open (QString& )
+bool Printer::open (QString path)
 {
-    return 0 ;
+    if (m_out) delete m_out ;
+    m_out = new QFile (path) ;
+    bool ok = m_out->open (QIODevice::WriteOnly) ;
+    if (ok) m_writingToFile = true ;
+    return ok ;
 }
 
+
+QString Printer::error()
+{
+    return m_out->errorString() ;
+}
 
 void Printer::close (void)
 {
-    if (m_out != stdout) {  // Avoid closing stdout!
-        fclose (m_out) ;
-        m_out = stdout ;
-    }
+    m_out->close() ;
+    delete m_out ;
+    m_out = new QFile() ;
+    m_out->open (1, QIODevice::WriteOnly) ;
+    m_writingToFile = false ;
+    MAC->m_ram[0x36] = 0xf0 ;  // restore the char. output vector to COUT1 ($FDF0)
+    MAC->m_ram[0x37] = 0xfd ;
 }
 
+
+bool Printer::haveOpenFile (void)
+{
+    return m_writingToFile ;
+}
+
+
+//
+//  This is called by Machine::fetch when fetching a byte from our fictitious printer ROM.
+//  This usually occurs when fetching 3 butes for a JSR $C100 (When a "PR#1" is entered),
+//  or 3 bytes when a JSR $C110 is executed to print a single character.
+//  ProDOS may also fetch single bytes when attempting to identify the device in slot 1. 
 
 quint8 Printer::fetch_Printer_ROM (int slotNumber, quint8 p)
 {                                      
@@ -80,9 +106,9 @@ quint8 Printer::fetch_Printer_ROM (int slotNumber, quint8 p)
         c = RTS ;
     } else if ((p==0x10) && (calledFrom==entryPoint)) {            // Print a single character.
 //printf (" %2.2x:", Areg) ;
-        fputc (ps->Areg&0x7f, m_out) ;
-        if ((ps->Areg&0x7f) == '\r') fputc ('\n', m_out) ;
-        fflush (m_out) ;
+        m_out->putChar (ps->Areg&0x7f) ;
+        if ((ps->Areg&0x7f) == '\r') m_out->putChar ('\n') ;
+        m_out->flush() ;
         if (MAC->m_ss[0] == 0x83) {    // If a ctrl-C was entered at the keyboard,
             MAC->m_ram[0x36] = 0xf0 ;  // restore the char. output vector to COUT1 ($FDF0),
             MAC->m_ram[0x37] = 0xfd ;  // and close the output file.

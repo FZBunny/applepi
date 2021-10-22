@@ -45,14 +45,16 @@ public:
     Printer (Machine* machine) ;
     ~Printer (void) {} ;
 
-    int    open (QString& name) ;
-    void   close (void) ;
-    quint8 fetch_Printer_ROM (int slotNumber, quint8 loByte) ;
+    bool    open (QString name) ;
+    QString error (void) ;
+    void    close (void) ;
+    bool    haveOpenFile (void) ;
+    quint8  fetch_Printer_ROM (int slotNumber, quint8 loByte) ;
 
 private:
-
-    Machine* m_mac ;
-    FILE*    m_out ;
+    Machine* m_parent ;
+    QFile*   m_out ;
+    bool     m_writingToFile ;
 
     // 'epson_ROM_fragment' exists only to let ProDOS identify slot 1 as a parallel (printer) card.
     const quint8 epson_ROM_fragment[0x50] = { 

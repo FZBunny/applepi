@@ -219,7 +219,7 @@ quint8 Machine::fetch_sspage (quint16 p)
         return 0 ;
     }
 
-    c= m_ss[p-0xC000] ;
+    c = m_ss[p-0xC000] ;
 
     switch (hiNibble) {
         case 0:                                // C000 .. C00F
@@ -397,8 +397,10 @@ quint8 Machine::fetch_sspage (quint16 p)
                     break ;
             }
             break ;
-        case 7:                                // C070 .. C07F  Analog Input Reset
-            break ;
+        case 7:                                // C070 .. C07F  Misc...
+            if (loNibble==0) {   // Reset AI
+            
+            }
        case 8:                                 // C080 .. C08F  Bank Switching
             fetchFromBankSwitches(p) ;
             break ;

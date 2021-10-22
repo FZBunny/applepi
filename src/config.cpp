@@ -75,20 +75,21 @@ Config::Config() : QSettings (QSettings::NativeFormat, QSettings::UserScope, "ap
         QString yes("yes") ;
         QString zeros("0000") ;
         QString ffff ("FFFF") ;
-        QString tmpStr ("10,10") ;
+        QString tmpStr ;
 
         Set ("check-key",  checkValue) ;
+        Set ("directory_for_slot1_print", defaultDir) ;
         Set ("disassemble_start_address", zeros) ;
         Set ("disassemble_end", zeros) ;
 //        Set ("disassemble_mem_type", uint(1)) ;
 //        Set ("disassemble_end_criterion", uint(1)) ;
-        Set ("history_dump", (uint)0) ;
-        tmpStr = "0" ;
         Set ("floppy1_path", defaultDir) ;
         Set ("floppy2_path", defaultDir) ;
         Set ("hd1_volume_path", defaultDir) ;
         Set ("hd2_volume_path", defaultDir) ;
+        Set ("history_dump", (uint)0) ;
         Set ("internal_rom_number", (uint)2) ;
+        tmpStr = "0" ;
         Set ("lines2dump", tmpStr) ;
         Set ("rom_path", defaultDir) ;
         Set ("speaker_volume", (uint)20) ;
@@ -107,6 +108,7 @@ Config::Config() : QSettings (QSettings::NativeFormat, QSettings::UserScope, "ap
         Set ("trap3_enable",  (uint)0) ;
         Set ("text_echo_path", defaultDir) ;
         Set ("use_internal_rom", yes) ;
+        tmpStr = "10,10" ;
         Set ("window_position", tmpStr) ;
         Set ("window_scale", (uint)1) ;
 

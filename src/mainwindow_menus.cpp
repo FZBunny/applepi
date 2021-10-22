@@ -30,7 +30,10 @@
 #include <Qt>
 #include <QMenuBar>
 #include <QFileDialog>
+#include <QPrinter>
+#include <QPrintDialog>
 #include <QMessageBox>
+#include <QErrorMessage>
 
 #include "about.h"
 #include "machine.h"
@@ -55,6 +58,9 @@ extern "C" void trim (char* buffer, int len) ;
 
 void MainWindow::createMenus (void)
 {
+    m_printToFilePrompt = new QString ("Select Slot1 Print File...") ;
+    m_closePrintToFilePrompt = new QString ("Close Slot1 file") ;
+
     m_fileMenu        = menuBar()->addMenu (tr("&File")) ;
     m_editMenu        = menuBar()->addMenu (tr("&Edit")) ;
     m_preferencesMenu = menuBar()->addMenu (tr("&Preferences")) ;
@@ -67,9 +73,15 @@ void MainWindow::createMenus (void)
     m_fileMenu->addAction (m_selectRomFile) ;
     connect (m_selectRomFile, &QAction::triggered, this, &MainWindow::onSelectRom) ;
 
+    m_selectPrint = new QAction (*m_printToFilePrompt, this) ;
+    m_fileMenu->addAction (m_selectPrint) ;
+    connect (m_selectPrint, &QAction::triggered, this, &MainWindow::onSelectPrinter) ;
+
     m_exit = new QAction (tr("Exit"), this) ;
     m_fileMenu->addAction (m_exit) ;
     connect (m_exit, &QAction::triggered, this, &MainWindow::onExit) ;
+
+    m_fileMenu->insertSeparator (m_exit) ;
 
 // "Edit" menu  ------------------------------------
 
@@ -85,7 +97,7 @@ void MainWindow::createMenus (void)
 // "Preferences" menu  ------------------------------------
 
     m_keyboardcase = new QAction (tr("Use Mixed-Case Keyboard"), this) ;
-    m_preferencesMenu->addAction (m_keyboardcase );
+    m_preferencesMenu->addAction (m_keyboardcase) ;
     connect (m_keyboardcase, &QAction::triggered, this, &MainWindow::onKeyboardcase) ;
 
     m_echoToConsole = new QAction (tr("Echo Screen Text to Console"), this) ;
@@ -131,6 +143,36 @@ void MainWindow::onSelectRom (void)
 {
     RomDialog* dlg = new RomDialog (this) ;
     dlg->exec() ;
+}
+
+
+void MainWindow::onSelectPrinter (void)
+{
+    QString fileKey = "directory_for_slot1_print" ;        
+    QString dir1 ;
+    QString dir2 ;
+
+    if (MAC->m_printer->haveOpenFile()) {      // Already printing to a file. Close it.
+        MAC->m_printer->close() ;
+        m_selectPrint->setText (*m_printToFilePrompt) ;
+    } else {                                   // Just printing to stdout. Open a file.   
+        CFG->Get (fileKey, &dir1) ;
+        QString fileName = QFileDialog::getSaveFileName (this, "Print to a file", dir1) ;
+
+        if (fileName.length()) {
+            QFileInfo info (fileName) ;
+            bool ok = MAC->m_printer->open (fileName) ;
+            if (ok) {
+                dir2 = info.absoluteDir().absolutePath() ;
+                m_selectPrint->setText (*m_closePrintToFilePrompt) ;
+                CFG->Set (fileKey, dir2) ;
+            } else {
+                QErrorMessage* msg = new QErrorMessage (this) ;
+                msg->showMessage (tr("Can't open file for slot1 printing: \n") + MAC->m_printer->error()) ;
+            }
+        }
+    }
+//qStdOut() << "dir2=" << dir2 << "; name=" << fileName << endl ;
 }
 
 
