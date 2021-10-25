@@ -41,6 +41,7 @@
 #include "disassembler.h"
 #include "floppy_controller.h"
 #include "hd_controller.h"
+#include "paddles.h"
 #include "printer.h"
 #include "traptrace.h"
 #include "usleep.h"
@@ -520,7 +521,7 @@ private:
     bool    m_echoToConsole ;
     QFile*  m_echoToFile ;
 
-//    AnalogInput          paddles ;
+    Paddles* m_paddles ;
 
     quint64  m_previousUsecs ;
 

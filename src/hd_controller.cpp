@@ -57,7 +57,6 @@ HdController::HdController (Machine* parent)
 
     if (m_configuredPath[0].length()) open (m_configuredPath[0], 0) ;
     if (m_configuredPath[1].length()) open (m_configuredPath[1], 1) ;
-m_p_is_4 = false ;
 }
 
 
@@ -110,13 +109,12 @@ quint8 HdController::fetch_HD_ROM (int slotNumber, quint8 p)
             c = 0x03 ;
             break ;
         case 7:
-            c = 0x3c ;   // ProDOS inspects byte 7; a zero value would indicate we're a "smartport" controller.
-            break ;      // '3c' seems to tell it we're a dumb hard drive controller. (And we're dumb as a brick.)
+//printf ("C707 fetched from %4.4x\n", MAC->savedPC()) ;
+            c = 0x3c ;   // A non-zero tells ProDOS we're a dumb hard drive controller. (And we're dumb as a brick.)
+            break ;      // ($3c seems to make some code happy.)
         case 0x10:
             if (MAC->savedPC() == entryPoint) {            // ProDOS call
-//printf ("A... fetch_HD_ROM\n") ;
                 ps->Areg = IO() ;
-//printf ("B... fetch_HD_ROM\n") ;
                 if (ps->Areg) ps->Pstat |= C ;
                 else          ps->Pstat &= C ^ 0xff ;
                 return RTS ;
@@ -126,7 +124,7 @@ quint8 HdController::fetch_HD_ROM (int slotNumber, quint8 p)
             break ;
         case 0x13:                                         // ProDOS 'smartport' call
             if (MAC->savedPC() == dispatchAddr) { 
-        //        smartPort() ;
+                smartPort() ;     // We should NEVER get here; we ain't got no smarts...
                 c = RTS ;
             } else {
                 c = 0 ;
@@ -152,21 +150,29 @@ quint8 HdController::fetch_HD_ROM (int slotNumber, quint8 p)
 
     return c ;
 } 
-/**
-fetch_HD_ROM, p=17
-fetch_HD_ROM, p=37
-fetch_HD_ROM, p=4c
-fetch_HD_ROM, p=02
-fetch_HD_ROM, p=0b
-**/
+
+
+// This is a dummy stand-in for a smartport call.
+// It should never be called, but just in case, try to respond with an error status.
+
+bool HdController::smartPort (void)
+{
+    ProcessorState* ps = MAC->processorState() ;
+    quint16 s = ps->Sptr + 0x100 ;
+    quint16 retAddr = MAC->fetch (s+1) | (MAC->fetch (s+2)<<8) ;
+printf ("*** Hard drive 'SmartPort' call was made from $%4.4x. This should not happen.\n", retAddr-2) ;
+    retAddr += 3 ;
+    MAC->store (retAddr, s+1) ;
+    MAC->store (retAddr>>8, s+2) ;
+    ps->Pstat |= C ;
+    ps->Areg = 0x28 ;     // ($28 == "No device connected")
+
+    return false ;
+}
+
 
 int HdController::IO (void)
 {
-//    quint16 buffer = MAC->m_ram[0x45]<<8 | MAC->m_ram[0x44] ;
-//    int block  = MAC->m_ram[0x47]<<8 | MAC->m_ram[0x46] ;
-//    quint8 operation = MAC->m_ram[0x42] ;
-//    if (MAC->m_ram[0x43] & 0x80) m_driveIndex = 1 ;
-//    else                         m_driveIndex = 0 ;
 //printf ("HdController::IO\n") ;
     quint16 buffer = MAC->fetch(0x45)<<8 | MAC->fetch(0x44) ;
     int block = MAC->fetch(0x47) << 8 | MAC->fetch(0x46) ;

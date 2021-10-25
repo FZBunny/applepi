@@ -84,7 +84,6 @@ private:
     const int NODEVICE  = 0x28 ;
     const int WRITE_PROTECTED = 0x2b ;
 
-bool        m_p_is_4 ;
     int         m_driveIndex ;
     QFile       m_file[2] ;
     QFileInfo   m_fileInfo[2] ;

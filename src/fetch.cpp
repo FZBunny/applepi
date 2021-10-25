@@ -338,36 +338,26 @@ quint8 Machine::fetch_sspage (quint16 p)
                 case 0:                        // C060: Cassette input  /  also Switch 3 ?
  //                   c = m_tape->readTapeInput() ;
                     break ;
-                case 1:                        // C061  Left-alt ("open apple" key) / Switch 0
-                    c = SW0IN ;
-                    SW0IN = 0 ;
-//                    SW0IN = paddles.readButton(0) ;  XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                case 1:                        // C061  Switch 0 / Left-alt  ("open apple" key)  // XXXXX what to do about the apple keys here ? XXXXX
+                    c = m_paddles->readButton(0) ;
                     break ;
-                case 2:                        // C062  Right-alt ("solid apple" key) / Switch 1
-                    c = SW1IN ;
-                    SW1IN = 0 ;
-//                    SW1IN = paddles.readButton(1) ;          XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                case 2:                        // C062  Switch 1 / Right-alt ("solid apple" key)
+                    c = m_paddles->readButton(1) ;
                     break ;
                 case 3:                        // C063  Switch 2
-                    c = SW2IN ;
-                    SW2IN = 0 ;
-//                    SW2IN = paddles.readButton(2) ;          XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                    c = m_paddles->readButton(2) ;
                     break ;
-                case 4:                        // C064  Analog input 0
-//                    AI0 = paddles.readPaddle(0) ;
-                    c = 0xff ;                      // Ain't got no paddles ner none'a them fancy "joy-sticks"...
+                case 4:                        // C064  Analog input 0  (paddle 0 / joystick X-axis) // XXXXX correct joystick axis? XXXXX
+                    c = m_paddles->readPaddle(0) ;
                     break ;
                 case 5:                        // C065  Analog input 1
-//                    AI1 = paddles.readPaddle(1) ;
-                    c = 0xff ;
+                    c = m_paddles->readPaddle(1) ;
                     break ;
                 case 6:                        // C066  Analog input 2
-//                    AI2 = paddles.readPaddle(2) ;
                     c = 0xff ;
                     break ;
                 case 7:                        // C067  Analog input 3
                     c = 0xff ;
-//                    AI3 = paddles.readPaddle(3) ;
                     break ;
                 case 8:                        // C068 STATEREG
                     c = 0 ;                         // ( ProDos 8 v2.0.3 does a 'TRB  $C068', but most docs )
@@ -398,9 +388,11 @@ quint8 Machine::fetch_sspage (quint16 p)
             }
             break ;
         case 7:                                // C070 .. C07F  Misc...
-            if (loNibble==0) {   // Reset AI
-            
+            if (loNibble==0) {    // Reset Analog inputs (paddles/joystick)
+                m_paddles->reset() ;
             }
+            c = 0 ;
+            break ;
        case 8:                                 // C080 .. C08F  Bank Switching
             fetchFromBankSwitches(p) ;
             break ;

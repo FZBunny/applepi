@@ -231,8 +231,9 @@ MainWindow::MainWindow (void)
 
     m_tapeButton->setEnabled (false) ;   // ***  Remove this statement after fixing tape.cpp ***
 
-
     resizeWindow() ;
+
+this->setMouseTracking(true) ;
 }
 
 
@@ -842,4 +843,3 @@ void MainWindow::setVolume (int volume)
 {
     m_speaker->setVolume (float(volume)) ;
 }
-

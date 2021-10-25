@@ -42,6 +42,7 @@ HEADERS += src/about.h \
            src/machine.h \
            src/mainwindow.h \
            src/mainwindow_menus.h \
+           src/paddles.h \
            src/paste_to_keyboard.h \
            src/printer.h \
            src/rom_apple2.h \
@@ -76,6 +77,7 @@ SOURCES += src/about.cpp \
            src/main.cpp \
            src/mainwindow.cpp \
            src/mainwindow_menus.cpp \
+           src/paddles.cpp \
            src/paste_to_keyboard.cpp \
            src/printer.cpp \
            src/rom_dialog.cpp \

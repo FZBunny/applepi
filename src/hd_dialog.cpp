@@ -155,7 +155,7 @@ void HardDriveDialog::insertVolume (void)
             m_fileInfo->setFile (newPath) ;
         }
         if (m_fileInfo->isDir()) {
-             m_ejectInsertButton->setText ("Insert a Floppy") ;
+             m_ejectInsertButton->setText ("Insert a Disk") ;
              m_newVolumeButton->setEnabled (true) ;
         } else {
             if (m_fileInfo->size()<819200) {
