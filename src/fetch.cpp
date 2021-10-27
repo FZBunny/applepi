@@ -339,19 +339,19 @@ quint8 Machine::fetch_sspage (quint16 p)
  //                   c = m_tape->readTapeInput() ;
                     break ;
                 case 1:                        // C061  Switch 0 / Left-alt  ("open apple" key)  // XXXXX what to do about the apple keys here ? XXXXX
-                    c = m_paddles->readButton(0) ;
+                    c = m_joystick->readButton(0) ;
                     break ;
                 case 2:                        // C062  Switch 1 / Right-alt ("solid apple" key)
-                    c = m_paddles->readButton(1) ;
+                    c = m_joystick->readButton(1) ;
                     break ;
                 case 3:                        // C063  Switch 2
-                    c = m_paddles->readButton(2) ;
+                    c = m_joystick->readButton(2) ;
                     break ;
-                case 4:                        // C064  Analog input 0  (paddle 0 / joystick X-axis) // XXXXX correct joystick axis? XXXXX
-                    c = m_paddles->readPaddle(0) ;
+                case 4:                        // C064  Analog input 0  (paddle 0 / joystick X-axis)
+                    c = m_joystick->readJoystick(0) ;
                     break ;
-                case 5:                        // C065  Analog input 1
-                    c = m_paddles->readPaddle(1) ;
+                case 5:                        // C065  Analog input 1  (paddle 1 / joystick Y-axis)
+                    c = m_joystick->readJoystick(1) ;
                     break ;
                 case 6:                        // C066  Analog input 2
                     c = 0xff ;
@@ -388,8 +388,8 @@ quint8 Machine::fetch_sspage (quint16 p)
             }
             break ;
         case 7:                                // C070 .. C07F  Misc...
-            if (loNibble==0) {    // Reset Analog inputs (paddles/joystick)
-                m_paddles->reset() ;
+            if (loNibble==0) {    // Reset Analog inputs (joystick)
+                m_joystick->reset() ;
             }
             c = 0 ;
             break ;

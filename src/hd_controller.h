@@ -71,18 +71,23 @@ public:
     int format (void) ;
 
     bool smartPort (void) ;
-    bool smartPortStatus (quint8* m_ram, quint16 paramPtr) ;
+    bool sp_readblock (void) ;
 
-    void    headStepDelay (int block) ;
+    void   headStepDelay (int block) ;
     quint8 getDiskSize (quint8 byteNumber) ;
-    bool    writeProtected (void) ;
+    bool   writeProtected (void) ;
 
 
 private:
 
+    quint8* address (quint16 address, bool write) ;
+    void    adjustReturnAddress (int nBytes) ;
+
     const int IOERROR   = 0x27 ;
     const int NODEVICE  = 0x28 ;
     const int WRITE_PROTECTED = 0x2b ;
+
+    Machine*    m_mac ;
 
     int         m_driveIndex ;
     QFile       m_file[2] ;
@@ -93,7 +98,10 @@ private:
     qulonglong  m_fileSize[2] ;
     int         m_previousTrack[2] ;
 
-    Machine*    m_parent ;
+    quint16     m_stackPtr ;
+    quint16     m_retAddr ;
+    quint16     m_paramPtr ;
+
 
 } ;
 

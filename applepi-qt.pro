@@ -38,11 +38,11 @@ HEADERS += src/about.h \
            src/floppy_dialog.h \
            src/hd_controller.h \
            src/hd_dialog.h \
+           src/joystick.h \
            src/lin-speaker.h \
            src/machine.h \
            src/mainwindow.h \
            src/mainwindow_menus.h \
-           src/paddles.h \
            src/paste_to_keyboard.h \
            src/printer.h \
            src/rom_apple2.h \
@@ -72,12 +72,12 @@ SOURCES += src/about.cpp \
            src/floppy_dialog.cpp \
            src/hd_controller.cpp \
            src/hd_dialog.cpp \
+           src/joystick.cpp \
            src/lin-speaker.cpp \
            src/machine.cpp \
            src/main.cpp \
            src/mainwindow.cpp \
            src/mainwindow_menus.cpp \
-           src/paddles.cpp \
            src/paste_to_keyboard.cpp \
            src/printer.cpp \
            src/rom_dialog.cpp \

@@ -49,7 +49,7 @@
 
 HdController::HdController (Machine* parent)
 {
-    m_parent = parent ;
+    m_mac = parent ;
 
     QString key ;
     CFG->Get ("hd1_volume_path", &m_configuredPath[0]) ;
@@ -75,23 +75,23 @@ quint8 HdController::fetch_HD_ROM (int slotNumber, quint8 p)
     quint8 c = 0 ;
     quint16 entryPoint = 0xc000 | (slotNumber << 8) | 0x10 ;  // Entry point for non-smartport calls
     quint16 dispatchAddr = entryPoint + 3 ;                   // Dispatch address for smartport calls
-    ProcessorState* ps = MAC->processorState() ;
+    ProcessorState* ps = m_mac->processorState() ;
 
     // Ignore 2 fetches after $Cn10 entry; just a side-effect of last
     // few lines of fn. "Machine::run" saving history data.
-    if ((MAC->savedPC()==entryPoint) && ((p==0x11) || (p==0x12))) return 0 ;
+    if ((m_mac->savedPC()==entryPoint) && ((p==0x11) || (p==0x12))) return 0 ;
 
     switch (p) {
-        case 0:                                            // Boot?
-            if (MAC->savedPC() == slotAddr) {              // Yes; 
-                if (isOpen(0)) {                           // Disk in drive?
-                    offsetKludge() ;                       // Yes. Read the first block on the hard drive
-                    readBlock (MAC->m_ram+0x0800, 0, 0) ;  // into $0800 - 0x9ff...
-                    ps->Xreg  = slotNumber << 4 ;          // Then jump to $0801
-                    ps->pc.pc_16 = 0x0801 ;                // (The code on the 1st block takes care of the rest.)
+        case 0:                                              // Boot?
+            if (m_mac->savedPC() == slotAddr) {              // Yes; 
+                if (isOpen(0)) {                             // Disk in drive?
+                    offsetKludge() ;                         // Yes. Read the first block on the hard drive
+                    readBlock (m_mac->m_ram+0x0800, 0, 0) ;  // into $0800 - 0x9ff...
+                    ps->Xreg  = slotNumber << 4 ;            // Then jump to $0801
+                    ps->pc.pc_16 = 0x0801 ;                  // (The code on the 1st block takes care of the rest.)
                     c  = NOP ;
-                } else {                                   // No disk in drive; tell ROM to try slot 6.
-                //    MAC->store (0xd6, 0x01) ;
+                } else {                                     // No disk in drive; tell ROM to try slot 6.
+                //    m_mac->store (0xd6, 0x01) ;
                     ps->pc.pc_16 = SLOOP ;
                     c = NOP ;
                 }
@@ -109,11 +109,11 @@ quint8 HdController::fetch_HD_ROM (int slotNumber, quint8 p)
             c = 0x03 ;
             break ;
         case 7:
-//printf ("C707 fetched from %4.4x\n", MAC->savedPC()) ;
+//printf ("C707 fetched from %4.4x\n", m_mac->savedPC()) ;
             c = 0x3c ;   // A non-zero tells ProDOS we're a dumb hard drive controller. (And we're dumb as a brick.)
             break ;      // ($3c seems to make some code happy.)
         case 0x10:
-            if (MAC->savedPC() == entryPoint) {            // ProDOS call
+            if (m_mac->savedPC() == entryPoint) {          // ProDOS call
                 ps->Areg = IO() ;
                 if (ps->Areg) ps->Pstat |= C ;
                 else          ps->Pstat &= C ^ 0xff ;
@@ -123,8 +123,8 @@ quint8 HdController::fetch_HD_ROM (int slotNumber, quint8 p)
             }
             break ;
         case 0x13:                                         // ProDOS 'smartport' call
-            if (MAC->savedPC() == dispatchAddr) { 
-                smartPort() ;     // We should NEVER get here; we ain't got no smarts...
+            if (m_mac->savedPC() == dispatchAddr) { 
+                smartPort() ;
                 c = RTS ;
             } else {
                 c = 0 ;
@@ -152,35 +152,16 @@ quint8 HdController::fetch_HD_ROM (int slotNumber, quint8 p)
 } 
 
 
-// This is a dummy stand-in for a smartport call.
-// It should never be called, but just in case, try to respond with an error status.
-
-bool HdController::smartPort (void)
-{
-    ProcessorState* ps = MAC->processorState() ;
-    quint16 s = ps->Sptr + 0x100 ;
-    quint16 retAddr = MAC->fetch (s+1) | (MAC->fetch (s+2)<<8) ;
-printf ("*** Hard drive 'SmartPort' call was made from $%4.4x. This should not happen.\n", retAddr-2) ;
-    retAddr += 3 ;
-    MAC->store (retAddr, s+1) ;
-    MAC->store (retAddr>>8, s+2) ;
-    ps->Pstat |= C ;
-    ps->Areg = 0x28 ;     // ($28 == "No device connected")
-
-    return false ;
-}
-
-
 int HdController::IO (void)
 {
 //printf ("HdController::IO\n") ;
-    quint16 buffer = MAC->fetch(0x45)<<8 | MAC->fetch(0x44) ;
-    int block = MAC->fetch(0x47) << 8 | MAC->fetch(0x46) ;
-    quint8 operation = MAC->fetch(0x42) ;
-    if (MAC->fetch(0x43) & 0x80)  m_driveIndex = 1 ;
+    quint16 buffer = m_mac->fetch(0x45)<<8 | m_mac->fetch(0x44) ;
+    int block = m_mac->fetch(0x47) << 8 | m_mac->fetch(0x46) ;
+    quint8 operation = m_mac->fetch(0x42) ;
+    if (m_mac->fetch(0x43) & 0x80)  m_driveIndex = 1 ;
     else                          m_driveIndex = 0 ;
 
-//ProcessorState *s = MAC->processorState() ;
+//ProcessorState *s = m_mac->processorState() ;
 //printf ("HdController::IO  PC=%4.4X  operation=%i\n", s->pc.pc_16, operation) ;
     int stat = 0 ;
 
@@ -189,21 +170,21 @@ int HdController::IO (void)
           stat = status() ;
           break ;
        case 1:                         // Read
-          m_parent->m_parent->HDActivityStarted (m_driveIndex) ;
+          m_mac->m_parent->HDActivityStarted (m_driveIndex) ;
           stat = readBlock (buffer, block) ;
-//ProcessorState *s = MAC->processorState() ;
+//ProcessorState *s = m_mac->processorState() ;
 //printf ("read: PC=%4.4X  buffer=%4.4x block=%4.4x stat=%i\n", s->pc.pc_16, buffer, block, stat) ;
           break ;
        case 2:                         // Write
-          m_parent->m_parent->HDActivityStarted (m_driveIndex) ;
+          m_mac->m_parent->HDActivityStarted (m_driveIndex) ;
           stat = writeBlock (buffer, block) ;
           break ;
        case 3:                         // Format
-          m_parent->m_parent->HDActivityStarted (m_driveIndex) ;
+          m_mac->m_parent->HDActivityStarted (m_driveIndex) ;
           stat = format() ;
           break ;
        default:
-          printf ("*** Internal error;  bad hard-drive operation code: %2.2x\n", operation) ;
+          fprintf (stderr, "*** Internal error;  bad hard-drive operation code: %2.2x\n", operation) ;
           stat = 0x27 ;
           break ;
     }
@@ -211,6 +192,19 @@ int HdController::IO (void)
     return stat ;
 }
 
+
+// Return a pointer to a bypte within either m_ram or m_aux,
+// depanding on soft-switch settings
+
+quint8* HdController::address (quint16 address, bool write)
+{
+    quint8* p ;
+
+    if (address < 0xd000) p = m_mac->lower48k (address, write) ;
+    else                  p = m_mac->store_highMem (address) ;  
+
+    return p ;
+}
 
 // This overload of readBlock is called from 'MainWindow::setHDLabel'   
 // upon power-on to get the ProDOS disk labels of any disks in the two
@@ -240,16 +234,7 @@ int HdController::readBlock (quint8* buffer, int block, int driveIndex)
  
 int HdController::readBlock (quint16 addr, int block)
 {
-//printf ("readBlock blk %i to %4.4X\n", block, addr) ;
-//ProcessorState* ps = MAC->processorState() ;
-//quint8 Sptr = ps->Sptr ;
-//printf ("Sptr=1%2.2x\n", Sptr) ;
-//xdump (MAC->m_ram+0x1e0, 0x20, 0x1e0) ;
-//printf ("\n") ;
-
-    quint8* p ; 
-    if (addr < 0xd000) p = MAC->lower48k (addr, true) ;
-    else               p = MAC->store_highMem (addr) ;
+    quint8* p = address (addr, true) ;
 
     if (p == NULL) {
         fprintf (stderr, "\n*** Error:  Attempting to read a disk block into ROM ***\n\n") ;
@@ -270,7 +255,7 @@ int HdController::readBlock (quint16 addr, int block)
         stat = IOERROR ;
     }
  //   } else {
- //       memset (MAC->m_ram+addr, 0, BLOCKSIZE) ;
+ //       memset (m_mac->m_ram+addr, 0, BLOCKSIZE) ;
  //       stat = NODEVICE ;
  //   }
     return stat ;
@@ -282,10 +267,9 @@ int HdController::writeBlock (quint16 buffer, int block)
 //printf ("HdController::writeBlock buffer=%4.4x block=%4.4x\n", buffer, block) ;
     int n = 0 ;
     int stat = 0 ;
-    quint8* p ; 
-    if (buffer < 0xd000) p = MAC->lower48k (buffer, true) ;
-    else                 p = MAC->store_highMem (buffer) ;
-    
+
+    quint8* p = address (buffer, true) ;
+       
     if (isOpen()) {
         m_file[m_driveIndex].seek (block*BLOCKSIZE + m_offset[m_driveIndex]) ;
         n = m_file[m_driveIndex].write ((char*)p, BLOCKSIZE) ;
@@ -368,24 +352,24 @@ int HdController::status (void)        //  (See 'ProDos Tech. Notes', note 21 fo
 {
     int stat = 0 ;
 
-    if (MAC->fetch(0x43) & 0x80) m_driveIndex = 1 ;
+    if (m_mac->fetch(0x43) & 0x80) m_driveIndex = 1 ;
     else                         m_driveIndex = 0 ;
 
     if (m_file[m_driveIndex].isOpen() == false) return NODEVICE ;
 
     else if (m_writeable[m_driveIndex] == false)  stat = WRITE_PROTECTED ; 
     quint64 length = (m_fileInfo[m_driveIndex].size() - m_offset[m_driveIndex]) / BLOCKSIZE  ; // (size in blocks)
-    MAC->setX (length & 0xff) ;
-    MAC->setY ((length >> 8) & 0xff) ;
+    m_mac->setX (length & 0xff) ;
+    m_mac->setY ((length >> 8) & 0xff) ;
 
-//printf ("HdController::status MAC->m_ram[$42]=%2.2x MAC->m_ram[$43]=%2.2x; status=%2.2x\n", MAC->m_ram[0x42], MAC->m_ram[0x43], stat) ;
+//printf ("HdController::status m_mac->m_ram[$42]=%2.2x m_mac->m_ram[$43]=%2.2x; status=%2.2x\n", m_mac->m_ram[0x42], m_mac->m_ram[0x43], stat) ;
     return stat ;
 }
 
 
 int HdController::format  (void)
 {
-printf ("*** FORMAT OPERATION NOT IMPLEMENTED ***\n") ;
+fprintf (stderr, "*** FORMAT OPERATION NOT IMPLEMENTED ***\n") ;
     return 0 ;                            //  XXXXXXXXXXXXXXXXXXX  What goes here?
 }
 
@@ -473,10 +457,6 @@ void HdController::offsetKludge (void)
 }
 
 
-
-
-
-
 // XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX  UNFINISHED  XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 /***
 bool HdController::create (QString &path, int drive, int nBlocks)
@@ -508,123 +488,149 @@ bool HdController::create (QString &path, int drive, int nBlocks)
     m_file[m_driveIndex].Flush() ;
     m_file[m_driveIndex].seek(0) ;
     m_offset[m_driveIndex] = 0 ;
-// XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX  UNFINISHED  XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
     return false ;
 }
 ***/
 
 
-// XXXXXXXXXXXXXXXXXXXXXXX  SMARTPORT IS UNFINISHED XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+//  ------------------  SmartPort calls ----------------------
+
+
+//  Fix up the return address on the stack
+
+void HdController::adjustReturnAddress (int nBytes)
+{
+    quint16 m_retAddr = m_mac->fetch(m_stackPtr+2)<<8 | m_mac->fetch(m_stackPtr+1) ;
+    m_retAddr += nBytes ;
+    m_mac->store (m_retAddr,    m_stackPtr+1) ;
+    m_mac->store (m_retAddr>>8,  m_stackPtr+2) ;
+}
+
 
 //  Perform a "smartport" call for a hard drive or 3.5" floppy drive.
 //  Returns "carry" value as a boolean:  false (carry=0) on success, true (carry=1) on error.
 //  See "Apple IIgs Firmware Reference", chapter 7.
+//
+//  cmdlist for SmartPort call:
+//  jsr C713
+//    byte 0:  command number
+//    byte 1:  cmd list ptr lo
+//    byte 2:  cmd list ptr hi
+//  next instruction
 
-/***
 bool HdController::smartPort (void)
 {
+    m_stackPtr = 0x100 + m_mac->processorState()->Sptr ;
+    m_retAddr  = 1 + (m_mac->fetch(m_stackPtr+2)<<8 | m_mac->fetch(m_stackPtr+1)) ;
+    m_paramPtr = m_mac->fetch(m_retAddr+2)<<8 | m_mac->fetch(m_retAddr+1) ;
+    quint8  cmd = m_mac->fetch (m_retAddr) ;
 
-    bool status ;
-    quint8 paramCount = memory[paramPtr] ;
-    quint8 unitNumber = memory[paramPtr+1] ;
+//printf ("1...Sptr=%2.2x  cmd=%i m_paramPtr=%4.4x\n", m_mac->processorState()->Sptr, cmd, m_paramPtr) ;
+//xdump (m_mac->m_ram+0x1e0, 0x20, 0x1e0) ;
+//xdump (address(m_retAddr, false),  16, m_retAddr) ;
+//xdump (address(m_paramPtr, false), 16, m_paramPtr) ;
+//printf ("\n") ;
 
-//------------------
-//    quint8  aLo = MAC->m_ram [ps->Sptr+0x101] ;
-//    quint8  aHi = MAC->m_ram [ps->Sptr+0x102] ;
-//    quint16 cmdPtr = (aHi<<8) + aLo + 1 ;
-//    quint8  pLo = MAC->m_ram [cmdPtr+1] ;
-//    quint8  pHi = MAC->m_ram [cmdPtr+2] ;
-//    quint16 paramPtr = (pHi<<8) + pLo ;
-//    quint8  cmd = MAC->m_ram [cmdPtr] ;
-//printf ("fetch_HD_ROM: *smartport* call  MAC->savedPC()=%4.4x cmdPtr=%4.4x cmd=%2.2x  paramPtr=%4.4x\n",  MAC->savedPC(), cmdPtr, cmd, paramPtr) ;
     if (cmd & 0x40) {               // This is an "extended" call.  We don't do extended.
-        printf ("*** 'extended' smartPort call made from 0x%4.4x\n", MAC->savedPC()) ;
-        ps->Pstat |= C ;
-        return BRK ;   // No idea what effect this will have...
+        fprintf (stderr, "\n\a*** Unimplemented 'extended' SmartPort call made from 0x%4.4x\n", m_retAddr-2) ;
+        fprintf (stderr, "*** This will probably be fatal to the running Apple II program.\n\n") ;
+        m_mac->processorState()->Pstat |= C ;
+        return true ;   // No idea what effect this will have...
     }
+
 //------------------------------
 
-//printf ("HdController::smartPort - cmd=%i; paramCount=%2.2x unitNumber=%2.2x\n", cmd, paramCount, unitNumber) ;
+    bool error ;
 
     switch (cmd) {
         case 0:
-            status = smartPortStatus (memory, paramPtr) ;   // Status
+printf ("SmartPort 'status'\n") ;
+    //        status = sp_status (paramPtr) ;   // Status
             break ;
         case 1:
+            error = sp_readblock() ;
+            adjustReturnAddress (3) ;
             break ;
         case 2:
+printf ("SmartPort 'write'\n") ;
             break ;
         case 3:
+printf ("SmartPort 'format'\n") ;
             break ;
         case 4:
+printf ("SmartPort 'control'\n") ;
             break ;
         case 5:
+printf ("SmartPort 'init'\n") ;
             break ;
         case 6:
+printf ("SmartPort 'open'\n") ;
             break ;
         case 7:
+printf ("SmartPort 'close'\n") ;
             break ;
         case 8:
+printf ("SmartPort 'char read'\n") ;
             break ;
         case 9:
+printf ("SmartPort 'char write'\n") ;
             break ;
         default:
-            printf ("*** ProDOS \"smart port\" call made with bad command value = 0x%2.2X\n", cmd) ;
-            status = true ;
+            fprintf (stderr, "\n*** \aProDOS \"SmartPort\" call made with bad command value = 0x%2.2X\n", cmd) ;
+            fprintf (stderr, "*** This will probably be fatal to the running Apple II program.\n\n") ;
+            error = true ;
     }
 
-    return status ;
-
-return 0 ;
+    return error ;
 }
-bool HdController::smartPortStatus (quint8* memory, quint16 paramPtr)
+
+
+// cmdlist for SmartPort read:
+//
+//  00 param count (3) <---(m_paramPtr)
+//  01 unit number
+//  02 buffer ptr   lo
+//  03 "        "   hi
+//  04 block number lo
+//  05 "          " hi (for 16-bit Apples)
+//  06 "          " hi hor IIGS machines
+
+bool HdController::sp_readblock (void)
 {
-    quint8 unitNumber = memory[paramPtr+1] ;
-    if (unitNumber > 1) unitNumber = 1 ;
-    m_driveIndex = unitNumber ;
-    quint16 statusListPtr = (memory[paramPtr+3]<<8) + memory[paramPtr+2] ;
-    quint8 statusCode = memory[paramPtr+4] ;
-//printf ("HdController::smartPortStatus - statusListPtr=%4.4x statusCode=%2.2x\n", statusListPtr, statusCode) ;
+    int driveIndex = m_mac->fetch (m_paramPtr+1) - 1 ;
+    quint8 bplo = m_mac->fetch (m_paramPtr+2) ;
+    quint8 bphi = m_mac->fetch (m_paramPtr+3) ;
+    quint8* buffer = address (bphi<<8|bplo, true) ;
+    quint8 blklo = m_mac->fetch (m_paramPtr+4) ;
+    quint8 blkhi = m_mac->fetch (m_paramPtr+5) ;
+    quint16 block = blkhi<<8 | blklo ;
+printf ("sp_readblock call from $%4.4x; buffer=%4.4x block=%i ($%4.4x)\n", m_retAddr-3, bphi<<8|bplo, block, block) ;
+//printf ("Host buffer= %16.16llx\n", (quint64)buffer) ;
+//printf ("\n") ;
 
+    if (driveIndex < 0) driveIndex = 0 ;
+    if (driveIndex > 1) driveIndex = 1 ;
+    m_driveIndex = driveIndex ;
+    
+    int n = 0 ;
+    bool error = false ;
+    headStepDelay (block) ;
 
-    switch (statusCode) {
-        case 0:                      // Return status of smartPort "host"
-            if (unitNumber == 0) {
-                memory[statusListPtr]   = 1 ;     // 1 device connected
-                memory[statusListPtr+1] = 0x40 ;  // "No interrupts sent"
-            } else {
-                memory[statusListPtr] = 0xe0 ;    // Block device | write allowed | read allowed
-                if (isOpen(m_driveIndex))         statusListPtr |= 0x40 ;
-                if ( ! m_writeable[m_driveIndex]) statusListPtr |= 0x20 ;
-            }
-            return false ;
-            break ;
-        case 1:                      // Return DCB
-            break ;
-        case 2:
-            break ;
-        case 3:
-            break ;
-        default:
-            printf ("(* HdController::smartPortStatus Illegal status request code: 0x%2.2X\n", statusCode) ;
-            return true ;
+    if (m_file[m_driveIndex].isOpen()) {
+        m_file[m_driveIndex].seek (block*BLOCKSIZE + m_offset[m_driveIndex]) ;
+        n = m_file[m_driveIndex].read ((char*)buffer, BLOCKSIZE) ;
+        if (n != BLOCKSIZE) error = true ;
     }
-//    quint8 status = 0xe0 ;   // (bits: 7=block device, 6=write allowed, 5=read allowed)
-
-
-    return true ;
+ //::exit(0) ;
+    return error ;
 }
 
-***/
 
 
-
-
+/***
 
 // p. 143
-
-/*****
 
 STATUS Calls
 A STATUS call with unit number = $00 and status code = $00 is a request to
@@ -661,6 +667,65 @@ Stat_list byte 0     Number of devices
           bytes 4-5  Interface Version
           bytes 6-7  Reserved (must be $0000)
 
-*****/
+------------------------------------------------------------------------------
 
+bool HdController::sp_status (quint16 paramPtr)
+{
+    quint8 unitNumber = *address (paramPtr+1) ;
+    if (unitNumber > 1) unitNumber = 1 ;
+    m_driveIndex = unitNumber ;
+    quint16 statusListPtr = (memory[paramPtr+3]<<8) + memory[paramPtr+2] ;
+    quint8 statusCode = memory[paramPtr+4] ;
+//printf ("HdController::smartPortStatus - statusListPtr=%4.4x statusCode=%2.2x\n", statusListPtr, statusCode) ;
+
+
+    switch (statusCode) {
+        case 0:                      // Return status of smartPort "host"
+            if (unitNumber == 0) {
+                memory[statusListPtr]   = 1 ;     // 1 device connected
+                memory[statusListPtr+1] = 0x40 ;  // "No interrupts sent"
+            } else {
+                memory[statusListPtr] = 0xe0 ;    // Block device | write allowed | read allowed
+                if (isOpen(m_driveIndex))         statusListPtr |= 0x40 ;
+                if ( ! m_writeable[m_driveIndex]) statusListPtr |= 0x20 ;
+            }
+            return false ;
+            break ;
+        case 1:                      // Return DCB
+            break ;
+        case 2:
+            break ;
+        case 3:
+            break ;
+        default:
+            printf ("(* HdController::smartPortStatus Illegal status request code: 0x%2.2X\n", statusCode) ;
+            return true ;
+    }
+//    quint8 status = 0xe0 ;   // (bits: 7=block device, 6=write allowed, 5=read allowed)
+
+
+    return true ;
+}
+***/
+
+
+/*****
+// This is a dummy stand-in for a smartport call.
+// It should never be called, but just in case, try to respond with an error status.
+
+bool HdController::smartPort (void)
+{
+    ProcessorState* ps = m_mac->processorState() ;
+    quint16 s = ps->Sptr + 0x100 ;
+    quint16 retAddr = m_mac->fetch (s+1) | (m_mac->fetch (s+2)<<8) ;
+printf ("*** Hard drive 'SmartPort' call was made from $%4.4x. This should not happen.\n", retAddr-2) ;
+    retAddr += 3 ;
+    m_mac->store (retAddr, s+1) ;
+    m_mac->store (retAddr>>8, s+2) ;
+    ps->Pstat |= C ;
+    ps->Areg = 0x28 ;     // ($28 == "No device connected")
+
+    return false ;
+}
+*****/
 

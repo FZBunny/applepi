@@ -5,26 +5,27 @@
 #include <QDesktopWidget>
 
 #include "defs.h"
-#include "paddles.h"
+#include "joystick.h"
 //#include "mainwindow.h"
 
 
 
-Paddles::Paddles (Machine* mac)
+Joystick::Joystick (Machine* mac)
 {
     m_mac = mac ;
     m_useMouse = true ;
+    for (int i=0; i<3; i++) m_buttons[i] = false ;
     m_triggerCycles = mac->getCycles() ;
 }
 
 
-quint8 Paddles::readButton (int )
+quint8 Joystick::readButton (int )
 {
     return 0 ;
 }
 
 
-quint8 Paddles::readPaddle (int n)
+quint8 Joystick::readJoystick (int n)
 {
     QRect r = QApplication::desktop()->screenGeometry() ;
     int w = r.width() ;
@@ -51,9 +52,7 @@ quint8 Paddles::readPaddle (int n)
 }
 
 
-void Paddles::reset (void)
+void Joystick::reset (void)
 {
     m_triggerCycles = m_mac->getCycles() ;
 }
-
-

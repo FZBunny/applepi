@@ -61,7 +61,7 @@ Machine::Machine (MainWindow* parent)
     m_floppy = new FloppyDiskController (this) ;
     m_hardDrive = new HdController (this) ;
     m_printer = new Printer (this) ;
-    m_paddles = new Paddles (this) ;
+    m_joystick = new Joystick (this) ;
 
 //    m_tape = new Tape (this) ;
 
