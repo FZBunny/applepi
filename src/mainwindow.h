@@ -41,6 +41,7 @@
 #include "machine.h"
 #include "applepi_button.h"
 #include "volume_dial.h"
+#include "joystick.h"
 #include "config.h"
 #include "defs.h"
 
@@ -67,8 +68,9 @@ public:
 
 //   static MainWindow* main_window ;
 
-    Machine* m_mac ;
-    Config*  m_cfg ;
+    Machine*   m_mac ;
+    Config*    m_cfg ;
+    Joystick*  m_joystick ;
 
     QString installRom (void) ;
     
@@ -108,7 +110,7 @@ private:
 
     Speaker*   m_speaker ;
     Screen*    m_screen ;
-
+    
     bool    m_powerButtonState ;
     bool    m_currentlyPastingText ;
     bool    m_upperCaseOnly ;

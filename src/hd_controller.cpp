@@ -161,8 +161,6 @@ int HdController::IO (void)
     if (m_mac->fetch(0x43) & 0x80)  m_driveIndex = 1 ;
     else                          m_driveIndex = 0 ;
 
-//ProcessorState *s = m_mac->processorState() ;
-//printf ("HdController::IO  PC=%4.4X  operation=%i\n", s->pc.pc_16, operation) ;
     int stat = 0 ;
 
     switch (operation) {
@@ -172,8 +170,6 @@ int HdController::IO (void)
        case 1:                         // Read
           m_mac->m_parent->HDActivityStarted (m_driveIndex) ;
           stat = readBlock (buffer, block) ;
-//ProcessorState *s = m_mac->processorState() ;
-//printf ("read: PC=%4.4X  buffer=%4.4x block=%4.4x stat=%i\n", s->pc.pc_16, buffer, block, stat) ;
           break ;
        case 2:                         // Write
           m_mac->m_parent->HDActivityStarted (m_driveIndex) ;
@@ -230,7 +226,7 @@ int HdController::readBlock (quint8* buffer, int block, int driveIndex)
 }
 
 
-// This overload of readBlock is called from fn. "IO" during nornmal ProDOS I/O.
+// This overload of readBlock is called from fn. "IO" during normal ProDOS I/O.
  
 int HdController::readBlock (quint16 addr, int block)
 {
@@ -254,10 +250,7 @@ int HdController::readBlock (quint16 addr, int block)
     } else {
         stat = IOERROR ;
     }
- //   } else {
- //       memset (m_mac->m_ram+addr, 0, BLOCKSIZE) ;
- //       stat = NODEVICE ;
- //   }
+    
     return stat ;
 }
 
@@ -294,7 +287,7 @@ bool HdController::open (QString &path, int driveIndex)
     m_configuredPath[m_driveIndex] = path ;
 
     m_fileInfo[m_driveIndex].setFile (path) ;
-    if ( ! m_fileInfo[m_driveIndex].exists()) return false ;  // "IsDir()" call doesn't seem to work...XXXXX wxWidgets only: FIXME XXXXX
+    if ( ! m_fileInfo[m_driveIndex].exists()) return false ;
     if ( ! m_fileInfo[m_driveIndex].isReadable()) return false ;
     m_writeable[m_driveIndex] = m_fileInfo[m_driveIndex].isWritable() ;
     m_fileSize[m_driveIndex] = m_fileInfo[m_driveIndex].size() ;
@@ -304,7 +297,6 @@ bool HdController::open (QString &path, int driveIndex)
     else                           mode = QIODevice::ReadOnly ;
     m_file[m_driveIndex].setFileName (m_configuredPath[m_driveIndex]) ;
     int ok = m_file[m_driveIndex].open (mode) ;
-//printf ("HdController::open    m_configuredPath = '%s', mode=%i  ok=%i\n", m_configuredPath, mode, ok) ;
     offsetKludge() ;
 
     return ok ;
@@ -362,7 +354,6 @@ int HdController::status (void)        //  (See 'ProDos Tech. Notes', note 21 fo
     m_mac->setX (length & 0xff) ;
     m_mac->setY ((length >> 8) & 0xff) ;
 
-//printf ("HdController::status m_mac->m_ram[$42]=%2.2x m_mac->m_ram[$43]=%2.2x; status=%2.2x\n", m_mac->m_ram[0x42], m_mac->m_ram[0x43], stat) ;
     return stat ;
 }
 
@@ -452,8 +443,8 @@ void HdController::offsetKludge (void)
     }
 
     if (n < BLOCKSIZE) m_offset[m_driveIndex] = n ;
-    else               m_offset[m_driveIndex] = 0 ; // If we don't find the starting bytes at all, just assume that it
-                                                    // starts with someting else at location 0.  (What else can we do?)
+    else               m_offset[m_driveIndex] = 0 ;// If we don't find the starting bytes at all, just assume that it
+                                                   // starts with someting else at location 0.  (What else can we do?)
 }
 
 
@@ -497,7 +488,7 @@ bool HdController::create (QString &path, int drive, int nBlocks)
 //  ------------------  SmartPort calls ----------------------
 
 
-//  Fix up the return address on the stack
+//  Fix up the return address on the stack before returning from a SmartPort call.
 
 void HdController::adjustReturnAddress (int nBytes)
 {
@@ -526,18 +517,14 @@ bool HdController::smartPort (void)
     m_paramPtr = m_mac->fetch(m_retAddr+2)<<8 | m_mac->fetch(m_retAddr+1) ;
     quint8  cmd = m_mac->fetch (m_retAddr) ;
 
-//printf ("1...Sptr=%2.2x  cmd=%i m_paramPtr=%4.4x\n", m_mac->processorState()->Sptr, cmd, m_paramPtr) ;
-//xdump (m_mac->m_ram+0x1e0, 0x20, 0x1e0) ;
-//xdump (address(m_retAddr, false),  16, m_retAddr) ;
-//xdump (address(m_paramPtr, false), 16, m_paramPtr) ;
-//printf ("\n") ;
-
     if (cmd & 0x40) {               // This is an "extended" call.  We don't do extended.
         fprintf (stderr, "\n\a*** Unimplemented 'extended' SmartPort call made from 0x%4.4x\n", m_retAddr-2) ;
         fprintf (stderr, "*** This will probably be fatal to the running Apple II program.\n\n") ;
         m_mac->processorState()->Pstat |= C ;
         return true ;   // No idea what effect this will have...
     }
+
+    m_mac->m_parent->HDActivityStarted (m_driveIndex) ;
 
 //------------------------------
 
@@ -605,9 +592,7 @@ bool HdController::sp_readblock (void)
     quint8 blklo = m_mac->fetch (m_paramPtr+4) ;
     quint8 blkhi = m_mac->fetch (m_paramPtr+5) ;
     quint16 block = blkhi<<8 | blklo ;
-printf ("sp_readblock call from $%4.4x; buffer=%4.4x block=%i ($%4.4x)\n", m_retAddr-3, bphi<<8|bplo, block, block) ;
-//printf ("Host buffer= %16.16llx\n", (quint64)buffer) ;
-//printf ("\n") ;
+//printf ("sp_readblock call from $%4.4x; buffer=%4.4x block=%i ($%4.4x)\n", m_retAddr-3, bphi<<8|bplo, block, block) ;
 
     if (driveIndex < 0) driveIndex = 0 ;
     if (driveIndex > 1) driveIndex = 1 ;
@@ -622,7 +607,7 @@ printf ("sp_readblock call from $%4.4x; buffer=%4.4x block=%i ($%4.4x)\n", m_ret
         n = m_file[m_driveIndex].read ((char*)buffer, BLOCKSIZE) ;
         if (n != BLOCKSIZE) error = true ;
     }
- //::exit(0) ;
+
     return error ;
 }
 

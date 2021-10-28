@@ -521,8 +521,6 @@ private:
     bool    m_echoToConsole ;
     QFile*  m_echoToFile ;
 
-    Joystick* m_joystick ;
-
     quint64  m_previousUsecs ;
 
     bool      m_haltedOnTrap ;
