@@ -183,8 +183,8 @@ void Screen::setScale (uint scale)
     m_scale = scale ;
 
     QSize size ;
-    if (scale == 1) size = QSize (SCREEN_PIXELS_WIDTH+4, SCREEN_PIXELS_HEIGHT+4) ;
-    else            size = QSize (2*SCREEN_PIXELS_WIDTH+4, 2*SCREEN_PIXELS_HEIGHT+4) ;
+    if (scale == 1) size = QSize (SCREEN_PIXELS_WIDTH, SCREEN_PIXELS_HEIGHT) ;
+    else            size = QSize (2*SCREEN_PIXELS_WIDTH, 2*SCREEN_PIXELS_HEIGHT) ;
 
     this->resize (size) ;
 }
@@ -295,7 +295,7 @@ void Screen::drawLine_40 (uchar *characters, int dstX, int dstY)
         quint8 c =  characters[i] ;
         if (m_flash && (RdAltChar == OFF) && (c > 0x3f) && (c < 0x80))  c -= 0x40 ;
         int srcPixmapOffset = 16 * c ;
-        painter.drawPixmap (dstX+(14*i)+2, dstY+2, *cSet, 0, srcPixmapOffset, 14, 16) ; // draw a single character
+        painter.drawPixmap (dstX+(14*i), dstY, *cSet, 0, srcPixmapOffset, 14, 16) ; // draw a single character
     }
 }
 
@@ -464,7 +464,6 @@ void Screen::drawHiRes (quint8 *screenData)
 
 // -------------------------  Double Hi-Res Graphics  -------------------------
 
-
 //     Double hi-res bit packing: 7 "dots" are packed in 4 bytes of screen data
 //     (Bit 7 of the screen data bytes is unused; a dot is 2x2 pixels)
 //
@@ -495,13 +494,13 @@ inline void Screen::doubleHiRes4bytes (quint8* main, quint8* aux, int rowOffset,
     int y = 2*row ;
     QPainter painter (&m_screenBuffer) ;
 
-    painter.drawPixmap(x,    y+2, *m_dblHiResBlock[iA]) ;  
-    painter.drawPixmap(x+4,  y+2, *m_dblHiResBlock[iB]) ;
-    painter.drawPixmap(x+8,  y+2, *m_dblHiResBlock[iC]) ;
-    painter.drawPixmap(x+12, y+2, *m_dblHiResBlock[iD]) ;
-    painter.drawPixmap(x+16, y+2, *m_dblHiResBlock[iE]) ;
-    painter.drawPixmap(x+20, y+2, *m_dblHiResBlock[iF]) ;
-    painter.drawPixmap(x+24, y+2, *m_dblHiResBlock[iG]) ;
+    painter.drawPixmap(x,    y, *m_dblHiResBlock[iA]) ;
+    painter.drawPixmap(x+4,  y, *m_dblHiResBlock[iB]) ;
+    painter.drawPixmap(x+8,  y, *m_dblHiResBlock[iC]) ;
+    painter.drawPixmap(x+12, y, *m_dblHiResBlock[iD]) ;
+    painter.drawPixmap(x+16, y, *m_dblHiResBlock[iE]) ;
+    painter.drawPixmap(x+20, y, *m_dblHiResBlock[iF]) ;
+    painter.drawPixmap(x+24, y, *m_dblHiResBlock[iG]) ;
 
 }
 
@@ -574,8 +573,6 @@ void Screen::paintEvent (QPaintEvent* e)
 
 void Screen::refreshScreen (void)
 {
-//putchar('.'); fflush(stdout) ;
-
     quint8  *loresData, *hiresData ;
 
     quint8 rdText     = MAC->m_ss[0x01a] ;

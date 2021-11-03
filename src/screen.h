@@ -65,8 +65,8 @@ private:
     void writeDoubleHiRes (quint8 page2) ;
     void paintEvent (QPaintEvent *) ;
 
-    const int m_pixelsWidth  = 564 ;
-    const int m_pixelsHeight = 388 ;
+    const int m_pixelsWidth  = 560 ;
+    const int m_pixelsHeight = 384 ;
     
     QTimer*  m_refreshTimer ;
     const int SLOW = 200 ;   // mSec delay for slow timer (for double hi-res)
