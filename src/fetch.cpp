@@ -337,27 +337,28 @@ quint8 Machine::fetch_sspage (quint16 p)
             switch (loNibble) {
                 case 0:                        // C060: Cassette input  /  also Switch 3 ?
  //                   c = m_tape->readTapeInput() ;
+                    c = m_parent->m_gamepad->readButton(3) ;
                     break ;
                 case 1:                        // C061  Switch 0 / Left-alt  ("open apple" key)  // XXXXX what to do about the apple keys here ? XXXXX
-                    c = m_parent->m_joystick->readButton(0) ;
+                    c = m_parent->m_gamepad->readButton(0) ;
                     break ;
                 case 2:                        // C062  Switch 1 / Right-alt ("solid apple" key)
-                    c = m_parent->m_joystick->readButton(1) ;
+                    c = m_parent->m_gamepad->readButton(1) ;
                     break ;
                 case 3:                        // C063  Switch 2
-                    c = m_parent->m_joystick->readButton(2) ;
+                    c = m_parent->m_gamepad->readButton(2) ;
                     break ;
-                case 4:                        // C064  Analog input 0  (paddle 0 / joystick X-axis)
-                    c = m_parent->m_joystick->readJoystick(0) ;
+                case 4:                        // C064  Analog input 0  (paddle 0 / gamepad 1 X-axis)
+                    c = m_parent->m_gamepad->readGamepad(0) ;
                     break ;
-                case 5:                        // C065  Analog input 1  (paddle 1 / joystick Y-axis)
-                    c = m_parent->m_joystick->readJoystick(1) ;
+                case 5:                        // C065  Analog input 1  (paddle 1 / gamepad 1 Y-axis)
+                    c = m_parent->m_gamepad->readGamepad(1) ;
                     break ;
-                case 6:                        // C066  Analog input 2
-                    c = 0xff ;
+                case 6:                        // C066  Analog input 2  (paddle 2 / gamepad 2 X-axis)
+                    c = m_parent->m_gamepad->readGamepad(2) ;
                     break ;
-                case 7:                        // C067  Analog input 3
-                    c = 0xff ;
+                case 7:                        // C067  Analog input 3  (paddle 3 / gamepad 2 y-axis)
+                    c = m_parent->m_gamepad->readGamepad(3) ;
                     break ;
                 case 8:                        // C068 STATEREG
                     c = 0 ;                         // ( ProDos 8 v2.0.3 does a 'TRB  $C068', but most docs )
@@ -388,8 +389,8 @@ quint8 Machine::fetch_sspage (quint16 p)
             }
             break ;
         case 7:                                // C070 .. C07F  Misc...
-            if (loNibble==0) {    // Reset Analog inputs (joystick)
-                m_parent->m_joystick->reset() ;
+            if (loNibble==0) {    // Reset Analog inputs (gamepad)
+                m_parent->m_gamepad->reset() ;
             }
             c = 0 ;
             break ;

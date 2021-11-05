@@ -41,7 +41,7 @@
 #include "machine.h"
 #include "applepi_button.h"
 #include "volume_dial.h"
-#include "joystick.h"
+#include "gamepad.h"
 #include "config.h"
 #include "defs.h"
 
@@ -70,7 +70,7 @@ public:
 
     Machine*   m_mac ;
     Config*    m_cfg ;
-    Joystick*  m_joystick ;
+    Gamepad*  m_gamepad ;
 
     QString installRom (void) ;
     
@@ -178,6 +178,7 @@ private:
     QAction* m_pasteTextToKeyboardInput;
 
 // Preferences  menu:
+    QAction* m_gameController ;
     QAction* m_keyboardcase ;
     QAction* m_selectPrint ;
     QAction* m_echoToConsole ;
@@ -217,14 +218,15 @@ private:
 
     void onSelectRom      (void) ;
     void onUseInternalRom (void) ;
-    void onExit       (void) ;
+    void onExit           (void) ;
 
     void onCopyScreen    (void) ;
     void pasteToKeyboard (void) ;
 
-    void toggleScale (void) ;
+    void toggleScale     (void) ;
     void onScreenScale   (void) ;
 
+    void onGameController(void) ;
     void onKeyboardcase  (void) ;
     void onSelectPrinter (void) ;
     void onEchoToConsole (void) ;

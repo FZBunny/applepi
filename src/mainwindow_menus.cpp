@@ -42,7 +42,7 @@
 
 #include "traptrace.h"
 
-// #include "hd_dialog.h"
+#include "gamepad_dialog.h"
 #include "rom_dialog.h"
 #include "view_memory.h"
 //#include "help_dialog.h"
@@ -96,6 +96,11 @@ void MainWindow::createMenus (void)
 
 // "Preferences" menu  ------------------------------------
 
+ //   m_gameController = new QAction (tr("Select Game Controller...")) ;
+ //   m_preferencesMenu->addAction (m_gameController) ;
+ //   connect (m_gameController, &QAction::triggered, this, &MainWindow::onGameController) ;
+
+  
     m_keyboardcase = new QAction (tr("Use Mixed-Case Keyboard"), this) ;
     m_preferencesMenu->addAction (m_keyboardcase) ;
     connect (m_keyboardcase, &QAction::triggered, this, &MainWindow::onKeyboardcase) ;
@@ -256,6 +261,13 @@ void MainWindow::onCopyScreen (void)
 
 
 //   ------  Preferences menus  ------
+
+
+void MainWindow::onGameController(void)
+{
+    gamepadDialog* dlg = new gamepadDialog (this) ;
+    dlg->exec() ;
+}
 
 
 void MainWindow::onKeyboardcase (void)

@@ -217,7 +217,7 @@ MainWindow::MainWindow (void)
     m_speaker->start() ;
 
     m_dial = new VolumeDial (this, 60, 60) ;
-    m_joystick = new Joystick(this) ;
+    m_gamepad = new Gamepad(this) ;
     
     m_mac->initialize(false) ;
     m_mac->start() ;

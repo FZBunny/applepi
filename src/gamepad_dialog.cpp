@@ -1,6 +1,6 @@
 /*****************************************************************************
 
-    File: "joystick_dialog.cpp"
+    File: "gamepad_dialog.cpp"
 
     Copyright (C) 2021, Bruce Ward
 
@@ -29,11 +29,11 @@
 #include <QTextStream>
 
 #include "defs.h"
-#include "joystick_dialog.h"
+#include "gamepad_dialog.h"
 
 
 
-joystickDialog::joystickDialog (MainWindow* parent)
+gamepadDialog::gamepadDialog (MainWindow* parent)
 {
     m_parent = parent ;
 
@@ -93,16 +93,16 @@ joystickDialog::joystickDialog (MainWindow* parent)
         }
     }
 
-    connect (m_saveButton,   &QPushButton::clicked,     this, &joystickDialog::onSaveButton) ;
-    connect (m_cancelButton, &QPushButton::clicked,     this, &joystickDialog::onCancelButton) ;
-    connect (m_listWidget,   &QListWidget::itemClicked, this, &joystickDialog::onListWidget) ;
+    connect (m_saveButton,   &QPushButton::clicked,     this, &gamepadDialog::onSaveButton) ;
+    connect (m_cancelButton, &QPushButton::clicked,     this, &gamepadDialog::onCancelButton) ;
+    connect (m_listWidget,   &QListWidget::itemClicked, this, &gamepadDialog::onListWidget) ;
 
     m_saveButton->setEnabled (false) ;
 
 }
 
 
-void joystickDialog::onListWidget (QListWidgetItem *item)
+void gamepadDialog::onListWidget (QListWidgetItem *item)
 {
     m_selectedRow = m_listWidget->currentRow() ;
     m_selectedID = m_controllerList.at(m_selectedRow).id ;
@@ -112,18 +112,17 @@ void joystickDialog::onListWidget (QListWidgetItem *item)
 }
 
 
-void joystickDialog::onSaveButton (void)
+void gamepadDialog::onSaveButton (void)
 {
- //   m_selectedControllerName = m_controllerList.at(m_selectedRow).name ;
-
     CFG->Set ("game_controller_name", m_selectedControllerName) ;
-    CFG->Set ("game_controller_ID", m_selectedID) ;
+    CFG->Set ("game_controller_id", m_selectedID) ;
+    m_parent->m_gamepad->openController() ;
 
     this->accept() ;
 }
 
 
-void joystickDialog::onCancelButton (void)
+void gamepadDialog::onCancelButton (void)
 {
     this->accept() ;
 }

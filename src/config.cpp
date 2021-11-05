@@ -85,6 +85,9 @@ Config::Config() : QSettings (QSettings::NativeFormat, QSettings::UserScope, "ap
 //        Set ("disassemble_end_criterion", uint(1)) ;
         Set ("floppy1_path", defaultDir) ;
         Set ("floppy2_path", defaultDir) ;
+        tmpStr = "/dev/input/mouse0" ;
+        Set ("game_controller_name", tmpStr) ;
+        Set ("game_controller_id", (uint)0) ;
         Set ("hd1_volume_path", defaultDir) ;
         Set ("hd2_volume_path", defaultDir) ;
         Set ("history_dump", (uint)0) ;
@@ -191,31 +194,34 @@ void Config::Set (const QString& key, char* value)
 // ---------------------------------------------------
 
 
-void Config::Get (const QString& key, QString* value)
+bool Config::Get (const QString& key, QString* value)
 {
-    if (keyExists(key) == false) return ;
+    if (keyExists(key) == false) return false ;
     static QString def ("No Such Key") ;
     *value = m_settings->value (key,def).value<QString>() ;
+    return true ;
 }
 
 
-void Config::Get (const QString& key, bool *value)
+bool Config::Get (const QString& key, bool *value)
 {
-    if (keyExists(key) == false) return ;
+    if (keyExists(key) == false) return false ;
     *value = m_settings->value (key).value<bool>() ;
+    return true ;
 }
 
 
-void Config::Get (const QString& key, uint* value)
+bool Config::Get (const QString& key, uint* value)
 {
-    if (keyExists(key) == false) return ;
+    if (keyExists(key) == false) return false ;
     *value = m_settings->value (key).value<uint>() ;
+    return true ;
 }
 
 
-void Config::Get (const QString& key, QPoint *pos)
+bool Config::Get (const QString& key, QPoint *pos)
 {
-    if (keyExists(key) == false) return ;
+    if (keyExists(key) == false) return false ;
 
     QString buffer ;
     buffer = m_settings->value (key).value<QString>() ;
@@ -233,12 +239,14 @@ void Config::Get (const QString& key, QPoint *pos)
         tmp = list.at(1).toUInt() ;
         pos->setY (tmp) ;
     }
+
+    return true ;
 }
 
 
-void Config::Get (const QString& key, QSize *size)
+bool Config::Get (const QString& key, QSize *size)
 {  
-    if (keyExists(key) == false) return ;
+    if (keyExists(key) == false) return false ;
 
     QString  buffer ;
     buffer = m_settings->value (key).value<QString>() ;
@@ -256,5 +264,7 @@ void Config::Get (const QString& key, QSize *size)
         tmp = list.at(1).toUInt() ;
         size->setHeight (tmp) ;
     }
+
+    return true ;
 }
 

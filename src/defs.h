@@ -57,8 +57,8 @@ extern "C" void trim (char* buffer, int len) ;
 #define  MAX_MAINWINDOW_HEIGHT 968
 //#define  MAX_MAINWINDOW_HEIGHT 989
 
-#define  SCREEN_PIXELS_WIDTH  564
-#define  SCREEN_PIXELS_HEIGHT 388
+#define  SCREEN_PIXELS_WIDTH  560
+#define  SCREEN_PIXELS_HEIGHT 384
 
 #define SECTORSIZE 256
 #define BLOCKSIZE  512

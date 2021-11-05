@@ -1,6 +1,6 @@
 /*****************************************************************************
 
-    File: "joystick_dialog.h"
+    File: "gamepad_dialog.h"
 
     Copyright (C) 2021, Bruce Ward
 
@@ -54,12 +54,12 @@ public:
 
 
 
-class joystickDialog : public QDialog
+class gamepadDialog : public QDialog
 {
 public:
 
-    joystickDialog (MainWindow* parent) ;
-    ~joystickDialog() {} ;
+    gamepadDialog (MainWindow* parent) ;
+    ~gamepadDialog() {} ;
 
 private:
 

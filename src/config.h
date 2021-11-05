@@ -54,11 +54,11 @@ public:
     void Set (char* key,          QPoint position) ;
     void Set (const QString& key, char* value) ;
 
-    void Get (const QString& key, QString* value) ;
-    void Get (const QString& key, bool *value) ;
-    void Get (const QString& key, QSize *size) ;
-    void Get (const QString& key, QPoint *position) ;
-    void Get (const QString& key, uint *value) ;
+    bool Get (const QString& key, QString* value) ;
+    bool Get (const QString& key, bool *value) ;
+    bool Get (const QString& key, QSize *size) ;
+    bool Get (const QString& key, QPoint *position) ;
+    bool Get (const QString& key, uint *value) ;
 
 private:
 

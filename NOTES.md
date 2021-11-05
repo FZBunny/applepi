@@ -6,7 +6,6 @@ DO NOT use "qmake -project" to recreate the .pro file. (You will, however, need 
 - The 'help' files are incomplete, and out-of-date.  Updates coming soon.
 
 - The 'Apple //e enhanced' emulation has several bugs and anomalies. No ideas when they might be resolved. 
-- No joystick/gamepad support yet.  Coming soon.
 - The same character-set ROMS are used for all AppleII models. This results in older models anachronistic access to the enhanced character ROM.  I am also not certain that the character ROMS are otherwise accurate.  To be fixed eventually.
 - Applepi does not always play well with the later versions of ProDOS utility disks.   
 Later ProDOS utilities frequently crash to the monitor when attempting  to exit the program.

@@ -12,6 +12,7 @@ INCLUDEPATH += .
 LIBS += -L/usr/lib/x86_64-linux-gnu/alsa-lib -lasound -no-pie
 QT += widgets
 QT += printsupport
+QT += gamepad
 
 # The following define makes your compiler warn you if you use any
 # feature of Qt which has been marked as deprecated (the exact warnings
@@ -36,9 +37,10 @@ HEADERS += src/about.h \
            src/disassemble_memory_dialog.h \
            src/floppy_controller.h \
            src/floppy_dialog.h \
+           src/gamepad.h \
+           src/gamepad_dialog.h \
            src/hd_controller.h \
            src/hd_dialog.h \
-           src/joystick.h \
            src/lin-speaker.h \
            src/machine.h \
            src/mainwindow.h \
@@ -70,9 +72,10 @@ SOURCES += src/about.cpp \
            src/fetch.cpp \
            src/floppy_controller.cpp \
            src/floppy_dialog.cpp \
+           src/gamepad.cpp \
+           src/gamepad_dialog.cpp \
            src/hd_controller.cpp \
            src/hd_dialog.cpp \
-           src/joystick.cpp \
            src/lin-speaker.cpp \
            src/machine.cpp \
            src/main.cpp \

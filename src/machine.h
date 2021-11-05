@@ -41,7 +41,7 @@
 #include "disassembler.h"
 #include "floppy_controller.h"
 #include "hd_controller.h"
-#include "joystick.h"
+#include "gamepad.h"
 #include "printer.h"
 #include "traptrace.h"
 #include "usleep.h"
