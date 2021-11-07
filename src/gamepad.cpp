@@ -99,6 +99,34 @@ quint8 Gamepad::readButton (int buttonNumber)
         }
     } else {
         QGamepad* g = m_gamepad ;
+        if (g->isConnected()) {
+            switch (buttonNumber) {
+                case 0:
+                    n = g->buttonL2() ;
+                    break ;
+                case 1:
+                    n = g->buttonR2() ;
+                    break ;
+                case 2:
+                    n = m_buttons[2] ;
+                    break ;
+                case 3:
+                    n = m_buttons[3] ;
+                    break ;
+                default:
+                    n = 0 ; 
+                    break ;
+            }
+        } else {
+            n = 0xff ;
+        }
+    }
+
+    if (n) n = 0xff ; 
+//if (buttonNumber==1) printf ("x%i", n) ;
+    return n ;
+}
+
 /*
 bool l1, l2, l3, r1, r2, r3 ;
 bool center, down, up, left, right, guide, select, start ;
@@ -117,30 +145,6 @@ a = g->buttonA(); b = g->buttonB(); x = g->buttonX(); y = g->buttonY();
 printf ("%i%i %i%i\n", a, b, x, y) ;
 printf ("\n") ;
 */
-        switch (buttonNumber) {
-            case 0:
-                n = g->buttonL2() ;
-                break ;
-            case 1:
-                n = g->buttonR2() ;
-                break ;
-            case 2:
-                n = m_buttons[2] ;
-                break ;
-            case 3:
-                n = m_buttons[3] ;
-                break ;
-            default:
-                n = 0 ; 
-                break ;
-        }
-    }
-
-    if (n) n = 0xff ; 
-//if (buttonNumber==1) printf ("x%i", n) ;
-    return n ;
-}
-
 
 void Gamepad::reset (void)
 {
@@ -154,22 +158,26 @@ quint8 Gamepad::readGamepad (int n)
 {
     float  f ;
 
-    switch (n) {
-        case 0:
-            f = m_gamepad->axisLeftX() ;
-            break ;
-        case 1:
-            f = m_gamepad->axisLeftY() ;
-            break ;
-        case 2:
-            f = m_gamepad->axisRightX() ;
-            break ;
-        case 3:
-            f = m_gamepad->axisRightY() ;
-            break ;
-        default:
-            f = 0 ;
-            break ;
+    if (m_gamepad->isConnected()) {
+        switch (n) {
+            case 0:
+                f = m_gamepad->axisLeftX() ;
+                break ;
+            case 1:
+                f = m_gamepad->axisLeftY() ;
+                break ;
+            case 2:
+                f = m_gamepad->axisRightX() ;
+                break ;
+            case 3:
+                f = m_gamepad->axisRightY() ;
+                break ;
+            default:
+                f = 0 ;
+                break ;
+        }
+    } else {
+        f = 1.0 ;
     }
 
     quint64 deltaCycles = MAC->getCycles() - m_triggerCycles ;
