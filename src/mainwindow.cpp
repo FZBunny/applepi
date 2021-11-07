@@ -555,14 +555,17 @@ Qt::ControlModifier  	0x04000000	A Ctrl key on the keyboard is pressed.
 Qt::AltModifier	        0x08000000	An Alt key on the keyboard is pressed.
 Qt::MetaModifier	    0x10000000	A Meta key on the keyboard is pressed.
 Qt::KeypadModifier	    0x20000000	A keypad button is pressed.
-Qt::GroupSwitchModifier	0x40000000	X11 only (unless activated on Windows by a command line argument). A Mode_switch key on the keyboard is pressed.
+Qt::GroupSwitchModifier	0x40000000	X11 only (unless activated on Windows by a command line argument).
+                                    A Mode_switch key on the keyboard is pressed.
 ***/
 
 void MainWindow::keyPressEvent (QKeyEvent *e)
 {
     int c = e->key() ;
     Qt::KeyboardModifiers mods = e->modifiers() ;
-
+    quint32 nvkey = e->nativeVirtualKey() ;           // left alt  (open apple)   == 0000ffe9
+    if ((nvkey==0xffe9) || (nvkey==0xffea))  return ; // right alt (closed apple) == 0000ffea  (c=$23 for either)
+                                                      // - We return to avoid treating the Alt keys as characters)
     switch (c) {
         case Qt::Key_Control:
             return ;
@@ -570,7 +573,6 @@ void MainWindow::keyPressEvent (QKeyEvent *e)
             return ;
         case Qt::Key_CapsLock:
             m_capsLockOn = ! m_capsLockOn ;
-//printf ("m_capsLockOn = %i\n", m_capsLockOn) ;
             return ;
         case Qt::Key_Escape:
             c = 0x1b ;

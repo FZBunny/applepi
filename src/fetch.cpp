@@ -26,7 +26,7 @@
 *****************************************************************************/
 
 
-
+#include <QGuiApplication>
 
 #include "machine.h"
 #include "device_roms.h"
@@ -114,6 +114,7 @@ quint8 Machine::fetch_ioSpace (quint16 p)     //  Addresses c000 - cfff
     }
 
 //     ------------------------------------------------
+
 
     if (p > 0xc7ff) {
         if (RdSLOTCXROM) {
@@ -208,6 +209,7 @@ quint8* Machine::fetch_highMem (quint16 p)
 quint8 Machine::fetch_sspage (quint16 p)
 {
     quint8  c ;
+    quint32 mods ;   // used only for open & closed Apple keys ($C061 & $C062)
 
     if (m_snoopSSFetches) ss_fetch_snoop (p) ;
 
@@ -339,11 +341,15 @@ quint8 Machine::fetch_sspage (quint16 p)
  //                   c = m_tape->readTapeInput() ;
                     c = m_parent->m_gamepad->readButton(3) ;
                     break ;
-                case 1:                        // C061  Switch 0 / Left-alt  ("open apple" key)  // XXXXX what to do about the apple keys here ? XXXXX
-                    c = m_parent->m_gamepad->readButton(0) ;
+                case 1:                        // C061  Switch 0 / Left-alt  ("open apple" key)
+                    mods = QGuiApplication::queryKeyboardModifiers() ;   // XXXX FIXME - left / right apple keys are not distinguished XXXXX
+                    if (mods & Qt::AltModifier) c = 0xff ;
+                    else                        c = m_parent->m_gamepad->readButton(0) ;
                     break ;
                 case 2:                        // C062  Switch 1 / Right-alt ("solid apple" key)
-                    c = m_parent->m_gamepad->readButton(1) ;
+                    mods = QGuiApplication::queryKeyboardModifiers() ;   // XXXX FIXME - left / right apple keys are not distinguished XXXXX
+                    if (mods & Qt::AltModifier) c = 0xff ;
+                    else                        c = m_parent->m_gamepad->readButton(1) ;
                     break ;
                 case 3:                        // C063  Switch 2
                     c = m_parent->m_gamepad->readButton(2) ;
