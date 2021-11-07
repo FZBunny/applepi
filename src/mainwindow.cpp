@@ -120,7 +120,8 @@ MainWindow::MainWindow (void)
     m_barHeight = this->menuBar()->size().height() ;  // ( height == 30)
 
     m_screen = new Screen (this) ; 
-    m_screen->move (3,m_barHeight) ;
+ //   m_screen->move (3,m_barHeight) ;
+    m_screen->move (8,m_barHeight) ;
     m_screen->resize (m_screenSize) ;
     
     m_led_bright_red   = QIcon (QPixmap(xpm_led_bright_red)) ;
