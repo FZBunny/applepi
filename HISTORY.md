@@ -23,8 +23,19 @@ Changed start/stop trace button to class 'ApplepiButton'.
 - **mainwindow.cpp**  
  Added a bit of (gimmicky) code to update date & time once/second when running ProDOS.
 - **hd_controller.cpp**   
-Added code to make the HD/3.5" floppy controller obey soft switch settings. (Previously only read and wrote main RAM. \*blush\*)  Also fixed typo which prevented "Total Replay" from running.
+Added code to make the HD/3.5" floppy controller obey soft switch settings. (Previously only read and wrote main RAM. (\*blush\*)  Also fixed typo which prevented "Total Replay" from running.
 - **mainwindow_menus.cpp**   
 Added Ctrl-V shortcut paste-to-keyboard operation. (Ctrl-C must be reserved for 'abort'.)
 - **rom_dialog.cpp**   
 Fixed bug which would cause a segfault.
+
+#### V 0.1.7
+- **printer.cpp**  
+Added ability to print, using PR#1, to either a disk file or console.
+- **screen.cpp**  
+Fixed (i.e. removed) anomalous horizontal lines in screen display.
+- **gamepad.cpp**  
+Added basic gamepad support, plus ability to use mouse input in place of a gamepad if none is available.
+- **mainwindow.cpp**  
+1) Fixed a bug preventing the left & right 'Alt' keys to mimic the open- & closed-apple keys on the Apple II keyboard.  
+2) Added a bit of (gimmicky) code to automatically set and maintain the time & day when ProDOS is running
