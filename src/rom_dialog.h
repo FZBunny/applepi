@@ -57,8 +57,6 @@ private:
     void onCancel          (void) ;
     void onDone            (void) ;
 
-    void centerFileName (void) ;
-
     MainWindow*    m_parent ;
     QFrame*        m_frame ;
     QLabel*        m_text ;

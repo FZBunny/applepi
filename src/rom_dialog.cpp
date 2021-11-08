@@ -75,9 +75,6 @@ RomDialog::RomDialog (MainWindow* parent) : QDialog (parent)
     m_apple2Plus      = new QRadioButton ("Apple][+",this) ;
     m_apple2e         = new QRadioButton ("Apple//e", this) ;
     m_apple2eEnhanced = new QRadioButton ("Apple//e enhanced", this) ;
-
-//    m_apple2eEnhanced->setDisabled (true) ; // XXXXXXXXX  temporary until if figure out what is wrong XXXXXXXXXXXXXXX
-
     m_externalFile    = new QRadioButton ("Select an external ROM file", this) ;
 
     m_apple2->move (m_buttonX, m_buttonY) ;
@@ -92,7 +89,7 @@ RomDialog::RomDialog (MainWindow* parent) : QDialog (parent)
     m_externalFile->resize (200,20) ;
 
     m_romFileName = new QLabel ("", this) ;
-    m_romFileName->resize (200, 20) ;
+    m_romFileName->resize (windowWidth, 24) ;
 
     m_fileButton   = new QPushButton ("Open File", this) ;
     m_cancelButton = new QPushButton ("Cancel", this) ;
@@ -115,8 +112,9 @@ RomDialog::RomDialog (MainWindow* parent) : QDialog (parent)
     QFileInfo fInfo (m_romPath) ;
     QString name (fInfo.fileName()) ;
     m_romFileName->setText (name) ;
-
-    centerFileName() ;
+    m_romFileName->resize (windowWidth, 24) ;
+    m_romFileName->move (0, m_buttonY+140) ;
+    m_romFileName->setAlignment (Qt::AlignCenter) ;
 
     if (m_useInternalRom == "yes") {
         m_fileButton->setEnabled(false) ;
@@ -215,21 +213,9 @@ void RomDialog::onSelectRomFile (void)
         QFileInfo fInfo (m_romPath) ;
         QString name (fInfo.fileName()) ;
         m_romFileName->setText (name) ;
-        centerFileName() ;
     } else {
         m_buttonOnEntry->setChecked (true) ;
     }
-}
-
-
-void RomDialog::centerFileName (void)
-{
-    int w, txtX ;
-    QFont font = this->font() ;
-    QFontMetrics fm (font) ;
-    w = fm.horizontalAdvance (m_romFileName->text()) ;
-    txtX = (this->width()/2) - w/2 ;
-    m_romFileName->move (txtX, m_buttonY+140) ;
 }
 
 
