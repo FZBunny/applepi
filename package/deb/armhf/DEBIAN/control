@@ -4,7 +4,7 @@ Version: 0.1.7
 Architecture: armhf
 Maintainer: J.B.Ward <j.bruce.ward@gmail.com>
 Installed-Size: 668
-Depends: libasound2, libqt5widgets5, libqt5gui5, libqt5core5a
+Depends: libasound2, libqt5widgets5, libqt5gui5, libqt5core5a, libqt5gamepad5
 Section: misc
 Priority: optional
 Homepage: https://github.com/FZBunny/applepi
