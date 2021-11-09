@@ -198,7 +198,7 @@ bool FloppyDiskController::open (unsigned int driveIndex, QString &path, bool wr
     m_diskAddressCounter = 0 ;
     m_epilogCounter = 0 ;
     m_writingData = false ;
-
+//printf ("m_sectorSkew[%i]=%i\n", driveIndex, m_sectorSkew[driveIndex]) ;
     return true ;
 }
 
@@ -632,10 +632,29 @@ DBUG(0x20000)("driveIndex %i: PRODOS order, PRODOS image\n", driveIndex) ;
         m_OS[driveIndex] = PRODOS ;
         return true ;
     }
-DBUG(0x20000)("*** DEFAULTING TO:  driveIndex %i: DOS order, DOS image\n\n", driveIndex) ;
 
-    m_sectorSkew[driveIndex] = DOS3 ;  // If all checks fail, assume DOS3
-    m_OS[driveIndex] = DOS3 ;
+// Check for a Pascal disk (in a very hack-ish manner)
+
+    m_sectorSkew[driveIndex] = DOS3 ;     // Assume DOS3 skew
+    m_OS[driveIndex] = DOS3 ;             // and DOS type
+
+    int n = m_image[driveIndex][0xb06] ;  // We just check for a valid Pascal volume name;
+    if (n>0 && n<8) {                     // if it's valid, we assume it's a Pascal disk.
+        int i ;                           // (Yes, this is a weak test, but it's all we got...)
+        for (i=0; i<n; i++) {
+            quint8 c = m_image[driveIndex][0xb07 + i] ;
+            if (c < 0x20) break ;
+            if (c > 0x7e) break ;
+            if ((c=='=') || (c=='$') || (c=='?') || (c==',')) break ;
+        }
+        if (i==n) m_OS[driveIndex] = PASCAL ;
+    }
+
+    if (m_OS[driveIndex] == PASCAL) return true ;
+
+    m_OS[driveIndex] = UNKNOWN ;
+
+DBUG(0x20000)("*** DEFAULTING TO:  driveIndex %i: DOS order, DOS image\n\n", driveIndex) ;
 
     return false ;
 }

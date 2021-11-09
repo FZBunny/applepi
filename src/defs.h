@@ -63,8 +63,11 @@ extern "C" void trim (char* buffer, int len) ;
 #define SECTORSIZE 256
 #define BLOCKSIZE  512
 
-#define DOS3 0
-#define PRODOS 1
+// disk types
+#define DOS3    0
+#define PRODOS  1
+#define PASCAL  2
+#define UNKNOWN 3
 
 #define CENTER_DIALOG \
   { \

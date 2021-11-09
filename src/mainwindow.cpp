@@ -484,7 +484,55 @@ void MainWindow::setFloppyLabel (uint drive)
 
     if (file.isDir()) {
         slashLabel = "- empty drive -" ;
-    } else if (m_mac->m_floppy->OSType(drive) == DOS3) {     // --- DOS disk
+    } else {
+        int n ;
+        switch (m_mac->m_floppy->OSType(drive)) {
+            case DOS3:
+                n = m_mac->m_floppy->readSector (buffer, drive, 17, 0) ;    // (DOS VTOC is on track 17, sector 0)
+                if (n == SECTORSIZE) {
+                    int releaseNumber = buffer[3] ;
+                    int volumeNumber  = buffer[6] ;
+                    QTextStream (&slashLabel) << "DOS" << releaseNumber << " Vol." << volumeNumber ;
+                } else {
+                    slashLabel = " *** I/O Error *** " ;
+                }
+                break ;
+            case PRODOS:
+                n = m_mac->m_floppy->readSector (buffer, drive, 0, 11) ;    // Track 0, Sector 11 contains beginning
+                if (n == SECTORSIZE) {                                      // of volume dir on a 5.25" ProDos floppy
+                    int nameLen = buffer[4] & 0x0f ;  // (volume name starts at 6th byte of block 2)
+                    buffer[nameLen+5] = 0 ;
+                    quint8 tmp[16] ;
+                    strcpy ((char*)tmp, (char*)buffer+5) ;
+                    label = QString ((const char*)tmp) ;
+                    slashLabel = "/" ;
+                    slashLabel += label ;
+                } else {
+                    slashLabel = " *** I/O Error *** " ;
+                }
+                break ;
+            case PASCAL:
+                n = m_mac->m_floppy->readSector (buffer, drive, 0, 11) ;    // Track 0, Sector 11 contains the volume
+                if (n == SECTORSIZE) {                                      // name of a Pascal disk.
+                    int nameLen = buffer[6] ;
+                    buffer[nameLen+7] = 0 ;
+                    quint8 tmp[16] ;
+                    strcpy ((char*)tmp, (char*)buffer+7) ;
+                    slashLabel = QString ((const char*)tmp) + QString(":") ;
+                } else {
+                    slashLabel = " *** I/O Error *** " ;
+                }
+                break ;
+            case UNKNOWN:
+                slashLabel = " Unknown disk type " ;
+                break ;
+            default:
+                break ;
+        }
+    }
+
+/***
+        if (m_mac->m_floppy->OSType(drive) == DOS3) {     // --- DOS disk
         int n = m_mac->m_floppy->readSector (buffer, drive, 17, 0) ;    // (DOS VTOC is on track 17, sector 0)
         if (n == SECTORSIZE) {
             int releaseNumber = buffer[3] ;
@@ -506,8 +554,7 @@ void MainWindow::setFloppyLabel (uint drive)
         } else {
             slashLabel = " *** I/O Error *** " ;
         }
-    }
-
+***/
     setFloppyLabel (drive, slashLabel) ;
 
 }
