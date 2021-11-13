@@ -52,33 +52,35 @@ public:
     ~Gamepad() {} ;
 
     quint8 readButton (int n) ;
-    quint8 readGamepad (int n) ;
-    quint8 readMouse (int n) ;
+    quint8 readAnalog (int n) ;
+    quint8 readButtons (int n) ;
     void   openController (void) ;
     void   reset (void) ;
     
 private:
 
+    void readMouseButtons (void) ;
+    void buttonBChanged (bool value) ;
+
     MainWindow* m_parent ;
-    void readMouseData (void) ;
-    void buttonBChanged(bool value) ;
+    QGamepad*  m_gamepad ;
 
     QString    m_controllerName ;
     uint       m_controllerID ;
     bool       m_useMouse ;
     int        m_mouseFd ;
-    QList<int> m_gamepadIDs ;
-    QGamepad*  m_gamepad ;
-    bool       m_arcadeStyle ;
+    int        m_screenWidth ;
+    int        m_screenHeight ;
+
     bool       m_buttons[4] ;
-    int        m_coarseDeltaX ;
-    int        m_coarseDeltaY ;
+    int        m_mouseX ;
+    int        m_mouseY ;
     quint64    m_triggerCycles ;
     QTimer*    m_mouseTimer ;
     
    
     const float m_maxTimeoutCycles = 11*255 ; // Maximum CPU cycles for paddle circuit time-out ( = 2805)
-    const float m_coarseK = 11*255 / 127 ;    // /dev/input/mice position-to-timeout conversion  constant
+//    const float m_coarseK = 11*255 / 127 ;    // /dev/input/mice position-to-timeout conversion  constant
 
 } ;
 

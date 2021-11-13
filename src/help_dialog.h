@@ -31,4 +31,6 @@ private:
     QPushButton*  m_homeButton ;
     QPushButton*  m_backButton ;
     QPushButton*  m_closeButton ;
+
+    QString       m_index ;
 } ;

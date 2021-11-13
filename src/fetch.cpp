@@ -355,16 +355,16 @@ quint8 Machine::fetch_sspage (quint16 p)
                     c = m_parent->m_gamepad->readButton(2) ;
                     break ;
                 case 4:                        // C064  Analog input 0  (paddle 0 / gamepad 1 X-axis)
-                    c = m_parent->m_gamepad->readGamepad(0) ;
+                    c = m_parent->m_gamepad->readAnalog(0) ;
                     break ;
                 case 5:                        // C065  Analog input 1  (paddle 1 / gamepad 1 Y-axis)
-                    c = m_parent->m_gamepad->readGamepad(1) ;
+                    c = m_parent->m_gamepad->readAnalog(1) ;
                     break ;
-                case 6:                        // C066  Analog input 2  (paddle 2 / gamepad 2 X-axis)
-                    c = m_parent->m_gamepad->readGamepad(2) ;
+                case 6:                        // C066  Analog input 2  (paddle 2 / gamepad 2 X-axis)readGamepadreadGamepad
+                    c = m_parent->m_gamepad->readAnalog(2) ;
                     break ;
                 case 7:                        // C067  Analog input 3  (paddle 3 / gamepad 2 y-axis)
-                    c = m_parent->m_gamepad->readGamepad(3) ;
+                    c = m_parent->m_gamepad->readAnalog(3) ;
                     break ;
                 case 8:                        // C068 STATEREG
                     c = 0 ;                         // ( ProDos 8 v2.0.3 does a 'TRB  $C068', but most docs )

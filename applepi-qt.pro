@@ -41,6 +41,7 @@ HEADERS += src/about.h \
            src/gamepad_dialog.h \
            src/hd_controller.h \
            src/hd_dialog.h \
+           src/help_dialog.h \
            src/lin-speaker.h \
            src/machine.h \
            src/mainwindow.h \
@@ -76,6 +77,7 @@ SOURCES += src/about.cpp \
            src/gamepad_dialog.cpp \
            src/hd_controller.cpp \
            src/hd_dialog.cpp \
+           src/help_dialog.cpp \
            src/lin-speaker.cpp \
            src/machine.cpp \
            src/main.cpp \

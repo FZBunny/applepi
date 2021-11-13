@@ -31,6 +31,8 @@
 #include <QApplication>
 #include <QDesktopWidget>
 #include <QErrorMessage>
+#include <QMouseEvent>
+#include <QScreen>
 
 #include "defs.h"
 #include "gamepad.h"
@@ -41,21 +43,29 @@
 Gamepad::Gamepad (MainWindow* parent) : QWidget ()
 {
     m_parent = parent ;
+    m_gamepad = new QGamepad (0, this) ;
     openController() ;
 
     for (int i=0; i<3; i++) m_buttons[i] = false ;
     m_triggerCycles = MAC->getCycles() ;
 
+    m_mouseX = 0 ;
+    m_mouseY = 0 ;
+
+    QRect r = QApplication::desktop()->screenGeometry() ;
+    m_screenWidth  = r.width() ;
+    m_screenHeight = r.height() ;
+
     m_mouseTimer = new QTimer (this) ;
-    connect (m_mouseTimer, &QTimer::timeout, this, &Gamepad::readMouseData) ;
-    m_mouseTimer->start (49) ;
+    connect (m_mouseTimer, &QTimer::timeout, this, &Gamepad::readMouseButtons) ;
+    m_mouseTimer->start (50) ;
 }
 
 
 void Gamepad::openController (void)
 {
     QList<int> controllerIDList = QGamepadManager::instance()->connectedGamepads() ;
-    if ( controllerIDList.length()) {
+    if (controllerIDList.length()) {
         int id = controllerIDList.at(0) ;
         m_gamepad = new QGamepad (id, this) ;
         m_useMouse = false ;
@@ -99,26 +109,22 @@ quint8 Gamepad::readButton (int buttonNumber)
         }
     } else {
         QGamepad* g = m_gamepad ;
-        if (g->isConnected()) {
-            switch (buttonNumber) {
-                case 0:
-                    n = g->buttonL2() ;
-                    break ;
-                case 1:
-                    n = g->buttonR2() ;
-                    break ;
-                case 2:
-                    n = m_buttons[2] ;
-                    break ;
-                case 3:
-                    n = m_buttons[3] ;
-                    break ;
-                default:
-                    n = 0 ; 
-                    break ;
-            }
-        } else {
-            n = 0xff ;
+        switch (buttonNumber) {
+            case 0:
+                n = g->buttonL2() ;
+                break ;
+            case 1:
+                n = g->buttonR2() ;
+                break ;
+            case 2:
+                n = m_buttons[2] ;
+                break ;
+            case 3:
+                n = m_buttons[3] ;
+                break ;
+            default:
+                n = 0 ; 
+                break ;
         }
     }
 
@@ -127,24 +133,6 @@ quint8 Gamepad::readButton (int buttonNumber)
     return n ;
 }
 
-/*
-bool l1, l2, l3, r1, r2, r3 ;
-bool center, down, up, left, right, guide, select, start ;
-bool a, b, x, y ;
-
-l1 = g->buttonL1(); l2 = g->buttonL2(); l3 = g->buttonL3(); 
-r1 = g->buttonR1(); r2 = g->buttonR2(); r3 = g->buttonR3(); 
-printf ("%i%i%i %i%i%i\n", l1, l2, l3, r1, r2, r3 ) ;
-
-center = g->buttonCenter(); down = g->buttonDown(); up = g->buttonUp();
-left = g->buttonLeft(); right = g->buttonRight(); 
-select = g->buttonSelect(); start = g->buttonStart(); guide = g->buttonGuide() ;
-printf ("%i %i%i%i%i %i%i%i\n", center, down, up, left, right, guide, select, start) ;
-
-a = g->buttonA(); b = g->buttonB(); x = g->buttonX(); y = g->buttonY(); 
-printf ("%i%i %i%i\n", a, b, x, y) ;
-printf ("\n") ;
-*/
 
 void Gamepad::reset (void)
 {
@@ -154,7 +142,7 @@ void Gamepad::reset (void)
 
 // 
 
-quint8 Gamepad::readGamepad (int n)
+quint8 Gamepad::readAnalog (int n)
 {
     float  f ;
 
@@ -177,13 +165,25 @@ quint8 Gamepad::readGamepad (int n)
                 break ;
         }
     } else {
-        f = 1.0 ;
+        QPoint pos = QCursor::pos() ;
+        switch (n) {
+            case 0:
+                f = (float)pos.x()/(float)m_screenWidth ;
+                break ;
+            case 1:
+                f = (float)pos.y()/(float)m_screenHeight ;
+                break ;
+            default:
+                f = 0 ;
+                break ;
+        }
+        
     }
 
     quint64 deltaCycles = MAC->getCycles() - m_triggerCycles ;
     quint8 value = 0xff ;
     if (deltaCycles > ((f+0.5)*m_maxTimeoutCycles)) value = 0 ;
-//if (value==0) printf ("n=%i dCyc=%5lli f=%4.2f\n", n, deltaCycles, f+0.5) ;
+
     return value ;
 }
 
@@ -194,35 +194,7 @@ printf ("buttonB = %i\n", value) ;
 }
 
 
-
-// -----------  Mouse ---------------
-
-
-quint8 Gamepad::readMouse (int n)
-{
-    QRect r = QApplication::desktop()->screenGeometry() ;
-    int w = r.width() ;
-    int h = r.height() ;
-
-    QPoint p = QCursor::pos() ;
-
-    int position ;
-    float mouseMax ;
-    if (n) {
-        mouseMax = h ;
-        position = p.y() ;
-    } else {
-        mouseMax = w ;
-        position = p.x() ;
-    }
-
-    quint64 deltaCycles = MAC->getCycles() - m_triggerCycles ;
-    float cyclesPerPixel = m_maxTimeoutCycles/mouseMax ;
-    quint8 value = 0xff ;
-    if (deltaCycles > (position*cyclesPerPixel)) value = 0 ;
-
-    return value ;
-}
+// -----------  Mouse Buttons  ---------------
 
 
 typedef struct mouseRecord {
@@ -231,31 +203,15 @@ typedef struct mouseRecord {
     quint8 y ;
 } mouseRecord ;
 
-//  Mouse movement readings from /dev/input/mice
-//
-//       left/down  |  right/up   
-//     <--fast    slow     fast-->
-//     $81  ..  $ff | $01  ..  $7f
-//    -127  ..   -1 |  +1  .. +127
 
-void Gamepad::readMouseData (void)
+void Gamepad::readMouseButtons (void)
 {
     mouseRecord mouse ;
     int n = read (m_mouseFd, &mouse, sizeof(mouse)) ;
     if ((n==EAGAIN) || (n==EWOULDBLOCK)) return ; 
-//putchar('-'); fflush(stdout) ;
+
     m_buttons[0] = m_buttons[1] = m_buttons[2] = 0 ;
     if (mouse.buttons & 1)  m_buttons[0] = 0xff ;  ;
     if (mouse.buttons & 2)  m_buttons[1] = 0xff ;  ;
     if (mouse.buttons & 4)  m_buttons[2] = 0xff ;  ;
-
-/***
-    m_coarseDeltaX = mouse.x ;
-    if (mouse.x & 0x80) m_coarseDeltaX = m_coarseDeltaX - 256 ;
-    m_coarseDeltaY = mouse.y ;
-    if (mouse.y & 0x80) m_coarseDeltaY = m_coarseDeltaY - 256 ;
-***/
-//printf ("m_coarseDelta: %4i %4i\n", m_coarseDeltaX, m_coarseDeltaY) ;
 }
-
-

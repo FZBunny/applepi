@@ -65,6 +65,8 @@ HardDriveDialog::HardDriveDialog (MainWindow* parent, int drive) : QDialog ()
     int width = 420 ;
     int height = 258 ;
     int x, y ;
+    this->setMinimumSize (width,height) ;
+    this->setMaximumSize (width,height) ;
     CENTER_DIALOG
 
     if (m_driveIndex)  m_volumePathKey = "hd2_volume_path" ;

@@ -54,6 +54,8 @@ FloppyDialog::FloppyDialog (MainWindow* parent, int driveIndex) : QDialog ()
     int width = 420 ;
     int height = 258 ;
     int x, y ;
+    this->setMinimumSize (width,height) ;
+    this->setMaximumSize (width,height) ;
     CENTER_DIALOG
 
 	m_driveIndex = driveIndex ;

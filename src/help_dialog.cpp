@@ -1,4 +1,6 @@
 
+//  *****************  UNFINISHED  ***********************
+
 #include <QHBoxLayout>
 
 
@@ -26,8 +28,9 @@ Help::Help (MainWindow *parent) : QDialog(parent)
     connect (m_closeButton, &QPushButton::clicked, this, &Help::onClose) ;
   //  connect (m_browser, SIGNAL(sourceChanged(const QUrl &)), this, &Help::updateWindowTitle) ;
 
- //   m_browser->setSearchPaths (QStringList() << path << SHARE_DIR) ;
- //   m_browser->setSource (page) ;
+    m_index = QString ("ApplePiHelp.html") ;
+    m_browser->setSearchPaths (QStringList() << SHARE_DIR) ;
+    m_browser->setSource (m_index) ;
 }
 
 

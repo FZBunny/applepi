@@ -45,7 +45,7 @@
 #include "gamepad_dialog.h"
 #include "rom_dialog.h"
 #include "view_memory.h"
-//#include "help_dialog.h"
+#include "help_dialog.h"
 //#include "about.h"
 #include "disassemble_memory_dialog.h"
 
@@ -380,6 +380,8 @@ void MainWindow::onDisassembleMemory (void)
 void MainWindow::onHelp (void)
 {
     QDesktopServices::openUrl (QUrl("file:///usr/share/applepi/ApplePiHelp.html")) ; 
+//    Help* help = new Help (this) ;
+//    help->show() ;
 }
 
 
