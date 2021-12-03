@@ -38,4 +38,8 @@ Fixed (i.e. removed) anomalous horizontal lines in screen display.
 Added basic gamepad support, plus ability to use mouse input in place of a gamepad if none is available.
 - **mainwindow.cpp**  
 1) Fixed a bug preventing the left & right 'Alt' keys to mimic the open- & closed-apple keys on the Apple II keyboard.  
-2) Added a bit of (gimmicky) code to automatically set and maintain the time & day when ProDOS is running
+2) Added a bit of (gimmicky) code to automatically set and maintain the time & day when ProDOS is running.
+
+#### V 0.1.8
+- **floppy_controller.cpp** & **mainwindow.cpp**  
+Added ability to recognize Apple Pascal disks and display Pascal volume names under the floppy disk buttons (Only tested on Pascal 1.3)

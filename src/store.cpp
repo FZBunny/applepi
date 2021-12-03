@@ -392,6 +392,7 @@ void Machine::store_sspage (quint8 c, quint16 p)
              storeToBankSwitches (p) ;         // Do something with high mem bank switches
              break ;
         case 9:                        // Slot 1      C090 - C09F
+            m_printer->store (loNibble, c) ;
             break ;
         case 0xa:                      // Slot 2      C0A0 - C0AF
             break ;

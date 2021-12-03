@@ -2,8 +2,8 @@
 
 sayLater() {
     echo 
-    echo You may copy the file to your desktop later with:
-    echo cp  /usr/share/applepi/applepi.desktop  $DESKTOP
+    echo 'You may copy the file to your desktop later with:'
+    echo 'cp  /usr/share/applepi/applepi.desktop  ~/Desktop'
     echo 
 }
 
@@ -15,12 +15,15 @@ if [ $SUDO_UID ]; then
     if [ -x $XDG ]; then
         $XDG install --novendor /usr/share/applepi/applepi.desktop
     fi
+
+    read -t 1 -n 10000 discard
+
     echo
     echo \*
     echo \* Would you like the applepi desktop file placed on your desktop? \(Y/n\)
     echo \*
 
-    read -s -n 1 REPLY
+    read  -n1 REPLY
     LEN=${#REPLY}
 
     if [ $LEN = 0 ] || [ $REPLY = 'y' ] || [ $REPLY = 'Y' ]; then

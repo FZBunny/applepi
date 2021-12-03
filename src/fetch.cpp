@@ -405,7 +405,7 @@ quint8 Machine::fetch_sspage (quint16 p)
             break ;
         case 9:                   //  slot 1      C090 - C09F  (Printer I/O)
             m_romSlot = 1 ;
-//printf ("A=%2.2x\n", A) ;
+            c = m_printer->fetch (loNibble) ;
             break ;
         case 0xa:                 //  slot 2      C0A0 - C0AF
             m_romSlot = 2 ;

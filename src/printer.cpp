@@ -59,6 +59,7 @@ QString Printer::error()
     return m_out->errorString() ;
 }
 
+
 void Printer::close (void)
 {
     m_out->close() ;
@@ -99,27 +100,40 @@ quint8 Printer::fetch_Printer_ROM (int slotNumber, quint8 p)
     if ((calledFrom==entryPoint) && ((p==0x11) || (p==0x12))) return 0 ;
 
     if ((p==0) && (calledFrom==slotAddr)) {                        // Did someone say "PR#1" ?
-        MAC->m_ram[0x36] = 0x10 ;           // Set the character output vector
-        MAC->m_ram[0x37] = slotAddr >> 8 ;  // to point to us
+        MAC->m_ram[0x36] = 0x10 ;            // Set the character output vector
+        MAC->m_ram[0x37] = slotAddr >> 8 ;   // to point to us
         ps->Areg = 0 ;
         ps->Pstat &= C ^ 0xff ;
         c = RTS ;
     } else if ((p==0x10) && (calledFrom==entryPoint)) {            // Print a single character.
-//printf (" %2.2x:", Areg) ;
         m_out->putChar (ps->Areg&0x7f) ;
         if ((ps->Areg&0x7f) == '\r') m_out->putChar ('\n') ;
         m_out->flush() ;
-        if (MAC->m_ss[0] == 0x83) {    // If a ctrl-C was entered at the keyboard,
-            MAC->m_ram[0x36] = 0xf0 ;  // restore the char. output vector to COUT1 ($FDF0),
-            MAC->m_ram[0x37] = 0xfd ;  // and close the output file.
-            close() ;
+        if (MAC->m_ss[0] == 0x83) {          // If a ctrl-C was entered at the keyboard,
+            close() ;                        // close the output file & reset the output vector.
         }
         c = RTS ;
     } else {                                                       // PC isn't Cn00 or Cn10; just return a byte from ROM.
         if (p > 0x4f) p = 0 ;
         c = epson_ROM_fragment[p] ;
     }
-
+//printf ("fetch_Printer_ROM %2.2x from %4.4x\n", c, p) ;
     return c ;
+}
+
+
+quint8 Printer::fetch (int)
+{
+    return 0 ;
+}
+
+
+// **** this code is incomplete; does not check for escape codes, or anything else, really. ***
+
+void Printer::store (int /*loNibble*/, quint8 c)
+{
+//printf ("Printer::store %2.2x to %4.4x\n", c, loNibble) ;
+    m_out->putChar (c) ;
+    m_out->flush() ;
 }
 

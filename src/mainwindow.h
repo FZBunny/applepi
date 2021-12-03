@@ -70,7 +70,7 @@ public:
 
     Machine*   m_mac ;
     Config*    m_cfg ;
-    Gamepad*  m_gamepad ;
+    Gamepad*   m_gamepad ;
 
     QString installRom (void) ;
     

@@ -37,6 +37,26 @@
 #include "machine.h"
 
 
+/*
+
+NOTE: use fopen (fileName "wb") ; //  - Note the 'b'!
+https://gist.github.com/niw/5963798
+
+typedef struct png {
+    quint8  n1[4] = {0x80|'I', 'P', 'N', 'G'} ;
+
+    quint64 ihdrLen = 0x0d000000 ;         // Big-endian for decimal 13
+    quint8  n2[4] = {'I', 'H', 'D', 'R'} ;
+    quint64 imageWidth ;
+    quint64 imageHeight ;
+    quint8  bitDepth = 1 ;
+    quint8  colourType = 0 ;
+    quint8  compressionMethod = 0 ;
+    quint8  
+    quint8  
+
+} png ;
+*/
 
 class Printer
 {
@@ -50,6 +70,8 @@ public:
     void    close (void) ;
     bool    haveOpenFile (void) ;
     quint8  fetch_Printer_ROM (int slotNumber, quint8 loByte) ;
+    quint8  fetch (int loNibble) ;
+    void    store (int loNibble, quint8 c) ;
 
 private:
     Machine* m_parent ;
