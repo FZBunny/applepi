@@ -27,10 +27,13 @@
 
 #include <QtGlobal>
 #include <stdio.h>
+#include <limits.h>
 
 #include "defs.h"
 #include "machine.h"
 #include "printer.h"
+#include "xpm_images.h"
+#include "debugging_dumps.h"
 
 
 
@@ -41,6 +44,7 @@ Printer::Printer (Machine* mac)
     m_out = new QFile() ;
     m_out->open (1, QIODevice::WriteOnly) ;
     m_writingToFile = false ;
+    m_pixmapPrinterPins = QPixmap (xpm_printerPins) ;
 }
 
 
@@ -50,6 +54,12 @@ bool Printer::open (QString path)
     m_out = new QFile (path) ;
     bool ok = m_out->open (QIODevice::WriteOnly) ;
     if (ok) m_writingToFile = true ;
+    //                                 XXXXX add error dialog XXXXX
+    m_graphicsState = 0 ;
+    m_pixelsWidth = 0 ;
+    m_numberLines = 0 ;
+    m_pixelCounter = INT_MAX ;
+
     return ok ;
 }
 
@@ -62,6 +72,8 @@ QString Printer::error()
 
 void Printer::close (void)
 {
+    if (m_graphicsState) makePDF() ;
+
     m_out->close() ;
     delete m_out ;
     m_out = new QFile() ;
@@ -122,18 +134,123 @@ quint8 Printer::fetch_Printer_ROM (int slotNumber, quint8 p)
 }
 
 
-quint8 Printer::fetch (int)
+quint8 Printer::fetch (int loNibble)
 {
-    return 0 ;
+    quint8 c ;
+
+    if (loNibble > 0x4f) c = 0 ;
+    else                 c = epson_ROM_fragment[loNibble] ;
+
+    return c ;
 }
 
-
-// **** this code is incomplete; does not check for escape codes, or anything else, really. ***
 
 void Printer::store (int /*loNibble*/, quint8 c)
 {
 //printf ("Printer::store %2.2x to %4.4x\n", c, loNibble) ;
     m_out->putChar (c) ;
     m_out->flush() ;
+
+    if (m_writingToFile) handleGraphics (c) ;
 }
 
+
+void Printer::handleGraphics (quint8 c)
+{    
+    switch (m_graphicsState) {
+        case 0:
+            if (c == 0x1b) m_graphicsState = 1 ;
+            break ;
+        case 1:
+            if (c == 0x4c) m_graphicsState = 2 ;
+            break ;
+        case 2:
+            m_pixelsWidthLo = c ;
+            m_graphicsState = 3 ;
+            break ;
+        case 3:
+            if (m_pixelsWidth == 0) {     // Take the width of the 1st line, and use it for all.
+                m_pixelsWidth = m_pixelsWidthLo + 256*c ;
+            }
+            m_pixelCounter = 0 ;
+            m_numberLines++ ;
+            m_graphicsState = 4 ;
+            break ;
+        case 4:
+            if (m_pixelCounter++ < m_pixelsWidth) {
+                m_printerPixelData.append (c) ;
+//printf ("%2.2x ", c) ;
+            } else {
+                m_graphicsState = 0 ;
+                if (c == 0x1b) m_graphicsState = 1 ;
+//printf ("\n-----\n") ;
+            }
+            break ;
+        default:
+            m_graphicsState = 0 ;
+            break ;
+    }
+
+}
+
+
+void Printer::makePDF (void)
+{
+printf ("Printer::makePDF m_graphicsState=%i\n", m_graphicsState) ;
+    if ( ! m_graphicsState) return ;
+
+    QString fileName = m_out->fileName() ;                  // Make the PDF filename
+    int len = fileName.length() ;
+    int ix = fileName.indexOf (".txt", 0, Qt::CaseInsensitive) ;  // XXXXXXXXXXXXXXXX  FIXME : don't assume ".txt"
+    if (ix ==  len-4) {
+        fileName.truncate (ix) ;
+    }
+    fileName.append (".pdf") ;
+qStdOut() << "PDF filename = " << fileName << endl ;
+
+    QFile pdfFile (fileName) ;
+    bool ok = pdfFile.open (QIODevice::WriteOnly) ;         // Open the PDF file
+    if ( !ok) {
+printf ("Open PDF failed.\n") ;                                   //  XXXXXXXXXXXXXXXXX Change this to an error dialog XXXXX
+        return ;
+    }
+
+    QPdfWriter writer (fileName) ;                          // Set up the PDF writer
+    writer.setResolution (120) ;  // A magic number which seems to work...
+    writer.setPageSize (QPagedPaintDevice::Letter) ;
+    writer.setPageMargins (QMargins(0.8, 0.8, 0.8, 0.6), QPageLayout::Inch) ;
+
+    QPainter painter (&writer) ;
+    QPen pen (Qt::black) ;
+    pen.setWidth(1) ;
+    painter.setPen (pen) ;
+
+    QRect r = painter.viewport() ;
+
+/*****************************************
+//----------------------------------------
+printf ("Painter viewport is %ix%i\n", r.width(), r.height()) ;
+printf ("m_numberLines=%i\n", m_numberLines) ;
+
+painter.drawLine (0,0,  r.width(),r.height()) ;
+painter.drawLine (r.width(),0,  0,r.height()) ;
+
+QPixmap cpixmap = QPixmap (xpm_40ColChars) ;
+for (int i=0; i<64; i++) {
+    painter.drawPixmap (14*i, 660, cpixmap, 0, i*16, 14, 16) ;
+}
+//----------------------------------------
+*****************************************/
+
+    for (int line=0; line<m_numberLines; line++) {
+        for (int column=0; column<m_pixelsWidth; column++) {
+            quint8 byte = m_printerPixelData.at (line*m_pixelsWidth+column)<< 1 ;
+            painter.drawPixmap (column,30+(line*7), m_pixmapPrinterPins, 0,byte*8, 1,8) ;
+        }
+    }
+
+    painter.end() ;
+    pdfFile.close() ;
+
+    m_numberLines = 0 ;
+}
