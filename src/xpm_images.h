@@ -36,6 +36,8 @@ extern const char* xpm_led_dim_red[] ;
 extern const char* xpm_led_bright_green[] ;
 extern const char* xpm_led_dim_green[] ;
 
+extern const char* xpm_printerPins[] ;
+
 extern const char* xpm_40ColChars[] ;
 extern const char* xpm_40ColCharsEnhanced[] ;
 //extern const char* xpm_40ColMouseText[] ;

@@ -91,8 +91,7 @@ void Machine::initialize (bool power)
     m_WAI_executed = false ;
     m_STP_executed = false ;
 
-    RdSLOTCXROM = ON ;      //  XXXXX is this correct? XXXXX
-//printf ("Machine::initialize RdSLOTCXROM=%i\n", RdSLOTCXROM) ;
+    RdSLOTCXROM = ON ;
 
     m_historyOldest = 0 ;
     m_historyNewest = 0 ;

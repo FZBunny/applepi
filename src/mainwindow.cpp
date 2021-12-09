@@ -235,7 +235,7 @@ MainWindow::MainWindow (void)
 
     resizeWindow() ;
 
-this->setMouseTracking(true) ;
+    // this->setMouseTracking(true) ;  WTF was this for ?
 }
 
 

@@ -58,8 +58,8 @@ extern "C" void trim (char* buffer, int len) ;
 
 void MainWindow::createMenus (void)
 {
-    m_printToFilePrompt = new QString ("Select Slot1 Print File...") ;
-    m_closePrintToFilePrompt = new QString ("Close Slot1 file") ;
+    m_printToFilePrompt = new QString ("Select a File to Print to...") ;
+    m_closePrintToFilePrompt = new QString ("Close Printer file") ;
 
     m_fileMenu        = menuBar()->addMenu (tr("&File")) ;
     m_editMenu        = menuBar()->addMenu (tr("&Edit")) ;
@@ -173,7 +173,7 @@ void MainWindow::onSelectPrinter (void)
                 CFG->Set (fileKey, dir2) ;
             } else {
                 QErrorMessage* msg = new QErrorMessage (this) ;
-                msg->showMessage (tr("Can't open file for slot1 printing: \n") + MAC->m_printer->error()) ;
+                msg->showMessage (tr("Can't open file for slot1 printing: \n") + MAC->m_printer->error()) ; // XXXXX  BAD FORMAT  FIXME XXXXX
             }
         }
     }

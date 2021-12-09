@@ -26,6 +26,8 @@
 *****************************************************************************/
 
 #include <QtGlobal>
+#include <QTransform>
+
 #include <stdio.h>
 #include <limits.h>
 
@@ -199,43 +201,51 @@ void Printer::makePDF (void)
 printf ("Printer::makePDF m_graphicsState=%i\n", m_graphicsState) ;
     if ( ! m_graphicsState) return ;
 
-    QString fileName = m_out->fileName() ;                  // Make the PDF filename
+    QString fileName = m_out->fileName() ;                     // Make the PDF filename
     int len = fileName.length() ;
-    int ix = fileName.indexOf (".txt", 0, Qt::CaseInsensitive) ;  // XXXXXXXXXXXXXXXX  FIXME : don't assume ".txt"
+    int ix = fileName.indexOf (".txt", 0, Qt::CaseInsensitive) ;                  // XXXXXXXXXXXXXXXX  FIXME : don't assume ".txt"
     if (ix ==  len-4) {
         fileName.truncate (ix) ;
     }
     fileName.append (".pdf") ;
-qStdOut() << "PDF filename = " << fileName << endl ;
+//qStdOut() << "PDF filename = " << fileName << endl ;
+//printf ("%i lines, %i pixels wide\n", m_numberLines, m_pixelsWidth) ;
 
-    QFile pdfFile (fileName) ;
-    bool ok = pdfFile.open (QIODevice::WriteOnly) ;         // Open the PDF file
-    if ( !ok) {
-printf ("Open PDF failed.\n") ;                                   //  XXXXXXXXXXXXXXXXX Change this to an error dialog XXXXX
-        return ;
-    }
+    QPixmap pixelBuffer (m_pixelsWidth, m_numberLines*8) ;     // Create one huge pixmap of all the bits
 
-    QPdfWriter writer (fileName) ;                          // Set up the PDF writer
-    writer.setResolution (120) ;  // A magic number which seems to work...
-    writer.setPageSize (QPagedPaintDevice::Letter) ;
-    writer.setPageMargins (QMargins(0.8, 0.8, 0.8, 0.6), QPageLayout::Inch) ;
-
-    QPainter painter (&writer) ;
-    QPen pen (Qt::black) ;
-    pen.setWidth(1) ;
-    painter.setPen (pen) ;
-
-    QRect r = painter.viewport() ;
-    
+    QPainter bufferPainter (&pixelBuffer) ;                    // Draw the 7 most significant bits of each line into the buffer painter
     for (int line=0; line<m_numberLines; line++) {
         for (int column=0; column<m_pixelsWidth; column++) {
             quint8 byte = m_printerPixelData.at (line*m_pixelsWidth+column)<< 1 ;
-            painter.drawPixmap (column,30+(line*7), m_pixmapPrinterPins, 0,byte*8, 1,8) ;
+            bufferPainter.drawPixmap (column,(line*7), m_pixmapPrinterPins, 0,byte*8, 1,8) ;
         }
     }
 
-    painter.end() ;
-    pdfFile.close() ;
+    float verticalScaleCorrection = 1.666 ;
+    QTransform xform = QTransform::fromScale (1.0, verticalScaleCorrection) ;
+    QPixmap xformedPixels = pixelBuffer.transformed (xform) ;  // Scale the pixmap
+
+    QFile pdfFile (fileName) ;
+    bool ok = pdfFile.open (QIODevice::WriteOnly) ;            // Open the PDF file for writing
+    if ( !ok) {
+printf ("Open PDF failed.\n") ;                                                 //  XXXXXXXXXXXXXXXXX Change this to an error dialog XXXXX
+        return ;
+    }
+    int resolution = 120 ;  // (A magic number which seems to work...)
+    QPdfWriter writer (fileName) ;                             // Set up the PDF writer
+    writer.setResolution (resolution) ;
+    writer.setPageSize (QPagedPaintDevice::Letter) ;
+    writer.setPageMargins (QMargins(0.8, 0.8, 0.8, 0.6), QPageLayout::Inch) ;
+
+    QPainter PDFPainter (&writer) ;                            // Write all pixels to the PDF
+    QPen pen (Qt::gray) ;
+    pen.setWidth(1) ;
+    PDFPainter.setPen (pen) ;
+    PDFPainter.drawPixmap (0,0,  xformedPixels,  0,0,  m_pixelsWidth,m_numberLines*7*verticalScaleCorrection) ;
+
+    PDFPainter.end() ;                                         // Close the PDF structure, and...
+    pdfFile.close() ;                                          // close the file.
 
     m_numberLines = 0 ;
-}
+}                                                              // - We're done here. -
+

@@ -29,8 +29,9 @@
 const char*  xpm_printerPins[] =
 {
     "1 2048 2 1",
-    "X c #ffffff",
-    "- c #000000",
+    "- c #ffffff",
+//    "X c #000000",
+    "X c #222222",
     
     "-",  // 00
     "-",

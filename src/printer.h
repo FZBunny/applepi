@@ -72,11 +72,24 @@ public:
     quint8  fetch_Printer_ROM (int slotNumber, quint8 loByte) ;
     quint8  fetch (int loNibble) ;
     void    store (int loNibble, quint8 c) ;
-
+    
 private:
+
+    void  handleGraphics (quint8 c) ;
+    void  makePDF (void) ;
+
     Machine* m_parent ;
     QFile*   m_out ;
     bool     m_writingToFile ;
+
+    int        m_graphicsState ;
+    int        m_numberLines ;
+    int        m_pixelCounter ;
+    int        m_pixelsWidth ;
+    int        m_pixelsWidthLo ;   // 1st byte of 2-byte image width
+    QByteArray m_printerPixelData ;
+    QPixmap    m_pixmapPrinterPins ;
+
 
     // 'epson_ROM_fragment' exists only to let ProDOS identify slot 1 as a parallel (printer) card.
     const quint8 epson_ROM_fragment[0x50] = { 

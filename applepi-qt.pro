@@ -101,5 +101,6 @@ SOURCES += src/about.cpp \
            src/xpm_80column_mousetext.cpp \
            src/xpm_hires.cpp \
            src/xpm_leds.cpp \
+           src/xpm_printer_pins.cpp \
            src/xpm_redapple.cpp
 
