@@ -226,22 +226,7 @@ printf ("Open PDF failed.\n") ;                                   //  XXXXXXXXXX
     painter.setPen (pen) ;
 
     QRect r = painter.viewport() ;
-
-/*****************************************
-//----------------------------------------
-printf ("Painter viewport is %ix%i\n", r.width(), r.height()) ;
-printf ("m_numberLines=%i\n", m_numberLines) ;
-
-painter.drawLine (0,0,  r.width(),r.height()) ;
-painter.drawLine (r.width(),0,  0,r.height()) ;
-
-QPixmap cpixmap = QPixmap (xpm_40ColChars) ;
-for (int i=0; i<64; i++) {
-    painter.drawPixmap (14*i, 660, cpixmap, 0, i*16, 14, 16) ;
-}
-//----------------------------------------
-*****************************************/
-
+    
     for (int line=0; line<m_numberLines; line++) {
         for (int column=0; column<m_pixelsWidth; column++) {
             quint8 byte = m_printerPixelData.at (line*m_pixelsWidth+column)<< 1 ;
