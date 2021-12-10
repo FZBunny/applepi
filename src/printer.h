@@ -71,7 +71,7 @@ public:
     bool    haveOpenFile (void) ;
     quint8  fetch_Printer_ROM (int slotNumber, quint8 loByte) ;
     quint8  fetch (int loNibble) ;
-    void    store (int loNibble, quint8 c) ;
+    void    store (quint8 c) ;
     
 private:
 
@@ -80,7 +80,8 @@ private:
 
     Machine* m_parent ;
     QFile*   m_out ;
-    bool     m_writingToFile ;
+    bool     m_writingText ;
+    bool     m_writingPDF ;
 
     int        m_graphicsState ;
     int        m_numberLines ;

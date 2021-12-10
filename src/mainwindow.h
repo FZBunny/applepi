@@ -141,6 +141,8 @@ private:
     ApplepiButton* m_tapeButton ;
     ApplepiButton* m_hd1Button ;
     ApplepiButton* m_hd2Button ;
+    ApplepiButton* m_closePrinterButton ;
+
 
     ApplepiButton* m_scaleButton ;
     ApplepiButton* m_resetButton ;
@@ -170,6 +172,9 @@ private:
 
 // File actions:
     QAction* m_selectRomFile ;
+    QMenu*   m_selectPrint ;
+    QAction* m_printText ;
+    QAction* m_printPDF ;
     QAction* m_exit;
 
 // Edit actions:
@@ -180,7 +185,6 @@ private:
 // Preferences  menu:
     QAction* m_gameController ;
     QAction* m_keyboardcase ;
-    QAction* m_selectPrint ;
     QAction* m_echoToConsole ;
     QAction* m_echoToFile ;
 
@@ -218,7 +222,11 @@ private:
 
     void onSelectRom      (void) ;
     void onUseInternalRom (void) ;
+    void onPrintText      (void) ;
+    void onPrintPDF       (void) ;
     void onExit           (void) ;
+
+    void openPrintFile   (QString suffix) ;
 
     void onCopyScreen    (void) ;
     void pasteToKeyboard (void) ;
@@ -228,9 +236,10 @@ private:
 
     void onGameController(void) ;
     void onKeyboardcase  (void) ;
-    void onSelectPrinter (void) ;
     void onEchoToConsole (void) ;
     void onEchoToFile    (void) ;
+
+    void onClosePDFButton(void) ;
 
     void onViewMemory    (void) ;
     void onTrapTrace     (void) ;

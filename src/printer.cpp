@@ -45,7 +45,8 @@ Printer::Printer (Machine* mac)
     m_parent = mac ;
     m_out = new QFile() ;
     m_out->open (1, QIODevice::WriteOnly) ;
-    m_writingToFile = false ;
+    m_writingText = false ;
+    m_writingPDF = false ;
     m_pixmapPrinterPins = QPixmap (xpm_printerPins) ;
 }
 
@@ -53,10 +54,17 @@ Printer::Printer (Machine* mac)
 bool Printer::open (QString path)
 {
     if (m_out) delete m_out ;
+
+    m_writingText = false ;
+    m_writingPDF = false ;
+qStdOut() << "Printer::open  path=" << path << endl ;
     m_out = new QFile (path) ;
     bool ok = m_out->open (QIODevice::WriteOnly) ;
-    if (ok) m_writingToFile = true ;
-    //                                 XXXXX add error dialog XXXXX
+    if (ok) {
+        if (path.indexOf(".pdf") < 0)  m_writingText = true ;
+        else                           m_writingPDF = true ;
+    }
+
     m_graphicsState = 0 ;
     m_pixelsWidth = 0 ;
     m_numberLines = 0 ;
@@ -80,15 +88,10 @@ void Printer::close (void)
     delete m_out ;
     m_out = new QFile() ;
     m_out->open (1, QIODevice::WriteOnly) ;
-    m_writingToFile = false ;
+    m_writingText = false ;
+    m_writingPDF = false ;
     MAC->m_ram[0x36] = 0xf0 ;  // restore the char. output vector to COUT1 ($FDF0)
     MAC->m_ram[0x37] = 0xfd ;
-}
-
-
-bool Printer::haveOpenFile (void)
-{
-    return m_writingToFile ;
 }
 
 
@@ -147,13 +150,20 @@ quint8 Printer::fetch (int loNibble)
 }
 
 
-void Printer::store (int /*loNibble*/, quint8 c)
+void Printer::store (quint8 c)
 {
-//printf ("Printer::store %2.2x to %4.4x\n", c, loNibble) ;
-    m_out->putChar (c) ;
-    m_out->flush() ;
+    if (m_writingPDF) {
+        handleGraphics (c) ;
+    } else {
+        m_out->putChar (c) ;
+        m_out->flush() ;
+    }
+}
 
-    if (m_writingToFile) handleGraphics (c) ;
+
+bool Printer::haveOpenFile (void)
+{
+    return m_writingText || m_writingPDF ;
 }
 
 

@@ -139,7 +139,10 @@ MainWindow::MainWindow (void)
     m_hd1Button     = new ApplepiButton (m_led_dim_red, "HD 1", this) ;
     m_hd2Button     = new ApplepiButton (m_led_dim_red, "HD 2", this) ;
     m_resetButton   = new ApplepiButton ("RESET", this) ;
-    
+    m_closePrinterButton = new ApplepiButton ("Close Printer file", this) ;
+    m_closePrinterButton->resize (120, 22) ;
+    m_closePrinterButton->hide() ;
+
     QString scaleButtonText ;
     if (m_scale == 1) scaleButtonText = "Big Screen" ;
     else              scaleButtonText = "Small Screen" ;
@@ -165,14 +168,15 @@ MainWindow::MainWindow (void)
         m_scaleButton->setFont (sbFont) ;
     }
 
-    connect (m_powerButton,   &ApplepiButton::clicked, this, &MainWindow::onPowerButton) ;
-    connect (m_floppy1Button, &ApplepiButton::clicked, this, &MainWindow::onFloppy1Button) ;
-    connect (m_floppy2Button, &ApplepiButton::clicked, this, &MainWindow::onFloppy2Button) ;
-    connect (m_tapeButton,    &ApplepiButton::clicked, this, &MainWindow::onTapeButton) ;
-    connect (m_hd1Button,     &ApplepiButton::clicked, this, &MainWindow::onHd1Button) ;
-    connect (m_hd2Button,     &ApplepiButton::clicked, this, &MainWindow::onHd2Button) ;
-    connect (m_resetButton,   &ApplepiButton::clicked, this, &MainWindow::onResetButton) ;
-    connect (m_scaleButton,   &ApplepiButton::clicked, this, &MainWindow::onScaleButton) ;
+    connect (m_powerButton,    &ApplepiButton::clicked, this, &MainWindow::onPowerButton) ;
+    connect (m_floppy1Button,  &ApplepiButton::clicked, this, &MainWindow::onFloppy1Button) ;
+    connect (m_floppy2Button,  &ApplepiButton::clicked, this, &MainWindow::onFloppy2Button) ;
+    connect (m_tapeButton,     &ApplepiButton::clicked, this, &MainWindow::onTapeButton) ;
+    connect (m_hd1Button,      &ApplepiButton::clicked, this, &MainWindow::onHd1Button) ;
+    connect (m_hd2Button,      &ApplepiButton::clicked, this, &MainWindow::onHd2Button) ;
+    connect (m_resetButton,    &ApplepiButton::clicked, this, &MainWindow::onResetButton) ;
+    connect (m_scaleButton,    &ApplepiButton::clicked, this, &MainWindow::onScaleButton) ;
+    connect (m_closePrinterButton, &ApplepiButton::clicked, this, &MainWindow::onClosePDFButton) ;
     
     createMenus() ;
     m_powerButtonState = false ;
@@ -769,6 +773,7 @@ void MainWindow::resizeWindow (void)
         m_hd2Button->move (floppy2ButtonX, row2ButtonY) ;
         m_floppy2Button->move (floppy2ButtonX, row1ButtonY) ;
         m_resetButton->move (MIN_MAINWINDOW_WIDTH-buttonWidth-15, row1ButtonY) ;
+        m_closePrinterButton->move (MIN_MAINWINDOW_WIDTH-buttonWidth-15, 1) ;
         
         m_floppy1Label->move (floppy2ButtonX-buttonWidth-5+piXAdjust, row1ButtonY+25) ;
         m_floppy2Label->move (floppy2ButtonX+piXAdjust, row1ButtonY+25) ;
@@ -791,6 +796,7 @@ void MainWindow::resizeWindow (void)
         m_resetButton->move (MAX_MAINWINDOW_WIDTH-buttonWidth-35, row1ButtonY) ;
         m_hd1Button->move (floppy2ButtonX-buttonWidth-60, row2ButtonY) ;
         m_hd2Button->move (floppy2ButtonX, row2ButtonY) ;
+        m_closePrinterButton->move (MAX_MAINWINDOW_WIDTH-buttonWidth-15, 1) ;
         
         m_floppy1Label->move (floppy2ButtonX-buttonWidth-55+piXAdjust, row1ButtonY+25) ;
         m_floppy2Label->move (floppy2ButtonX+piXAdjust, row1ButtonY+25) ;
@@ -885,6 +891,14 @@ void MainWindow::onResetButton (void)
     if (m_mac->powerIsOn()) {
         m_mac->reset() ;
     }
+}
+
+
+void MainWindow::onClosePDFButton (void)
+{
+    m_mac->m_printer->close() ;
+    m_closePrinterButton->hide() ;
+    m_selectPrint->setEnabled (true) ;
 }
 
 

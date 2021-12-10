@@ -58,7 +58,7 @@ extern "C" void trim (char* buffer, int len) ;
 
 void MainWindow::createMenus (void)
 {
-    m_printToFilePrompt = new QString ("Select a File to Print to...") ;
+    m_printToFilePrompt = new QString (tr("Print to File...")) ;
     m_closePrintToFilePrompt = new QString ("Close Printer file") ;
 
     m_fileMenu        = menuBar()->addMenu (tr("&File")) ;
@@ -73,9 +73,13 @@ void MainWindow::createMenus (void)
     m_fileMenu->addAction (m_selectRomFile) ;
     connect (m_selectRomFile, &QAction::triggered, this, &MainWindow::onSelectRom) ;
 
-    m_selectPrint = new QAction (*m_printToFilePrompt, this) ;
-    m_fileMenu->addAction (m_selectPrint) ;
-    connect (m_selectPrint, &QAction::triggered, this, &MainWindow::onSelectPrinter) ;
+    m_selectPrint = m_fileMenu->addMenu (tr("Print")) ;
+    m_printText = new QAction ("To Text File...") ;
+    m_printPDF  = new QAction ("To PDF File (graphics only)...") ;
+    m_selectPrint->addAction (m_printText) ;
+    m_selectPrint->addAction (m_printPDF) ;
+    connect (m_printText, &QAction::triggered, this, &MainWindow::onPrintText) ;
+    connect (m_printPDF,  &QAction::triggered, this, &MainWindow::onPrintPDF) ;
 
     m_exit = new QAction (tr("Exit"), this) ;
     m_fileMenu->addAction (m_exit) ;
@@ -151,29 +155,45 @@ void MainWindow::onSelectRom (void)
 }
 
 
-void MainWindow::onSelectPrinter (void)
+void MainWindow::onPrintText (void)
+{
+    openPrintFile (".txt") ;
+}
+
+
+void MainWindow::onPrintPDF (void)
+{
+    openPrintFile (".pdf") ;
+}
+
+
+void MainWindow::openPrintFile (QString suffix)
 {
     QString fileKey = "directory_for_slot1_print" ;        
     QString dir1 ;
     QString dir2 ;
 
-    if (MAC->m_printer->haveOpenFile()) {      // Already printing to a file. Close it.
-        MAC->m_printer->close() ;
-        m_selectPrint->setText (*m_printToFilePrompt) ;
-    } else {                                   // Just printing to stdout. Open a file.   
+    if (MAC->m_printer->haveOpenFile()) {      // Already printing to a file.
+        return ;                               // (This should never happen...)
+    } else {                                   // Currently printing to stdout. Open a file.   
         CFG->Get (fileKey, &dir1) ;
         QString fileName = QFileDialog::getSaveFileName (this, "Print to a file", dir1) ;
 
         if (fileName.length()) {
+            int dotIx = fileName.indexOf ('.') ;
+            if (dotIx < 0) fileName += QString (suffix) ;
             QFileInfo info (fileName) ;
             bool ok = MAC->m_printer->open (fileName) ;
             if (ok) {
                 dir2 = info.absoluteDir().absolutePath() ;
-                m_selectPrint->setText (*m_closePrintToFilePrompt) ;
                 CFG->Set (fileKey, dir2) ;
+                m_closePrinterButton->show() ;
+                m_selectPrint->setEnabled (false) ;
             } else {
                 QErrorMessage* msg = new QErrorMessage (this) ;
-                msg->showMessage (tr("Can't open file for slot1 printing: \n") + MAC->m_printer->error()) ; // XXXXX  BAD FORMAT  FIXME XXXXX
+                QString text ;
+                QTextStream (&text) << "Can't open " << fileName << " for printing:   " << MAC->m_printer->error() ;
+                msg->showMessage (text) ;
             }
         }
     }
