@@ -31,7 +31,6 @@
 #include <QApplication>
 #include <QDesktopWidget>
 #include <QErrorMessage>
-#include <QMouseEvent>
 #include <QScreen>
 
 #include "defs.h"
@@ -49,16 +48,10 @@ Gamepad::Gamepad (MainWindow* parent) : QWidget ()
     for (int i=0; i<3; i++) m_buttons[i] = false ;
     m_triggerCycles = MAC->getCycles() ;
 
-    m_mouseX = 0 ;
-    m_mouseY = 0 ;
-
     QRect r = QApplication::desktop()->screenGeometry() ;
     m_screenWidth  = r.width() ;
     m_screenHeight = r.height() ;
 
-    m_mouseTimer = new QTimer (this) ;
-    connect (m_mouseTimer, &QTimer::timeout, this, &Gamepad::readMouseButtons) ;
-    m_mouseTimer->start (50) ;
 }
 
 
@@ -68,18 +61,6 @@ void Gamepad::openController (void)
     if (controllerIDList.length()) {
         int id = controllerIDList.at(0) ;
         m_gamepad = new QGamepad (id, this) ;
-        m_useMouse = false ;
-    } else {
-        m_useMouse = true ;
-        m_mouseFd = open ("/dev/input/mouse0",  O_RDONLY|O_NONBLOCK) ;
-        if (m_mouseFd < 0) {
-            char* text = (char*)"\n"
-                "*  Could not open /dev/input/mouse0.\n"
-                "*  You will not be able to use mouse buttons\n"
-                "*  when using the mouse as a substitute gamepad.\n"
-                "*  Use 'Help' to learn how to fix this." ;
-            fprintf (stderr, "\n%s\n\n", text) ;
-        }
     }
 }
 
@@ -89,47 +70,26 @@ quint8 Gamepad::readButton (int buttonNumber)
 //printf ("Gamepad::readButton %i\n", n) ;
     quint8 n = 0 ;
 
-    if (m_useMouse) {
-        switch (buttonNumber) {
-            case 0:
-                n = m_buttons[0] ;
-                break ;
-            case 1:
-                n = m_buttons[1] ;
-                break ;
-            case 2:
-                n = m_buttons[2] ;
-                break ;
-            case 3:
-                n = m_buttons[3] ;
-                break ;
-            default:
-                n = 0 ;
-                break ;
-        }
-    } else {
-        QGamepad* g = m_gamepad ;
-        switch (buttonNumber) {
-            case 0:
-                n = g->buttonL2() ;
-                break ;
-            case 1:
-                n = g->buttonR2() ;
-                break ;
-            case 2:
-                n = m_buttons[2] ;
-                break ;
-            case 3:
-                n = m_buttons[3] ;
-                break ;
-            default:
-                n = 0 ; 
-                break ;
-        }
+    QGamepad* g = m_gamepad ;
+    switch (buttonNumber) {
+        case 0:
+            n = g->buttonL2() ;
+            break ;
+        case 1:
+            n = g->buttonR2() ;
+            break ;
+        case 2:
+            n = m_buttons[2] ;
+            break ;
+        case 3:
+            n = m_buttons[3] ;
+            break ;
+        default:
+            n = 0 ; 
+            break ;
     }
 
     if (n) n = 0xff ; 
-//if (buttonNumber==1) printf ("x%i", n) ;
     return n ;
 }
 
@@ -145,6 +105,7 @@ void Gamepad::reset (void)
 quint8 Gamepad::readAnalog (int n)
 {
     float  f ;
+    quint8 value = 0xff ;
 
     if (m_gamepad->isConnected()) {
         switch (n) {
@@ -164,54 +125,10 @@ quint8 Gamepad::readAnalog (int n)
                 f = 0 ;
                 break ;
         }
-    } else {
-        QPoint pos = QCursor::pos() ;
-        switch (n) {
-            case 0:
-                f = (float)pos.x()/(float)m_screenWidth ;
-                break ;
-            case 1:
-                f = (float)pos.y()/(float)m_screenHeight ;
-                break ;
-            default:
-                f = 0 ;
-                break ;
-        }
-        
-    }
+        quint64 deltaCycles = MAC->getCycles() - m_triggerCycles ;
+        if (deltaCycles > ((f+0.5)*m_maxTimeoutCycles)) value = 0 ;
+    } 
 
-    quint64 deltaCycles = MAC->getCycles() - m_triggerCycles ;
-    quint8 value = 0xff ;
-    if (deltaCycles > ((f+0.5)*m_maxTimeoutCycles)) value = 0 ;
-
+//printf ("value=%i\n", value) ;
     return value ;
-}
-
-
-void buttonBChanged(bool value)
-{
-printf ("buttonB = %i\n", value) ;
-}
-
-
-// -----------  Mouse Buttons  ---------------
-
-
-typedef struct mouseRecord {
-    quint8 buttons ;
-    quint8 x ;
-    quint8 y ;
-} mouseRecord ;
-
-
-void Gamepad::readMouseButtons (void)
-{
-    mouseRecord mouse ;
-    int n = read (m_mouseFd, &mouse, sizeof(mouse)) ;
-    if ((n==EAGAIN) || (n==EWOULDBLOCK)) return ; 
-
-    m_buttons[0] = m_buttons[1] = m_buttons[2] = 0 ;
-    if (mouse.buttons & 1)  m_buttons[0] = 0xff ;  ;
-    if (mouse.buttons & 2)  m_buttons[1] = 0xff ;  ;
-    if (mouse.buttons & 4)  m_buttons[2] = 0xff ;  ;
 }

@@ -139,8 +139,9 @@ MainWindow::MainWindow (void)
     m_hd1Button     = new ApplepiButton (m_led_dim_red, "HD 1", this) ;
     m_hd2Button     = new ApplepiButton (m_led_dim_red, "HD 2", this) ;
     m_resetButton   = new ApplepiButton ("RESET", this) ;
-    m_closePrinterButton = new ApplepiButton ("Close Printer file", this) ;
-    m_closePrinterButton->resize (120, 22) ;
+    m_closePrinterButton = new ApplepiButton ("Close Printer", this) ;
+    QSize s = m_closePrinterButton->size() ;
+    m_closePrinterButton->resize (s.width()+6, 22) ;
     m_closePrinterButton->hide() ;
 
     QString scaleButtonText ;
@@ -168,15 +169,15 @@ MainWindow::MainWindow (void)
         m_scaleButton->setFont (sbFont) ;
     }
 
-    connect (m_powerButton,    &ApplepiButton::clicked, this, &MainWindow::onPowerButton) ;
-    connect (m_floppy1Button,  &ApplepiButton::clicked, this, &MainWindow::onFloppy1Button) ;
-    connect (m_floppy2Button,  &ApplepiButton::clicked, this, &MainWindow::onFloppy2Button) ;
-    connect (m_tapeButton,     &ApplepiButton::clicked, this, &MainWindow::onTapeButton) ;
-    connect (m_hd1Button,      &ApplepiButton::clicked, this, &MainWindow::onHd1Button) ;
-    connect (m_hd2Button,      &ApplepiButton::clicked, this, &MainWindow::onHd2Button) ;
-    connect (m_resetButton,    &ApplepiButton::clicked, this, &MainWindow::onResetButton) ;
-    connect (m_scaleButton,    &ApplepiButton::clicked, this, &MainWindow::onScaleButton) ;
-    connect (m_closePrinterButton, &ApplepiButton::clicked, this, &MainWindow::onClosePDFButton) ;
+    connect (m_powerButton,        &ApplepiButton::clicked, this, &MainWindow::onPowerButton) ;
+    connect (m_floppy1Button,      &ApplepiButton::clicked, this, &MainWindow::onFloppy1Button) ;
+    connect (m_floppy2Button,      &ApplepiButton::clicked, this, &MainWindow::onFloppy2Button) ;
+    connect (m_tapeButton,         &ApplepiButton::clicked, this, &MainWindow::onTapeButton) ;
+    connect (m_hd1Button,          &ApplepiButton::clicked, this, &MainWindow::onHd1Button) ;
+    connect (m_hd2Button,          &ApplepiButton::clicked, this, &MainWindow::onHd2Button) ;
+    connect (m_resetButton,        &ApplepiButton::clicked, this, &MainWindow::onResetButton) ;
+    connect (m_scaleButton,        &ApplepiButton::clicked, this, &MainWindow::onScaleButton) ;
+    connect (m_closePrinterButton, &ApplepiButton::clicked, this, &MainWindow::onClosePrinterButton) ;
     
     createMenus() ;
     m_powerButtonState = false ;
@@ -894,7 +895,7 @@ void MainWindow::onResetButton (void)
 }
 
 
-void MainWindow::onClosePDFButton (void)
+void MainWindow::onClosePrinterButton (void)
 {
     m_mac->m_printer->close() ;
     m_closePrinterButton->hide() ;

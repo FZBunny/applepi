@@ -10,7 +10,7 @@ OBJECTS_DIR=obj
 DESTDIR=bin
 INCLUDEPATH += .
 LIBS += -L/usr/lib/x86_64-linux-gnu/alsa-lib -lasound -no-pie
-QT += widgets printsupport gamepad webenginewidgets
+QT += widgets printsupport gamepad
 
 
 # The following define makes your compiler warn you if you use any
@@ -40,7 +40,6 @@ HEADERS += src/about.h \
            src/gamepad_dialog.h \
            src/hd_controller.h \
            src/hd_dialog.h \
-           src/help_dialog.h \
            src/lin-speaker.h \
            src/machine.h \
            src/mainwindow.h \
@@ -76,7 +75,6 @@ SOURCES += src/about.cpp \
            src/gamepad_dialog.cpp \
            src/hd_controller.cpp \
            src/hd_dialog.cpp \
-           src/help_dialog.cpp \
            src/lin-speaker.cpp \
            src/machine.cpp \
            src/main.cpp \

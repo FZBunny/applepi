@@ -31,6 +31,7 @@
 #include <QMenuBar>
 #include <QFileDialog>
 #include <QPrinter>
+#include <QPrinterInfo>
 #include <QPrintDialog>
 #include <QMessageBox>
 #include <QErrorMessage>
@@ -45,7 +46,6 @@
 #include "gamepad_dialog.h"
 #include "rom_dialog.h"
 #include "view_memory.h"
-#include "help_dialog.h"
 //#include "about.h"
 #include "disassemble_memory_dialog.h"
 
@@ -73,13 +73,13 @@ void MainWindow::createMenus (void)
     m_fileMenu->addAction (m_selectRomFile) ;
     connect (m_selectRomFile, &QAction::triggered, this, &MainWindow::onSelectRom) ;
 
-    m_selectPrint = m_fileMenu->addMenu (tr("Print")) ;
-    m_printText = new QAction ("To Text File...") ;
-    m_printPDF  = new QAction ("To PDF File (graphics only)...") ;
+    m_selectPrint = m_fileMenu->addMenu (tr("Save Print File")) ;
+    m_printPDF = new QAction ("Save PDF...") ;
+    m_printText    = new QAction ("Save Text...") ;
     m_selectPrint->addAction (m_printText) ;
     m_selectPrint->addAction (m_printPDF) ;
-    connect (m_printText, &QAction::triggered, this, &MainWindow::onPrintText) ;
-    connect (m_printPDF,  &QAction::triggered, this, &MainWindow::onPrintPDF) ;
+    connect (m_printText,    &QAction::triggered, this, &MainWindow::onPrintText) ;
+    connect (m_printPDF,     &QAction::triggered, this, &MainWindow::onPrintPDF) ;
 
     m_exit = new QAction (tr("Exit"), this) ;
     m_fileMenu->addAction (m_exit) ;
@@ -152,6 +152,7 @@ void MainWindow::onSelectRom (void)
 {
     RomDialog* dlg = new RomDialog (this) ;
     dlg->exec() ;
+    delete dlg ;
 }
 
 
@@ -177,27 +178,33 @@ void MainWindow::openPrintFile (QString suffix)
         return ;                               // (This should never happen...)
     } else {                                   // Currently printing to stdout. Open a file.   
         CFG->Get (fileKey, &dir1) ;
-        QString fileName = QFileDialog::getSaveFileName (this, "Print to a file", dir1) ;
+        QString caption ;
+        QTextStream (&caption) << "Print to " << suffix ; //.remove (0,1) ; 
+        QString filter ;
+        if (suffix == ".pdf") filter = "PDF File (*.pdf *.PDF);;Any *" ;
+        else                  filter = "Text File (*.txt *.TXT);;Any *" ; ;
+        QString filename = QFileDialog::getSaveFileName (this, caption, dir1, filter) ;
 
-        if (fileName.length()) {
-            int dotIx = fileName.indexOf ('.') ;
-            if (dotIx < 0) fileName += QString (suffix) ;
-            QFileInfo info (fileName) ;
-            bool ok = MAC->m_printer->open (fileName) ;
+        if (filename.length()) {
+            int dotIx = filename.indexOf ('.') ;
+            if (dotIx < 0) filename += QString (suffix) ;
+            QFileInfo info (filename) ;
+            bool ok = MAC->m_printer->open (filename) ;
             if (ok) {
                 dir2 = info.absoluteDir().absolutePath() ;
                 CFG->Set (fileKey, dir2) ;
                 m_closePrinterButton->show() ;
+//qStdOut() << "suffix = " << suffix << endl ;
                 m_selectPrint->setEnabled (false) ;
             } else {
                 QErrorMessage* msg = new QErrorMessage (this) ;
                 QString text ;
-                QTextStream (&text) << "Can't open " << fileName << " for printing:   " << MAC->m_printer->error() ;
+                QTextStream (&text) << "Can't open " << filename << " for printing:   " << MAC->m_printer->error() ;
                 msg->showMessage (text) ;
             }
         }
     }
-//qStdOut() << "dir2=" << dir2 << "; name=" << fileName << endl ;
+//qStdOut() << "dir2=" << dir2 << "; name=" << filename << endl ;
 }
 
 
@@ -399,9 +406,12 @@ void MainWindow::onDisassembleMemory (void)
 
 void MainWindow::onHelp (void)
 {
-//    QDesktopServices::openUrl (QUrl("file:///usr/share/applepi/ApplePiHelp.html")) ; 
-    Help* help = new Help (this) ;
-    help->show() ;
+// For the time being, just kick off the default web browser.
+// Support for displaying HTML is currently missing from the R.Pi port of Qt5.
+
+    QDesktopServices::openUrl (QUrl("file:///usr/share/applepi/ApplePiHelp.html")) ; 
+//    Help* help = new Help (this) ;
+//    help->show() ;
 }
 
 

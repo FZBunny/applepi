@@ -83,6 +83,7 @@ private:
     bool     m_writingText ;
     bool     m_writingPDF ;
 
+    QString    m_filepath ;
     int        m_graphicsState ;
     int        m_numberLines ;
     int        m_pixelCounter ;

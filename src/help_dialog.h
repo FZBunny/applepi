@@ -1,4 +1,12 @@
 
+/******************************************************************
+
+    This code has been temporarily abandoned due to missing 
+    'QWebEngineView' support in Pi OS.
+
+******************************************************************/
+
+
 //#include <QWidget>
 #include <QDialog>
 #include <QString>

@@ -60,7 +60,6 @@ public:
 private:
 
     void readMouseButtons (void) ;
-    void buttonBChanged (bool value) ;
 
     MainWindow* m_parent ;
     QGamepad*  m_gamepad ;

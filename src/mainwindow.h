@@ -173,6 +173,7 @@ private:
 // File actions:
     QAction* m_selectRomFile ;
     QMenu*   m_selectPrint ;
+    QAction* m_printPrinter ;
     QAction* m_printText ;
     QAction* m_printPDF ;
     QAction* m_exit;
@@ -222,6 +223,7 @@ private:
 
     void onSelectRom      (void) ;
     void onUseInternalRom (void) ;
+    void onPrintPrinter   (void) ;
     void onPrintText      (void) ;
     void onPrintPDF       (void) ;
     void onExit           (void) ;
@@ -239,7 +241,7 @@ private:
     void onEchoToConsole (void) ;
     void onEchoToFile    (void) ;
 
-    void onClosePDFButton(void) ;
+    void onClosePrinterButton(void) ;
 
     void onViewMemory    (void) ;
     void onTrapTrace     (void) ;
