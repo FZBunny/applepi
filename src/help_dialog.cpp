@@ -8,8 +8,9 @@
 ******************************************************************/
 
 
-
-#include <QWebEngineView>
+#ifndef Q_PROCESSOR_ARM
+    #include <QWebEngineView>
+#endif
 
 #include "defs.h"
 #include "help_dialog.h"
