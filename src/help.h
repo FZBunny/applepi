@@ -1,6 +1,7 @@
 /*****************************************************************************
 
-    File: "gamepad_dialog.h"
+
+    File: "help.h"
 
     Copyright (C) 2021, Bruce Ward
 
@@ -26,66 +27,46 @@
 *****************************************************************************/
 
 
-#ifndef JOYSTCK_DIALOG_H
-#define JOYSTCK_DIALOG_H
 
+#ifndef Help_H
+#define Help_H
 
-#include <QDialog>
-#include <QGroupBox>
-#include <QRadioButton>
-#include <QSpinBox>
-#include <QPushButton>
 #include <QLabel>
-#include <QListWidget>
-
-#include "mainwindow.h"
-
-
-class gameController
-{
-public:
-    gameController() {} ;
-    ~gameController() {} ;
-
-    int type ;
-    int id ;
-    QString name ;
-} ;
+#include <QWidget>
+#include <QMainWindow>
+#include <QDialog>
+#include <QPushButton>
+#include <QTextBrowser>
 
 
-
-class gamepadDialog : public QDialog
+class Help : public QDialog
 {
 public:
 
-    gamepadDialog (MainWindow* parent) ;
-    ~gamepadDialog() {} ;
+    Help (QMainWindow* parent) ;
+    ~Help() {} ;
 
 private:
 
-    void onSaveButton (void) ;
-    void onCancelButton (void) ;
-    void onMapButton (void) ;
-    void onListWidget (QListWidgetItem *item) ;
-    void openGamepad (void) ;
+    void onCloseButtonClicked (void) ;
+    void onBackButtonClicked (void) ;
+    void onFwdButtonClicked (void) ;
+    void onHomeButtonClicked (void) ;
+    void resizeEvent (QResizeEvent* e) ;
+    void moveEvent (QMoveEvent* e) ;
+    int  centerText (QLabel* label) ;
 
-    const int GAMEPAD = 0 ;
-    const int MOUSE   = 1 ;
-
-    MainWindow*    m_parent ;
-    QListWidget*   m_listWidget ;
-    QGamepad*      m_gamepad ;
-    QString        m_currentControllerName ;
-    QString        m_selectedControllerName ;
-    int            m_selectedRow ;
-    uint           m_selectedID ;
-
-    QList<int>             m_controllerIDs ;
-    QList<gameController>  m_controllerList ;
-
-    QPushButton*  m_saveButton ;
-    QPushButton*  m_cancelButton ;
-
+    QString m_index ;
+    QLabel* m_txt1 ;
+    QLabel* m_txt2 ; 
+       
+    QWidget*       m_panel1 ;
+    QWindow*       m_panel2 ;
+    QTextBrowser*  m_html ;
+    QPushButton*   m_close ;
+    QPushButton*   m_back ;
+    QPushButton*   m_fwd ;
+    QPushButton*   m_home ;
 } ;
 
 #endif

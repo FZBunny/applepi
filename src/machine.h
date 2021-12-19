@@ -436,7 +436,7 @@ public:
 
     quint16 getPC (void) ;
 
-    bool toggleEchoToConsole (void) ;
+    bool toggleEchoToTerminal (void) ;
 //    bool toggleEchoToFile    (void) ;
     bool isEchoingToFile (void) ;
     void echoToFile (QFile* f) ;
@@ -518,7 +518,7 @@ private:
 
     bool  m_monochrome ;
 
-    bool    m_echoToConsole ;
+    bool    m_echoToTerminal ;
     QFile*  m_echoToFile ;
 
     quint64  m_previousUsecs ;

@@ -256,9 +256,9 @@ void Machine::shutDown(void)
 }
 
 
-bool Machine::toggleEchoToConsole (void)
+bool Machine::toggleEchoToTerminal (void)
 {
-    return m_echoToConsole = ! m_echoToConsole ;
+    return m_echoToTerminal = ! m_echoToTerminal ;
 }
 
 
@@ -754,7 +754,7 @@ void Machine::run (void)
             m_previousUsecs = microseconds() ;
         } ;
 
-        // Prepare to echo screen text to the console or to a file
+        // Prepare to echo screen text to the terminal or to a file
         // if we have requested this in the 'preferences' menu
 
         bool echo ;
@@ -765,7 +765,7 @@ void Machine::run (void)
             quint8 c = A & 0x7f ;
             static const quint8 CR  = 0x0d ;
             static const quint8 LF  = 0x0a ;
-            if (m_echoToConsole) {     //   Echo screen character to console?
+            if (m_echoToTerminal) {     //   Echo screen character to terminal?
                     printf ("%c", c) ;
                     if (c == CR) printf ("%c", LF) ;
                     fflush (stdout) ;

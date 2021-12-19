@@ -90,6 +90,8 @@ Config::Config() : QSettings (QSettings::NativeFormat, QSettings::UserScope, "ap
         Set ("game_controller_id", (uint)0) ;
         Set ("hd1_volume_path", defaultDir) ;
         Set ("hd2_volume_path", defaultDir) ;
+        Set (QString("help_size"), QSize(420,500)) ;
+        Set (QString("help_position"), QPoint(10,10)) ;
         Set ("history_dump", (uint)0) ;
         Set ("internal_rom_number", (uint)2) ;
         tmpStr = "0" ;

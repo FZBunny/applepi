@@ -186,7 +186,7 @@ private:
 // Preferences  menu:
     QAction* m_gameController ;
     QAction* m_keyboardcase ;
-    QAction* m_echoToConsole ;
+    QAction* m_echoToTerminal ;
     QAction* m_echoToFile ;
 
 // Debug actions:
@@ -238,7 +238,7 @@ private:
 
     void onGameController(void) ;
     void onKeyboardcase  (void) ;
-    void onEchoToConsole (void) ;
+    void onEchoToTerminal (void) ;
     void onEchoToFile    (void) ;
 
     void onClosePrinterButton(void) ;

@@ -40,6 +40,7 @@
 #include "machine.h"
 #include "mainwindow.h"
 #include "config.h"
+#include "help.h"
 
 #include "traptrace.h"
 
@@ -73,9 +74,9 @@ void MainWindow::createMenus (void)
     m_fileMenu->addAction (m_selectRomFile) ;
     connect (m_selectRomFile, &QAction::triggered, this, &MainWindow::onSelectRom) ;
 
-    m_selectPrint = m_fileMenu->addMenu (tr("Save Print File")) ;
-    m_printPDF = new QAction ("Save PDF...") ;
-    m_printText    = new QAction ("Save Text...") ;
+    m_selectPrint = m_fileMenu->addMenu (tr("Print to File")) ;
+    m_printPDF = new QAction ("Print a PDF...") ;
+    m_printText    = new QAction ("Print Text...") ;
     m_selectPrint->addAction (m_printText) ;
     m_selectPrint->addAction (m_printPDF) ;
     connect (m_printText,    &QAction::triggered, this, &MainWindow::onPrintText) ;
@@ -109,9 +110,9 @@ void MainWindow::createMenus (void)
     m_preferencesMenu->addAction (m_keyboardcase) ;
     connect (m_keyboardcase, &QAction::triggered, this, &MainWindow::onKeyboardcase) ;
 
-    m_echoToConsole = new QAction (tr("Echo Screen Text to Console"), this) ;
-    m_preferencesMenu->addAction (m_echoToConsole) ;
-    connect (m_echoToConsole, &QAction::triggered, this, &MainWindow::onEchoToConsole) ;
+    m_echoToTerminal = new QAction (tr("Echo Screen Text to Terminal"), this) ;
+    m_preferencesMenu->addAction (m_echoToTerminal) ;
+    connect (m_echoToTerminal, &QAction::triggered, this, &MainWindow::onEchoToTerminal) ;
 
     m_echoToFile = new QAction (tr("Echo Screen Text to File..."), this) ;
     m_preferencesMenu->addAction (m_echoToFile) ;
@@ -305,12 +306,12 @@ void MainWindow::onKeyboardcase (void)
 }
 
 
-void MainWindow::onEchoToConsole (void)
+void MainWindow::onEchoToTerminal (void)
 {
-    if (MAC->toggleEchoToConsole()) {
-        m_echoToConsole->setText ("Stop Echo to Console") ;
+    if (MAC->toggleEchoToTerminal()) {
+        m_echoToTerminal->setText ("Stop Echo to Terminal") ;
     } else {
-        m_echoToConsole->setText ("Echo Screen Text to Console") ;
+        m_echoToTerminal->setText ("Echo Screen Text to Terminal") ;
     }
 }
 
@@ -409,9 +410,9 @@ void MainWindow::onHelp (void)
 // For the time being, just kick off the default web browser.
 // Support for displaying HTML is currently missing from the R.Pi port of Qt5.
 
-    QDesktopServices::openUrl (QUrl("file:///usr/share/applepi/ApplePiHelp.html")) ; 
-//    Help* help = new Help (this) ;
-//    help->show() ;
+//    QDesktopServices::openUrl (QUrl("file:///usr/share/applepi/ApplePiHelp.html")) ; 
+    Help* help = new Help (this) ;
+    help->exec() ;
 }
 
 

@@ -57,3 +57,15 @@ void VolumeDial::sliderChange (QAbstractSlider::SliderChange)
     repaint () ;
 }
 
+
+void VolumeDial::keyPressEvent (QKeyEvent *e)
+{
+    e->ignore() ;
+}
+
+
+void VolumeDial::keyReleaseEvent (QKeyEvent *e)
+{
+    e->ignore() ;
+}
+

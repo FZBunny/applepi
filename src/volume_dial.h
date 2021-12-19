@@ -45,6 +45,8 @@ public:
 protected:
 
     void sliderChange (QAbstractSlider::SliderChange) ;
+    void keyPressEvent (QKeyEvent *) ;
+    void keyReleaseEvent (QKeyEvent *) ;
 
 private:
 
