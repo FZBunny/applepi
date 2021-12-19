@@ -73,9 +73,7 @@ Help::Help (QMainWindow*)
     connect (m_fwd,   &QPushButton::clicked, this, &Help::onFwdButtonClicked) ;
     connect (m_home,  &QPushButton::clicked, this, &Help::onHomeButtonClicked) ;
 
-  //  m_index = QString ("file:///usr/share/applepi/ApplePiHelp.html") ;
-
-    m_index = QString ("file:///home/bward/projects/applepi/help/ApplePiHelp.html") ;
+    m_index = QString ("file:///usr/share/applepi/ApplePiHelp.html") ;
     m_html->setSource (QUrl(m_index)) ;
 
     QSize size ;
