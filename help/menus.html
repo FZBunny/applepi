@@ -5,121 +5,154 @@
    <META NAME="GENERATOR" CONTENT="Mozilla/4.06 [en] (X11; I; Linux 2.0.35 i686) [Netscape]">
 </HEAD>
 
-
 <BODY TEXT="#000000" BGCOLOR="#E8E8F0" LINK="#0000FF" VLINK="#FF0000" ALINK="#000088">
 
-<h1>Menus</h1>
+
+<span style="font-size:14pt; color:black;">
+<BR>
+<b><a href="buttons.html">Buttons</a></b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<b><a href="slots.html">Slots</a></b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<b><a href="printing.html">Printing</a></b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<b><a href="gamepad.html">Gamepad</a></b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<b><a href="misc.html">Misc.</a></b>
+<BR><BR>
+
+<center><h1 style="color:crimson;">Menus</h1></center>
 <BR>
 
-<span style="font-size:11pt; color:black;">
 
-<b><a href="ApplePiHelp.html">Home</a></b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<b><a href="buttons.html">Buttons</a></b><BR>
 
-<BR>
-<h2>File</h2>
+<!-- ----------------------------- FILE ------------------------------------- -->
+
+
+<h2>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;File</h2>
 <hr>
 
 
-<h4>Select AppleII Model...</h4>
+<h3>Select AppleII Model...</h3>
     <p style="margin-left: 20px">
     Opens a dialog with 'radio button' options to select Apple II models ranging from the original to the enhanced IIe
-    There is also a button to permit selecting an external ROM image file.  This menu item is disabled when the machine
-    is powered on.
-    </p>
-
-<h4>Print to File</h4>
+    There is also a button to permit selecting an external ROM image file.  This menu item is disabled when the machineis powered on. </p>
+    
+<p style="margin-left: 0px">
+<h3>Print to File</h3></p>
     <p style="margin-left: 20px">
     Displays the two options below
     
-        <p style="margin-left: 20px">
-        <h4>Print Text...</h4>
+        <p style="margin-left: 0px">
+        <h3>Print Text...</h3></p>
         <p style="margin-left: 40px">
         Opens a file dialog to save text to a file on the host computer. Text will be directed to the file after a
-        <font face=courier style=bold><b>PR#1</b></font> command is issued.
+        <font face=courier style=bold><b>PR#1</b></font> command is issued.</p>
 
         <p style="margin-left: 20px">
-        <h4>Print a PDF...</h4>
+        <h3>Print a PDF...</h3></p>
         <p style="margin-left: 40px">
-        Opens a file dialog to save dot-matrix style graphics to a PDF file.
-        &nbsp;(See <a href="Printing.html">Printing</a> for important info about the "Close Print" button)
-        </p>
-    </p>
+        Opens a file dialog to save dot-matrix style graphics to a PDF file.  This can be output from a Basic pogram 
+        or a program such as "Print Shop".
+        &nbsp;(See <a href="Printing.html">Printing</a> for important information about the "<b>Close Print</b>" button)</p>
 
-<h4>Exit</h4>
+<h3>Exit</h3>
     <p style="margin-left: 20px">
-    Immediately exits the ApplePi program.
+    Immediately exits the ApplePi program.</p>
 
-    
+<!-- ----------------------------- EDIT ------------------------------------- -->
+   
 <BR><BR><BR>
-<p style="margin-left: 0px"></p>
-<h2>Edit</h2>
+<p style="margin-left: 0px">
+<h2>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Edit</h2></p>
 <hr>
 
-<h4>Copy Screen Text to Clipboard</h4>
+<h3>Copy Screen Text to Clipboard</h3>
     <p style="margin-left: 20px">
-    Copy all text on screen to the clipboard.
-<p style="margin-left: 0px"></p>   <h4>Paste Text to Keyboard</h4>
+    Copy all text on screen to the clipboard.</p>
+<p style="margin-left: 0px">
+<h3>Paste Text to Keyboard</h3></p>
     <p style="margin-left: 20px">
-    If the clipboard contains text, it will be entered to the keyboard.
+    If the clipboard contains text, it will be entered to the keyboard.</p>
 
+<!-- -------------------------- PREFERENCES---------------------------------- -->
 
 <BR><BR><BR>
-<p style="margin-left: 0px"></p>
-<h2>Preferences</h2>
+<p style="margin-left: 0px">
+<h2>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Preferences</h2></p>
 <hr>
 
-<h4>Use Mixed-Case Keyboard</h4>
-    &nbsp;&nbsp;&nbsp; Use this to toggle between an upper-case-only and mixed-case keyboard.<BR>
-    &nbsp;&nbsp;&nbsp; (When this is selected, the menu item will change to: "Use Uppercase-only<BR> 
-    &nbsp;&nbsp;&nbsp; Keyboard").
-<h4>Echo Screen Text to Terminal</h4>
-    &nbsp;&nbsp;&nbsp; If ApplePi has been run from the command line (i.e. from a terminal window),<BR>
-    &nbsp;&nbsp;&nbsp; text output to the ApplePi screen, as well as anything entered from the keyboard,<BR> 
-    &nbsp;&nbsp;&nbsp; will be echoed to the terminal window. (When this is selected, the menu item<BR>
-    &nbsp;&nbsp;&nbsp; will change to: "Stop Echo to Terminal").
-<h4>Echo Screen Text to File...</h4>
-    &nbsp;&nbsp;&nbsp; Use this to echo screen text to a disk file, in the same way as echo to terminal.<BR>
-    &nbsp;&nbsp;&nbsp; Menu item text will also change, as in echo to screen.
-     
-<IMG SRC="menu-debug.png" ALT="DEBUG MENU"><BR><BR>
-    <b>Note: When using any debug dialog, all text fields require the<BR>
-        'Enter' key before the value will be used.</b> 
-    <BR><BR>
-View Memory...<BR>
-    &nbsp;&nbsp;&nbsp; Use this to view RAM, ROM, or the state of the Apple II "soft switches". Both<BR>
-    &nbsp;&nbsp;&nbsp; main or auxiliary RAM may be viewed.  Currently, data can be neither copied<BR>
-    &nbsp;&nbsp;&nbsp; nor edited.
-    <BR><BR>
-Disassemble Memory...<BR>
-    &nbsp;&nbsp;&nbsp; If ApplePi has been run from the command line (i.e. from a terminal window), use<BR>
-    &nbsp;&nbsp;&nbsp; this to disassemble RAM or ROM to the terminal.  Both main or auxiliary RAM may<BR>
-    &nbsp;&nbsp;&nbsp; be disassembled.
-    <BR><BR>
-Trap and Trace...<BR>
-    &nbsp;&nbsp;&nbsp; Use this to trap (halt execution) of a machine-language program, or to trace<BR>
-    &nbsp;&nbsp;&nbsp; its execution between two addresses.  (Doing either makes sense ony if ApplePi<BR> 
-    &nbsp;&nbsp;&nbsp; is being run from a terminal window).  Up to four traps may set; these addresses<BR>
-    &nbsp;&nbsp;&nbsp; are remembered after ApplePi is shut down, but are not active unless the trap-and-<BR>
-    &nbsp;&nbsp;&nbsp; trace window is shown.  The history of up to 100,000 of the instructions executed<BR>
-    &nbsp;&nbsp;&nbsp; before the trap may be dumped.<BR>
-    &nbsp;&nbsp;&nbsp; Execution of 65C02 machine instructions may be traced between two any two<BR>
-    &nbsp;&nbsp;&nbsp; addresses. No distnction between tracing instructions in ROM or RAM. Trace is<BR>
-    &nbsp;&nbsp;&nbsp; started and stopped by the 'Start Trace' button. Two check boxes, 'Trace SS fetches'<BR>
-    &nbsp;&nbsp;&nbsp; and 'Trace SS stores' may be used to print the address of execution and name of<BR>  
-    &nbsp;&nbsp;&nbsp; "soft switches" as they are read and written.
-    <BR><BR><BR>
-    
-<IMG SRC="menu-help.png" ALT="HELP MENU" ><BR><BR>
-Help...<BR>
-    &nbsp;&nbsp;&nbsp; Brings up the pages you are looking at now. :)
-    <BR><BR> 
-About...<BR>
-    &nbsp;&nbsp;&nbsp; Displays a GPL (General Public License) statement, copyright notice, and a brief<BR>
-    &nbsp;&nbsp;&nbsp; list of what operating systems ApplePi runs on.
+<h3>Use Mixed-Case Keyboard</h3>
+    <p style="margin-left: 20px">
+    Use this to toggle between an upper-case-only and mixed-case keyboard.
+    (When this is selected, the menu item will change to: "Use Uppercase-only Keyboard").</p>
+<p style="margin-left: 0px">
+<h3>Echo Screen Text to Terminal</h3></p>
+    <p style="margin-left: 20px">
+     If ApplePi has been run from the command line (i.e. from a terminal window),
+     text output to the ApplePi screen, as well as anything entered from the keyboard, 
+     will be echoed to the terminal window. (When this is selected, the menu item
+     will change to: "Stop Echo to Terminal").</p>
+<p style="margin-left: 0px">
+<h3>Echo Screen Text to File...</h3></p>
+    <p style="margin-left: 20px">
+     Use this to echo screen text to a disk file, in the same way as echo to terminal.
+     Menu item text will also change, as in echo to screen. </p>
+
+<!-- ----------------------------- DEBUG ------------------------------------- -->
+
+<BR><BR><BR>
+<p style="margin-left: 0px">
+<h2>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Debug</h2></p>
+<hr> 
  
+<h3>View Memory...</h3>
+    <p style="margin-left: 20px">
+     Use this to view RAM, ROM, or the state of the Apple II "soft switches". Both
+     main or auxiliary RAM may be viewed.  Currently, data can be neither copied
+     nor edited.</p>
+
+<h3>Disassemble Memory...</h3>
+    <p style="margin-left: 20px">
+     If ApplePi has been run from the command line (i.e. from a terminal window), use
+     this to disassemble RAM or ROM to the terminal.  Both main or auxiliary RAM may
+     be disassembled.</p>
+
+<h3>Trap and Trace...</h3>
+    <p style="margin-left: 20px">
+     Use this to trap (halt execution) of a machine-language program, or to trace
+     its execution between two addresses.  (Doing either makes sense ony if ApplePi 
+     is being run from a terminal window).  Up to four traps may set; these addresses
+     are remembered after ApplePi is shut down, but are not active unless the trap-and-
+     trace window is shown.  The history of up to 100,000 of the instructions executed
+     before the trap may be dumped.<BR><BR>
+     Execution of 65C02 machine instructions may be traced between two any two
+     addresses. No distnction between tracing instructions in ROM or RAM. Trace is
+     started and stopped by the 'Start Trace' button. Two check boxes, 'Trace SS fetches'
+     and 'Trace SS stores' may be used to print the address of execution and name of
+     "soft switches" as they are read and written.</p>
+    
+<!-- ----------------------------- HELP ------------------------------------- -->
+
+
+<p style="margin-left: 0px">
+<h2>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Help</h2></p>
+<hr> 
+
+<h3>Help...</h3>
+<p style="margin-left: 20px">
+    Brings up the page you are looking at now. :)</p>
+
+<h3>About...</h3>
+<p style="margin-left: 20px">
+     Displays a GPL (General Public License) statement, copyright notice, and a brief
+     list of what operating systems ApplePi runs on.</p>
+ 
+<BR><BR><BR>
+<b><a href="buttons.html">Buttons</a></b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<b><a href="slots.html">Slots</a></b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<b><a href="printing.html">Printing</a></b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<b><a href="gamepad.html">Gamepad</a></b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<b><a href="misc.html">Misc.</a></b>&nbsp;
+<BR><BR>
 
 <font size=+2></font>
-<b><a href="ApplePiHelp.html">Help</a></b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b><a href="buttons.html">Buttons</a></b> 
+
 
 </span>

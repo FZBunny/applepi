@@ -57,15 +57,15 @@ Help::Help (QMainWindow*)
     m_home  = new QPushButton ("Home", this) ;
 
 
-    QFont font1 ("Times", 30, QFont::Bold)  ;  // 'Times' probably faked by Qt, but looks good enough...
-    m_txt1 = new QLabel ("ApplePi Help", this) ;                             //  XXXXXXXXXXXXXXXXXX   SEGFAULT
+    QFont font1 ("Times", 30, QFont::Bold)  ;  // 'Times' is probably faked by Qt, but looks good enough...
+    m_txt1 = new QLabel ("ApplePi Help", this) ;
     m_txt1->setFont (font1) ;
 
     QFont font2 ("Times", 12, QFont::Bold)  ;
     m_txt2 = new QLabel ("v" + QString(APPLEPI_VERSION), this) ;
     m_txt2->setFont (font2) ;
 
-    m_html = new QTextBrowser (this) ;                                       // XXXXXXXXXXXXXXXXXXXXXXX  SIGABORT & SEGFAULT
+    m_html = new QTextBrowser (this) ;
     m_html->move (3, 90) ;
 
     connect (m_close, &QPushButton::clicked, this, &Help::onCloseButtonClicked) ;
