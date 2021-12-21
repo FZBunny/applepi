@@ -10,22 +10,28 @@
 
 <span style="font-size:14pt; color:black;">
 
+
+<center><h1 style="color:crimson;"><BR>Printing</h1></center>
 <BR>
-<center><h1 style="color:crimson;">Printing</h1></center>
+
+Printing is accomplished by use of the <b>PR#1</b> command.
 <BR>
-
-<b>Slot 1</b>
+<p style="margin-left: 0px">
+<b>Case 1:</b> The '<b>Print to File</b>' menu is not in effect:</p>
   <p style="margin-left: 20px">
-  <b>PR#1</b> Case 1: The '<b>Print to File</b>' menu is not in effect:</p>
-    <p style="margin-left: 40px">
-    By default, text output will be directed from the screen to the terminal at which ApplePi has been executed.&nbsp;
-    (If ApplePi was not executed from a terminal, text will simply be sent into the aether.)</p>
+  By default, text output will be directed from the screen to the terminal from which ApplePi has been executed.&nbsp;
+(If ApplePi was not executed from a terminal, text is simply sent into the aether, gone forever.)</p>
+
+<p style="margin-left: 0px">
+<b>Case 2: 'Print Text</b>' was used:</p>
   <p style="margin-left: 20px">
-  <b>PR#1</b> Case 2: '<b>Print Text</b>' has been used to write text to a file:</p>
-    <p style="margin-left: 40px">
-    Text will be written to the file; every byte will be flushed to disk as it is encountered.
+  Text will be written to the selected file.&nbsp; Every byte will be flushed to disk as it is encountered, so the '<b>Close Printer</b>' button may be largely ignored unless you wish to close that file, and open another.&nbsp;&nbsp;If you exit ApplePi without closing the file, no text will be lost.<BR><BR>
+This is <i><u>very</u></i> unlike printing a PDF:</b>
 
-
+<p style="margin-left: 0px">
+<b>Case 3: 'Print a PDF</b>' was used:
+<p style="margin-left: 20px">
+Data representing dot-matrix graphics will be accumulated inside ApplePi.&nbsp; It will not be written to the PDF file until the '<b>Close Printer</b>' button is clicked.</p>
 
 <BR><BR>
 

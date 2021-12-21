@@ -212,8 +212,8 @@ void Printer::makePDF (void)
     QPixmap pixelBuffer (m_pixelsWidth, m_numberLines*8) ;     // * Create one huge pixmap of all the bits
     QPainter bufferPainter (&pixelBuffer) ;
 
-    for (int line=0; line<m_numberLines; line++) {             // * Draw the 7 most significant bits of each line into the buffer painter
-        for (int column=0; column<m_pixelsWidth; column++) {
+    for (int line=0; line<m_numberLines; line++) {             // * Draw the 7 most significant bits of each line
+        for (int column=0; column<m_pixelsWidth; column++) {   //   into the buffer painter
             quint8 byte = m_printerPixelData.at (line*m_pixelsWidth+column)<< 1 ;
             bufferPainter.drawPixmap (column,(line*7), m_pixmapPrinterPins, 0,byte*8, 1,8) ;
         }
