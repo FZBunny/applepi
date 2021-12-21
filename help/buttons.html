@@ -5,59 +5,61 @@
    <META NAME="GENERATOR" CONTENT="Mozilla/4.06 [en] (X11; I; Linux 2.0.35 i686) [Netscape]">
 </HEAD>
 
+<BODY TEXT="#000000" BGCOLOR="#E8E8FF" LINK="#0000FF" VLINK="#FF0000" ALINK="#000088">
 
-<BODY TEXT="#000000" BGCOLOR="#E8E8F0" LINK="#0000FF" VLINK="#FF0000" ALINK="#000088">
 
-<!-- <h1><center>Buttons</center></h1> -->
+<span style="font-size:14pt; color:black;">
 
-<h1>Buttons</h1>
+<BR>
+<center><h1 style="color:crimson;">Buttons</h1></center>
 <BR>
 
-<b><a href="ApplePiHelp.html">Home</a></b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<b><a href="menus.html">Menus</a></b><BR>
+<h3>POWER</h3>
+    <p style="margin-left: 20px">
+    The power button; turns the machine on and off.
+    </p>
     
-<h4>POWER</h4>
-    <span style="font-size:11pt; color:black;">
-    <BR>
-    &nbsp;&nbsp;&nbsp; The power button; turns the machine on and off.
-    </span> <BR>
-<h4>Floppy 1 and Floppy 2</h4>
-    <span style="font-size:11pt; color:black;">
-    <BR>
-    &nbsp;&nbsp;&nbsp; Use these to insert 5&frac14;" "floppy disks" to / from the two floppy disk drives.<BR>
-    &nbsp;&nbsp;&nbsp; These disks exist as 140K (143,360 byte) files, usually with wthe suffix ".dsk".<BR>
-    &nbsp;&nbsp;&nbsp; Note that such disk images cannot be used in the "HD" drives below them.<BR><BR>
-    &nbsp;&nbsp;&nbsp; -- ProDos8 disks: "/", followed by the volume name is displayed just below the button.<BR>
-    &nbsp;&nbsp;&nbsp; (This volume name, which is stored in the disk, is NOT the name of the file<BR>
-    &nbsp;&nbsp;&nbsp; containing the image.)<BR>
-    &nbsp;&nbsp;&nbsp; -- Apple Dos3 disks: "DOS3" and the volume number of the disk is displayed<BR>
-    &nbsp;&nbsp;&nbsp; instead. For various reasons which we can't go into here, this number is usually 254.<BR>
-    &nbsp;&nbsp;&nbsp; -- Apple Pascal disks: the volume name is shown followed by ":" <BR><BR>
-    &nbsp;&nbsp;&nbsp; (In BASIC, use PR#6 or IN#6 to boot from 'Floppy 1'.)
-    </span>
-<h4>HD 1 and HD 2</h4>
-    <span style="font-size:11pt; color:black;">
-    <BR>
-    &nbsp;&nbsp;&nbsp; Use these to insert or eject 3&frac12;"" floppy (800K) or hard-disk (up to 32MB) images.<BR> 
-    &nbsp;&nbsp;&nbsp; Just as 5&frac14;" disk images can't be used here, these can't be used in the drives above.<BR>
-    &nbsp;&nbsp;&nbsp; (In BASIC, use PR#7 or IN#7 to boot from 'HD 1'.)
-    </span>
-<h4>RESET</h4>
-    <span style="font-size:11pt; color:black;">
-    <BR>
-    &nbsp;&nbsp;&nbsp; Use this to interrupt a running program and reset the BASIC interpreter, just as on a<BR>
-    &nbsp;&nbsp;&nbsp; physical Apple II.
-    </span>       
-<h4>Big Screen / Small Screen</h4>
-    <span style="font-size:11pt; color:black;">
-    <BR>
-    &nbsp;&nbsp;&nbsp; This doubles or halves the size of the screen.
-    </span>
-<h4>Tape</h4>
-    <span style="font-size:11pt; color:black;">
-    <BR>
-    &nbsp;&nbsp;&nbsp; <b>*** This button is disabled in v0.1****</b><BR>
-    &nbsp;&nbsp;&nbsp; Use this to insert or eject a cassette tape image.  The data on the "tape" may be a BASIC<BR>
-    &nbsp;&nbsp;&nbsp; program, text, or any binary data. 
-    </span> <BR><BR>
+<h3>Floppy 1 and Floppy 2</h3>
+    <p style="margin-left: 20px">
+     Use these to insert 5&frac14;" floppy disk images into, or eject from,  the two floppy disk drives.
+     These disks exist as 140K (143,360 byte) files, usually with wthe suffix ".dsk".&nbsp;
+     Note that such disk images cannot be used in the "HD" drives below them.<BR><BR>
+     -- ProDos8 disks: "/", followed by the volume name is displayed just below the button.&nbsp;
+     (This volume name, which is stored in the disk, is NOT the name of the file
+     containing the image.)<BR>
+     -- Apple Dos3 disks: "DOS3" and the volume number of the disk is displayed
+     instead.&nbsp; For various reasons which we can't go into here, this number is usually 254.<BR>
+     -- Apple Pascal disks: the volume name is shown followed by ":" <BR><BR>
+     (In BASIC, use <font face=courier style=bold><b>PR#6</b></font> or
+      <font face=courier style=bold><b>IN#6</b></font> to boot from 'Floppy 1'.)
+    </p>
+<h3>HD 1 and HD 2</h3>
+    <p style="margin-left: 20px">
+     Use these to insert or eject 3&frac12;" floppy (800K) or hard-disk (up to 32MB) images.&nbsp;&nbsp; 
+     Just as 5&frac14;" disk images can't be used here, these can't be used in the drives above.<BR><BR>
+     (In BASIC, use <font face=courier style=bold><b>PR#7</b></font> or 
+     <font face=courier style=bold><b>IN#7</b></font> to boot from 'HD 1'.)
+    </p>
+<h3>RESET</h3>
+    <p style="margin-left: 20px">
+    Use this to interrupt a running program and reset the BASIC interpreter, as on a physical Apple II.
+    </p>
+<p style="margin-left: 0px">     
+<h3>Big Screen / Small Screen</h3></p>
+    <p style="margin-left: 20px">
+    This doubles or halves the size of the screen.
+    </p>
+<h3>Close Printer</h3>
+    <p style="margin-left: 20px">
+    This is a slightly odd button, which is only visible when printing to a file.<BR>
+    See  <a href="printing.html">Printing</a> for an full explanation.
+    </p>
+
+<h3>Tape</h3>
+    <p style="margin-left: 20px">
+    *** This button is disabled in v0.1****<BR>
+    Use this to insert or eject a cassette tape image.  The data on the "tape" may be a BASIC
+    program, text, or any binary data. 
+    </p> 
+    <BR><BR>
 

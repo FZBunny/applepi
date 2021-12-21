@@ -1,0 +1,47 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+   <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+   <META NAME="GENERATOR" CONTENT="Mozilla/4.06 [en] (X11; I; Linux 2.0.35 i686) [Netscape]">
+</HEAD>
+
+<BODY TEXT="#000000" BGCOLOR="#E8E8FF" LINK="#0000FF" VLINK="#FF0000" ALINK="#000088">
+
+
+<span style="font-size:14pt; color:black;">
+
+<BR>
+<center><h1 style="color:crimson;">Slots</h1></center>
+<BR>
+
+ApplePi emulates the first 4 models of Apple II computers.&nbsp; These models have seven expansion slots<sup>note1</sup>, numbered 1-7, which can hold peripheral controller cards.
+<BR><BR>
+Populated slots in the ApplePi:
+<BR><BR>
+<b>Slot 1:&nbsp;&nbsp;&nbsp;&nbsp;</b>Printer card <BR>
+<b>Slot 3:&nbsp;&nbsp;&nbsp;&nbsp;</b>80-column card <BR>
+<b>Slot 6:&nbsp;&nbsp;&nbsp;&nbsp;</b>DiskII 5&frac14;" floppy controller card <BR>
+<b>Slot 7:&nbsp;&nbsp;&nbsp;&nbsp;</b>A combination 3&frac12;" floppy / hard drive controller card<sup>note2</sup> <BR><BR>
+
+To use a slot, enter <font face=courier style=bold><b>PR#n</b></font>&nbsp;(i.e, "print to slot n") , where 'n' is a number from 1-7.<BR><BR>
+
+<b>Slot 1</b>
+  <p style="margin-left: 20px">
+  <b>PR#1</b> Case 1: The '<b>Print to File</b>' menu is not in effect:</p>
+    <p style="margin-left: 40px">
+    By default, text output will be directed from the screen to the terminal at which ApplePi has been executed.&nbsp;
+    (If ApplePi was not executed from a terminal, text will simply be sent into the aether.)</p>
+  <p style="margin-left: 20px">
+  <b>PR#1</b> Case 2: '<b>Print Text</b>' has been used to write text to a file:</p>
+    <p style="margin-left: 40px">
+    Text will be written to the file; every byte will be flushed to disk as it is encountered.
+
+
+<BR><BR><BR><BR>
+Note1:<BR>
+There was also a special 'slot 0', called the 'language card slot' on the AppleII and II+, or the 'auxiliary slot' on the IIe.&nbsp; This was physically and electronically incompatible with the expansion slots, and used for 80-column display circuitry and/or memory expansion.&nbsp;  Its existence in ApplePi is currently (V0.2) a combination all the above.<BR><BR>
+Note 2:<BR>
+(This type of controller may or may not have actually existed in the real world.&nbsp;&nbsp;Just pretend, OK?)
+
+<BR><BR>
+
