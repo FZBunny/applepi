@@ -64,6 +64,7 @@ bool Printer::open (QString path)
         if (path.indexOf(".pdf") < 0)  m_writingText = true ;
         else                           m_writingPDF = true ;
     }
+    m_out->seek(0) ;  // Seems silly & redundant, but sometimes necessary. Don't know why.
 
     m_graphicsState = 0 ;
     m_pixelsWidth = 0 ;

@@ -14,12 +14,13 @@
 <center><h1 style="color:crimson;"><BR>Printing</h1></center>
 <BR>
 
-Printing is accomplished by use of the <b>PR#1</b> command.
+Printing text is accomplished by use of the <b>PR#1</b> command.<BR>
+Printing a PDF is usually done with programs such as 'Print Shop'.
 <BR>
 <p style="margin-left: 0px">
 <b>Case 1:</b> The '<b>Print to File</b>' menu is not in effect:</p>
   <p style="margin-left: 20px">
-  By default, text output will be directed from the screen to the terminal from which ApplePi has been executed.&nbsp;
+  By default, text output will be directed to the terminal from which ApplePi has been executed.&nbsp;
 (If ApplePi was not executed from a terminal, text is simply sent into the aether, gone forever.)</p>
 
 <p style="margin-left: 0px">
@@ -31,7 +32,32 @@ This is <i><u>very</u></i> unlike printing a PDF:</b>
 <p style="margin-left: 0px">
 <b>Case 3: 'Print a PDF</b>' was used:
 <p style="margin-left: 20px">
-Data representing dot-matrix graphics will be accumulated inside ApplePi.&nbsp; It will not be written to the PDF file until the '<b>Close Printer</b>' button is clicked.</p>
+Data representing dot-matrix graphics will be accumulated in a buffer inside ApplePi.&nbsp; It will not be written to the PDF file until the '<b>Close Printer</b>' button is clicked. &nbsp;&nbsp; If the '<b>Close Printer</b>' button is <i><u>not</u></i> clicked before ApplePi is shut down, the PDF contents will be lost.
+<BR>
+
+<p style="margin-left: 0px">
+<b>A few tricks</b></p>
+
+<p style="margin-left: 20px">
+If, for some reason, you don't wish to use <b>PR#1</b>, there are still some ways to get text output to a file:<BR><BR>
+
+<b>1)</b>&nbsp;&nbsp;In a terminal window:
+<p style="margin-left: 40px">
+* Select the 'Preferences->Echo Screen Text to Terminal' menu item and enter:&nbsp;&nbsp;&nbsp;&nbsp;
+<font face=courier style=bold><b>applepi > somefilename.txt</b></font><BR>
+
+* Or use:&nbsp;&nbsp;&nbsp;&nbsp;<font face=courier style=bold><b>applepi >> somefilename.txt</b></font>&nbsp;&nbsp;&nbsp;&nbsp;
+to append text to an existing file.<BR>
+* If you wish to see the text on the terminal as it is written to the file, use:<BR>
+<font face=courier style=bold><b>applepi | tee somefilename.txt</b></font><BR>
+
+<p style="margin-left: 20px">
+<b>2)</b>&nbsp;&nbsp;Select the 'Preferences->Echo Screen Text to File...' menu item.<BR><BR>
+Any of these 'trick' methods will echo any text which appears the screen to a disk file, including all entered commands, whether in Basic or in the Apple II monitor.
+
+
+
+</p>
 
 <BR><BR>
 

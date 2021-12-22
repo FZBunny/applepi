@@ -183,7 +183,7 @@ void MainWindow::openPrintFile (QString suffix)
         QTextStream (&caption) << "Print to " << suffix ; //.remove (0,1) ; 
         QString filter ;
         if (suffix == ".pdf") filter = "PDF File (*.pdf *.PDF);;Any *" ;
-        else                  filter = "Text File (*.txt *.TXT);;Any *" ; ;
+        else                  filter = "Text File (*.txt *.TXT);;Any *" ; ;  // XXXXXXXXXX  BUG if no suffix in selected file FIXME XXXXXX
         QString filename = QFileDialog::getSaveFileName (this, caption, dir1, filter) ;
 
         if (filename.length()) {
