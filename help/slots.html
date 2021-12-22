@@ -15,32 +15,54 @@
 
 ApplePi emulates the first 4 models of Apple II computers.&nbsp; These models have seven expansion slots<sup>note1</sup>, numbered 1-7, which can hold peripheral controller cards.
 <BR><BR>
+When ApplePi is turned on, it (i.e. the internal ROM) will search for a disk controller in decreasing order beginning with slot 7, and boot from the first inserted disk image it finds.
+<BR><BR>
 Populated slots in the ApplePi:
 <BR><BR>
 <b>Slot 1:&nbsp;&nbsp;&nbsp;&nbsp;</b>Printer card <BR>
 <b>Slot 3:&nbsp;&nbsp;&nbsp;&nbsp;</b>80-column card <BR>
-<b>Slot 6:&nbsp;&nbsp;&nbsp;&nbsp;</b>DiskII 5&frac14;" floppy controller card <BR>
+<b>Slot 6:&nbsp;&nbsp;&nbsp;&nbsp;</b>'Disk II' 5&frac14;" floppy controller card <BR>
 <b>Slot 7:&nbsp;&nbsp;&nbsp;&nbsp;</b>A combination 3&frac12;" floppy / hard drive controller card<sup>note2</sup> <BR><BR>
 
-To use a slot, enter <font face=courier style=bold><b>PR#n</b></font>&nbsp;(i.e, "print to slot n") , where 'n' is a number from 1-7.<BR><BR>
+To use a slot, enter <font face=courier><b>PR#n,</b></font>&nbsp;(i.e, "print to slot n") , where 'n' is a number from 1-7.<BR><BR>
 
 <b>Slot 1</b>
   <p style="margin-left: 20px">
-  <b>PR#1</b> Case 1: The '<b>Print to File</b>' menu is not in effect:</p>
-    <p style="margin-left: 40px">
-    By default, text output will be directed from the screen to the terminal at which ApplePi has been executed.&nbsp;
-    (If ApplePi was not executed from a terminal, text will simply be sent into the aether.)</p>
+  See &nbsp; <a href="printing.html">Printing</a>.</p>
+<BR>
+
+<b>Slot 3</b>
   <p style="margin-left: 20px">
-  <b>PR#1</b> Case 2: '<b>Print Text</b>' has been used to write text to a file:</p>
-    <p style="margin-left: 40px">
-    Text will be written to the file; every byte will be flushed to disk as it is encountered.
+  <font face=courier><b>PR#3</b></font> &nbsp; switches the screen to an 80 column display.  To switch back to a 40-column display, use  &nbsp;<font face=courier><b>PR#0</b></font>.
+  <\p>
+ <BR>
+
+
+<p style="margin-left: 0px">
+<b>Slot 6</b>
+  <p style="margin-left: 20px">
+  <font face=courier><b>PR#6</b></font> &nbsp; boots from the 5&frac14;" disk image in the drive labelled "Floppy 1". <sup>note3</sup>
+  <\p>
+ <BR></p>
+
+
+<p style="margin-left: 0px">
+<b>Slot 7</b>
+  <p style="margin-left: 20px">
+  <font face=courier><b>PR#7</b></font> &nbsp; boots from the 3&frac12;" floppy or hard disk image in the drive labelled "HD 1". <sup>note2</sup>
+  <\p>
+ <BR><\p>
 
 
 <BR><BR><BR><BR>
 Note1:<BR>
-There was also a special 'slot 0', called the 'language card slot' on the AppleII and II+, or the 'auxiliary slot' on the IIe.&nbsp; This was physically and electronically incompatible with the expansion slots, and used for 80-column display circuitry and/or memory expansion.&nbsp;  Its existence in ApplePi is currently (V0.2) a combination all the above.<BR><BR>
+There was also a special 'slot 0', called the 'language card slot' on the AppleII and II+, or the 'auxiliary slot' on the IIe.&nbsp; This was physically and electronically incompatible with the expansion slots, and used for 80-column display circuitry and/or memory expansion.&nbsp;  Its existence in ApplePi is currently a combination of both.
+<BR><BR>
+
 Note 2:<BR>
 (This type of controller may or may not have actually existed in the real world.&nbsp;&nbsp;Just pretend, OK?)
-
+<BR><BR>
+Note 3:<BR>
+The Disk II controller was an utterly brilliant design by Steve Wozniak which allowed the controller to be sold <i>far</i> less than anything else on the market at that time, and small enough to fit inside the AppleII case. &nbsp;  An unavoidable side-effect of the design was a format completely incompatible with anything else on the planet. &nbsp; So AppleII owners gained a lot (a disk drive they could afford), and lost only a little.
 <BR><BR>
 

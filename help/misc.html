@@ -1,0 +1,69 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+   <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+   <META NAME="GENERATOR" CONTENT="Mozilla/4.06 [en] (X11; I; Linux 2.0.35 i686) [Netscape]">
+</HEAD>
+
+<BODY TEXT="#000000" BGCOLOR="#E8E8FF" LINK="#0000FF" VLINK="#FF0000" ALINK="#000088">
+
+
+<span style="font-size:14pt; color:black;">
+
+<center><h1 style="color:crimson;"><BR>Miscellaneous</h1></center>
+<BR>
+
+
+<h3 style="color:crimson;">Running ApplePi</h3>
+ <p style="margin-left: 20px">
+During installation, a copy of the ApplePi desktop file should have been dropped on your desktop.  If not, you may manually drag it to your desktop from:<BR> <font face=courier>/usr/share/applepi/applepi.desktop</font>
+<BR>
+You may also run ApplePi from a terminal with: <font face=courier>&nbsp;applepi</font> 
+<BR>
+Running from a terminal is necessary when using most of the <b>Debug</b> tools. &nbsp; When debugging, it is sometimes helpful to save terminal output to a file for later inspection like this:
+<BR>
+<font face=courier>applepi | tee somefilename</font>
+<BR>
+Debug output will still be visible on the terminal.
+<BR>
+</p>
+
+
+ <p style="margin-left: 0px">
+<h3 style="color:crimson;">Booting from disk</h3>
+</p>
+  <p style="margin-left: 20px">
+When ApplePi is turned on, it (i.e. the internal ROM) will search for a disk controller containing a disk in decreasing slot order beginning with slot 7 (the "HD 1" button), and boot from the first disk image it finds.
+<BR>
+A boot may be interrupted by pressing the 'RESET' button, and restarted with &nbsp;<font face=courier>PR#6</font>&nbsp; or &nbsp; <font face=courier>PR#7</font>
+<BR>
+</p>
+
+<h3 style="color:crimson;">Disks</h3>
+ <p style="margin-left: 20px">
+ApplePi uses disk images of three types:<BR>
+- In "Floppy 1 & 2" drives:  5&frac14;" disk images in 140K (143360 byte) files. <BR>
+- "HD 1 & 2" drives:  3&frac12;" disk images in 800K (819200 byte) files, or hard drive images in up to 32MB files.
+<BR><BR>
+ Below each disk button is a lable identfying the loaded disk:
+ <BR><BR>
+ - DOS3 disks show "DOS 3 Vol.", followed by a volume number, 0-255.  For various obscure reasons, this is almost aways "254".  
+ <BR>
+ Example: &nbsp;&nbsp; DOS3 Vol.254
+ <BR><BR>
+- ProDOS8 disks show a volume name, preceded by a "/".  &nbsp; Note that this is <i>not</i> &nbsp;the name of the file containing the disk image. 
+ <BR>
+ Example: &nbsp;&nbsp; /APPLEWORKS
+ <BR><BR>
+ - Apple Pascal disks show the Pascal volume name, which is always terminated by a colon. &nbsp; Again, this is unrelated to the name of the image file.
+<BR>
+Example: &nbsp;&nbsp; APPLE1:
+<BR>
+</p>
+
+
+<p style="margin-left: 0px">
+<h3 style="color:crimson;">next...</h3>
+</p>
+<BR>
+

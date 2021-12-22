@@ -10,9 +10,10 @@ This is only up to version 0.1.8, so expect bugs.   You can report them to jbwar
 
 To get a copy, go to "Releases" on the right of this page, download a .deb file, then use: 
 
-``` sudo apt install ./applepi-(whichever)```
-##### (Note that the "./" is necessary.)   
- 
+###  ``` sudo apt install ./applepi-(rev-&-arch).deb``` 
+--- Note that the "./" is necessary ---
+   
+- During installation, a 'desktop' file should have been dropped on your desktop.  If not, copy it manually: ```cp /usr/share/applepi/applepi.desktop ~/Desktop``` 
 - Of course, an Apple II of any kind isn't much use without a disk or two. To find disk-image files on the 'web, google "apple ii disk images".  For Apple disk masters, try https://www.apple.asimov.net/images/masters/;  for games, go to https://archive.org/details/TotalReplay for an amazing 32MB hard drive full of of HUNDREDS of games.  Also a good source: http://virtualapple.org/. 
 
 - When you do boot a floppy disk image, you will hear a series of 'tick' sounds.  These are a kind-of lame attempt to mimic the sound of head seeks as the drive moves from track to track. They will be replaced by proper recorded sounds someday.
