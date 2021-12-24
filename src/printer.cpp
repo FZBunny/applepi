@@ -61,8 +61,13 @@ bool Printer::open (QString path)
     bool ok = m_out->open (QIODevice::WriteOnly|QIODevice::Truncate) ;
     if (ok) {
         m_filepath = path ;
-        if (path.indexOf(".pdf") < 0)  m_writingText = true ;
-        else                           m_writingPDF = true ;
+        if (path.indexOf(".pdf") < 0)  {
+            m_writingText = true ;
+            MAC->m_ram[0x36] = 0x10 ;  // point the char. output vector to printer
+            MAC->m_ram[0x37] = m_slotAddr ;
+        } else {
+            m_writingPDF = true ;
+        }
     }
     m_out->seek(0) ;  // Seems silly & redundant, but sometimes necessary. Don't know why.
 
@@ -104,27 +109,28 @@ void Printer::close (void)
 //  ProDOS may also fetch single bytes when attempting to identify the device in slot 1. 
 
 quint8 Printer::fetch_Printer_ROM (int slotNumber, quint8 p)
-{                                      
+{                              
     static const quint8 RTS = 0x60 ;
     
     quint16 calledFrom = MAC->savedPC() ;
-    quint16 slotAddr = 0xc000 | (slotNumber << 8) ;
-    quint16 entryPoint = slotAddr + 0x10 ;
+    m_slotAddr = 0xc000 | (slotNumber << 8) ;
+    quint16 entryPoint = m_slotAddr + 0x10 ;
     ProcessorState* ps = MAC->processorState() ;
     quint8 c ;
 
     // Ignore 2 fetches after $Cn00 or $Cn10 entry; just a side-effect
     // of last few lines of fn. "Machine::run" saving history data.
-    if ((calledFrom==slotAddr)   && ((p==0x01) || (p==0x02))) return 0 ;
+    if ((calledFrom==m_slotAddr)   && ((p==0x01) || (p==0x02))) return 0 ;
     if ((calledFrom==entryPoint) && ((p==0x11) || (p==0x12))) return 0 ;
 
-    if ((p==0) && (calledFrom==slotAddr)) {                        // Did someone say "PR#1" ?
+    if ((p==0) && (calledFrom==m_slotAddr)) {                        // Did someone say "PR#1" ?
         MAC->m_ram[0x36] = 0x10 ;            // Set the character output vector
-        MAC->m_ram[0x37] = slotAddr >> 8 ;   // to point to us
+        MAC->m_ram[0x37] = m_slotAddr >> 8 ;   // to point to us
         ps->Areg = 0 ;
         ps->Pstat &= C ^ 0xff ;
         c = RTS ;
     } else if ((p==0x10) && (calledFrom==entryPoint)) {            // Print a single character.
+//printf ("Printer::fetch_Printer_ROM A=%2.2x\n", ps->Areg&0x7f) ;     
         m_out->putChar (ps->Areg&0x7f) ;
         if ((ps->Areg&0x7f) == '\r') m_out->putChar ('\n') ;
         m_out->flush() ;
@@ -136,7 +142,7 @@ quint8 Printer::fetch_Printer_ROM (int slotNumber, quint8 p)
         if (p > 0x4f) p = 0 ;
         c = epson_ROM_fragment[p] ;
     }
-//printf ("fetch_Printer_ROM %2.2x from %4.4x\n", c, p) ;
+
     return c ;
 }
 
@@ -154,6 +160,7 @@ quint8 Printer::fetch (int loNibble)
 
 void Printer::store (quint8 c)
 {
+//putchar(c) ; fflush(stdout) ;
     if (m_writingPDF) {
         handleGraphics (c) ;
     } else {

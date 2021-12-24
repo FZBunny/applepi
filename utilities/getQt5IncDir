@@ -1,0 +1,6 @@
+#!/bin/bash
+
+incpath=`find /usr/include -type d  -name qt5`
+
+echo $incpath
+

@@ -45,7 +45,6 @@ Gamepad::Gamepad (MainWindow* parent) : QWidget ()
     m_gamepad = new QGamepad (0, this) ;
     openController() ;
 
-    for (int i=0; i<3; i++) m_buttons[i] = false ;
     m_triggerCycles = MAC->getCycles() ;
 
     QRect r = QApplication::desktop()->screenGeometry() ;
@@ -79,10 +78,10 @@ quint8 Gamepad::readButton (int buttonNumber)
             n = g->buttonR2() ;
             break ;
         case 2:
-            n = m_buttons[2] ;
+            n = g->buttonL1() ;
             break ;
         case 3:
-            n = m_buttons[3] ;
+            n = g->buttonR1() ;
             break ;
         default:
             n = 0 ; 

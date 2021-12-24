@@ -1,0 +1,6 @@
+#!/bin/bash
+
+corepath=`find /usr/lib -name libQt5Core.so`
+QTLIBS=${corepath%/libQt5Core.so}
+echo $QTLIBS
+

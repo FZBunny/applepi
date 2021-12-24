@@ -84,6 +84,7 @@ private:
     bool     m_writingPDF ;
 
     QString    m_filepath ;
+    quint16    m_slotAddr ;
     int        m_graphicsState ;
     int        m_numberLines ;
     int        m_pixelCounter ;
