@@ -4,9 +4,8 @@ BIN=../bin
 OBJ=../obj
 MAKE=make
 MKDIR=mkdir -p
-QTLIBS=`./getQtLibDir`
-QTINCDIR=-I `./getQt5IncDir`
-QTINCS=$(QTINCDIR)/QtCore
+QTLIBS=`./getQt5LibDir`
+QTINCDIR=`./getQt5IncDir`
 CXXFLAGS=-fPIC -I ../src
 
 #   For debugging with gdb, use "export DEBUG=1" before running 'make'.
@@ -24,7 +23,7 @@ all:
 	$(MAKE) $(EXECS)
 
 7bits:
-	$(MAKE) $(BIN)/7bits
+	$(MAKE) 7bits.cpp $(BIN)/7bits
 
 create-printer-pins-xpm:
 	$(MAKE) $(BIN)/create-printer-pins-xpm
@@ -51,8 +50,16 @@ $(BIN)/%:
 # -- project targets -- #
 
 
-$(BIN)/disassemble: $(OBJ)/disassemble.o $(OBJ)/disassembler.o
-	$(CXX) $(CXXFLAGS)  $(SRC)/disassemble.cpp $(QTINCS) $(LDFLAGS) $(OBJ)/disassembler.o  $(LDLIBS) -o $(BIN)/disassemble$(EXE)
+
+$(BIN)/7bits: 7bits.cpp
+	$(CXX) $(CXXFLAGS)  7bits.cpp  -o $(BIN)/7bits$(EXE)
+
+$(BIN)/create-printer-pins-xpm: create-printer-pins-xpm.cpp
+	$(CXX) $(CXXFLAGS)   create-printer-pins-xpm.cpp -o $(BIN)/create-printer-pins-xpm$(EXE)
+
+
+$(BIN)/disassemble: $(OBJ)/disassembler.o disassemble.cpp
+	$(CXX) $(CXXFLAGS)  $(SRC)/disassemble.cpp -I../src -I$(QTINCDIR) -I$(QTINCDIR)/QtGui -I$(QTINCDIR)/QtWidgets -I$(QTINCDIR)/QtGamepad -I$(QTINCDIR)/QtCore $(LDFLAGS) $(OBJ)/disassembler.o  -L$(QTLIBS) -lQt5Core -o $(BIN)/disassemble$(EXE)
 
 $(BIN)/video-40col-rom-to-xpm: $(OBJ)/video-40col-rom-to-xpm.o
 	$(CXX) $(CXXFLAGS)  $(SRC)/video-40col-rom-to-xpm.cpp  $(LDFLAGS)  -o $(BIN)/video-40col-rom-to-xpm$(EXE)

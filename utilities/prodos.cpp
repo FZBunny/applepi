@@ -26,6 +26,8 @@
 *****************************************************************************/
 
 
+// XXXXXXXXXXXXXXXXXXXXXXXXXXXX INCOMPLETE & NOT FULLY WORKING XXXXXXXXXXXXXXXXXXXXXXXXXXX
+
 
 //
 //    ./prodos [-h] [-l dirname [-r]] [-x pathname ] filename
