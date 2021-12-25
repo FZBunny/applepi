@@ -90,7 +90,7 @@ HardDriveDialog::HardDriveDialog (MainWindow* parent, int drive) : QDialog ()
 	connect (m_newVolumeButton,   &QPushButton::clicked, ::hdOnNewButtonClick) ;
 
     m_filenameField->move (16,40) ;        m_filenameField->resize (384,26) ;
-    m_noWriteWarning->move (135,72) ;      m_noWriteWarning->resize (160,20) ;
+    m_noWriteWarning->move (135,72) ;      m_noWriteWarning->resize (170,20) ;
     m_StaticText2->move (120,16) ;         m_StaticText2->resize (180,20) ;
     m_ejectInsertButton->move (135,100) ;  m_ejectInsertButton->resize (152,34) ;
     m_newVolumeButton->move (135,144) ;    m_newVolumeButton->resize (152,34) ;
