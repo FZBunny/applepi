@@ -1,5 +1,6 @@
 
 
+EXE=
 BIN=../bin
 OBJ=../obj
 MAKE=make
@@ -14,10 +15,9 @@ ifdef DEBUG
 endif
 
 
-EXECS = $(BIN)/7bits  $(BIN)/create-printer-pins-xpm  $(BIN)/disassemble  $(BIN)/prodos  $(BIN)/video-40col-rom-to-xpm
-SRC = .
-VPATH=$(SRC)
-
+# EXECS = $(BIN)/7bits  $(BIN)/create-printer-pins-xpm  $(BIN)/disassemble  $(BIN)/prodos  $(BIN)/video-40col-rom-to-xpm  (prodos.cpp is in bad shape. Ignore for now.)
+EXECS = $(BIN)/7bits  $(BIN)/create-printer-pins-xpm  $(BIN)/disassemble   $(BIN)/video-40col-rom-to-xpm
+OBJS = $(OBJ)/7bits.o  $(OBJ)/create-printer-pins-xpm.o  $(OBJ)/disassemble.o   $(OBJ)/video-40col-rom-to-xpm.o
 
 all:
 	$(MAKE) $(EXECS)
@@ -38,14 +38,6 @@ prodos:
 	$(MAKE) $(BIN)/prodos
 
 
-#$(OBJ)/%.o: %.cpp
-#	$(COMPILE.cpp)  $(CXXFLAGS) $(QTINCS) $<
-#	$(COMPILE.cpp)   $(QTINCS) $<
-
-$(BIN)/%:
-	$(LINK.cpp) $^ $(LDLIBS) -o $@
-	@echo
-
 
 # -- project targets -- #
 
@@ -55,21 +47,20 @@ $(BIN)/7bits: 7bits.cpp
 	$(CXX) $(CXXFLAGS)  7bits.cpp  -o $(BIN)/7bits$(EXE)
 
 $(BIN)/create-printer-pins-xpm: create-printer-pins-xpm.cpp
-	$(CXX) $(CXXFLAGS)   create-printer-pins-xpm.cpp -o $(BIN)/create-printer-pins-xpm$(EXE)
-
-
-$(BIN)/disassemble: $(OBJ)/disassembler.o disassemble.cpp
-	$(CXX) $(CXXFLAGS)  $(SRC)/disassemble.cpp -I../src -I$(QTINCDIR) -I$(QTINCDIR)/QtGui -I$(QTINCDIR)/QtWidgets -I$(QTINCDIR)/QtGamepad -I$(QTINCDIR)/QtCore $(LDFLAGS) $(OBJ)/disassembler.o  -L$(QTLIBS) -lQt5Core -o $(BIN)/disassemble$(EXE)
+	$(CXX) $(CXXFLAGS)  create-printer-pins-xpm.cpp  -o $(BIN)/create-printer-pins-xpm$(EXE)
 
 $(BIN)/video-40col-rom-to-xpm: video-40col-rom-to-xpm.o
-	$(CXX) $(CXXFLAGS)  $(SRC)/video-40col-rom-to-xpm.cpp  $(LDFLAGS)  -o $(BIN)/video-40col-rom-to-xpm$(EXE)
+	$(CXX) $(CXXFLAGS)  video-40col-rom-to-xpm.cpp   -o $(BIN)/video-40col-rom-to-xpm$(EXE)
+
+$(BIN)/disassemble: $(OBJ)/disassembler.o disassemble.cpp
+	$(CXX) $(CXXFLAGS)  disassemble.cpp -I../src -I$(QTINCDIR) -I$(QTINCDIR)/QtGui -I$(QTINCDIR)/QtWidgets -I$(QTINCDIR)/QtGamepad -I$(QTINCDIR)/QtCore $(LDFLAGS) $(OBJ)/disassembler.o  -L$(QTLIBS) -lQt5Core -o $(BIN)/disassemble$(EXE)
 
 $(BIN)/prodos: prodos.o prodos.cpp prodos.h
-	$(CXX) -Wno-address-of-packed-member $(CXXFLAGS) $(SRC)/prodos.cpp  $(LDFLAGS) $(WX_LDLIBS) $(OBJ)/debugging_dumps.o  -o $(BIN)/prodos$(EXE)
+	$(CXX) $(CXXFLAGS)  prodos.cpp -Wno-address-of-packed-member   $(LDFLAGS) $(OBJ)/debugging_dumps.o  -o $(BIN)/prodos$(EXE)
 
 
 
 .PHONY: clean
 clean:
-	$(RM)  *.o $(EXECS) 
+	$(RM) $(OBJS)  $(EXECS) 
 
