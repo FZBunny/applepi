@@ -1,13 +1,10 @@
 #!/bin/bash
 
 if [ $SUDO_UID ]; then
-    DESKTOP=/home/$SUDO_USER/Desktop
     NAME=applepi.desktop
+    DESKTOP=/home/$SUDO_USER/Desktop
     PATH=$DESKTOP/$NAME
-    XDG=$(which xdg-desktop-menu)
-    if [ -x $XDG ]; then
-        $XDG uninstall /usr/share/applepi/applepi.desktop
-    fi
+    /usr/bin/xdg-desktop-menu  uninstall $NAME
     if [ -f $PATH ]; then
         /usr/bin/rm $PATH
     fi

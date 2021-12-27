@@ -2,8 +2,8 @@
 
 sayLater() {
     echo 
-    echo You may copy the file to your desktop later with:
-    echo cp  /usr/share/applepi/applepi.desktop  ~/Desktop
+    echo 'You may copy the file to your desktop later with:'
+    echo 'cp  /usr/share/applepi/applepi.desktop  ~/Desktop'
     echo 
 }
 
@@ -11,11 +11,10 @@ sayLater() {
 if [ $SUDO_UID ]; then
     DESKTOP=/home/$SUDO_USER/Desktop
 
-    /usr/bin/xdg-desktop-menu install --novendor /usr/share/applepi/applepi.desktop
 
-    echo
     read -t 1 -n 10000 discard
 
+    echo
     echo \*
     echo \* Would you like the applepi desktop file placed on your desktop? \(Y/n\)
     echo \*
@@ -32,6 +31,11 @@ if [ $SUDO_UID ]; then
     fi
 else
     sayLater
+fi
+
+XDG=$(which xdg-desktop-menu)
+if [ -x $XDG ]; then
+    $XDG install --novendor /usr/share/applepi/applepi.desktop
 fi
 
 exit 0

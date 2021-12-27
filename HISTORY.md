@@ -43,3 +43,13 @@ Added basic gamepad support, plus ability to use mouse input in place of a gamep
 #### V 0.1.8
 - **floppy_controller.cpp** & **mainwindow.cpp**  
 Added ability to recognize Apple Pascal disks and display Pascal volume names under the floppy disk buttons (Only tested on Pascal 1.3)
+
+#### V 0.2
+- **gamepad.cpp**  
+Fixed gamepad code & removed mouse emulation of a gamepad.
+- **printer.cpp**  
+Added ability to print to PDF files.  'Print Shop' now works, but only one sheet at a time.  Banners are not yet possible.
+- **help.cpp**  
+Reworked method of displaying help (again).  Help has been brought up-to-date.
+- **utilities directory**  
+Moved source code for several small utility programs from src directory, and added a separate makefile for them.
