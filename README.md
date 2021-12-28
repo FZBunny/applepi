@@ -14,7 +14,7 @@ To get a copy, go to "Releases" on the right of this page, download a .deb file,
 --- Note that the "./" is necessary ---
    
 
-#### notice, v0.2.0: The 'help' facility does not work on the most recent version of PiOS (/etc/rpi-issue : 2021-10-30) Work-around: open /usr/share/applepi/ApplePiHelp.html in your web browser.
+#### notice, v0.2.0: The 'help' facility may not work on the most recent version of PiOS (/etc/rpi-issue : 2021-10-30) Work-around: open /usr/share/applepi/ApplePiHelp.html in your web browser.
    
    
 - During installation, a 'desktop' file should have been dropped on your desktop.  If not, copy it manually: ```cp /usr/share/applepi/applepi.desktop ~/Desktop``` 
