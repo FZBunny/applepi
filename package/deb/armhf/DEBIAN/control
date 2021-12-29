@@ -1,6 +1,6 @@
 Package: applepi
 Source:
-Version: 0.1.8
+Version: 0.2.1
 Architecture: armhf
 Maintainer: J.B.Ward <j.bruce.ward@gmail.com>
 Installed-Size: 684
