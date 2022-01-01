@@ -44,6 +44,7 @@ using namespace std ;
 #include <QDebug>
 #include <QDate>
 #include <QTime>
+#include <QSound>
 
 #include "defs.h"
 #include "machine.h"
@@ -210,6 +211,10 @@ MainWindow::MainWindow (void)
     m_oneSecondTimer = new QTimer() ;
     connect (m_oneSecondTimer, &QTimer::timeout, this, &MainWindow::setProdosDateTime) ;
     m_oneSecondTimer->start (1000) ;
+
+    m_driveSoundTimer = new QTimer() ;
+    connect (m_driveSoundTimer, &QTimer::timeout, this, &MainWindow::onPlayDriveSoundTimer) ;
+    m_driveSoundTimer->start (10) ;
 
     m_floppyMotorCountDown[0] = 0 ;
     m_floppyMotorCountDown[1] = 0 ;
@@ -737,6 +742,19 @@ void MainWindow::setProdosDateTime (void)
 }
 
 
+void MainWindow::onPlayDriveSoundTimer (void)
+{
+    switch (m_soundNumber) {
+        case 1:
+            m_soundNumber = 0 ;
+            QSound::play (":/sounds/step1.wav") ;
+            break ;
+        default:
+            break ;
+    }
+}
+
+
 void MainWindow::onScreenScale (void)
 {
 // fprintf ("MainWindow::onScreenScale\n") ;
@@ -806,8 +824,6 @@ void MainWindow::resizeWindow (void)
     }
     m_dial->move (volumeX, volumeY) ;
     m_volText->move (volumeX+5, volumeY+55) ;
-  //  m_minText->move (volumeX-25, volumeY+40) ;
-  //  m_maxText->move (volumeX+60, volumeY+40) ;
 
 }
 
@@ -906,4 +922,11 @@ void MainWindow::onClosePrinterButton (void)
 void MainWindow::setVolume (int volume)
 {
     m_speaker->setVolume (float(volume)) ;
+}
+
+
+void MainWindow::play (int n)
+{
+//putchar ('x') ;  fflush (stdout) ;
+    m_soundNumber = n ;
 }

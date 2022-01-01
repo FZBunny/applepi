@@ -4,7 +4,7 @@ Version: 0.2.1
 Architecture: amd64
 Maintainer: J.B.Ward <j.bruce.ward@gmail.com>
 Installed-Size: 845
-Depends: libasound2, libqt5widgets5, libqt5gui5, libqt5core5a, libqt5gamepad5
+Depends: libasound2, libqt5widgets5, libqt5gui5, libqt5core5a, libqt5gamepad5, qtmultimedia5
 Section: misc
 Priority: optional
 Homepage: https://github.com/FZBunny/applepi

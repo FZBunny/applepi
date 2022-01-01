@@ -10,7 +10,8 @@ OBJECTS_DIR=obj
 DESTDIR=bin
 INCLUDEPATH += .
 LIBS += -L/usr/lib/x86_64-linux-gnu/alsa-lib -lasound -no-pie
-QT += widgets printsupport gamepad
+QT += widgets printsupport gamepad multimedia
+RESOURCES = resources.qrc
 
 
 # The following define makes your compiler warn you if you use any

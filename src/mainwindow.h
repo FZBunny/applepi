@@ -66,9 +66,8 @@ public:
     MainWindow (void) ;
     ~MainWindow();
 
-//   static MainWindow* main_window ;
+    Machine*      m_mac ;
 
-    Machine*   m_mac ;
     Config*    m_cfg ;
     Gamepad*   m_gamepad ;
 
@@ -88,7 +87,7 @@ public:
     void pastingText (bool pasting) ;
 
     void trapTraceIsStopping (void) ;
-    
+ void play (int n) ;   
     Speaker* speaker (void) ;
 
     void onPowerButton   (void) ;
@@ -108,8 +107,8 @@ private:
 
     virtual void  keyPressEvent (QKeyEvent *event) override ;
 
-    Speaker*   m_speaker ;
-    Screen*    m_screen ;
+    Speaker*      m_speaker ;
+    Screen*       m_screen ;
     
     bool    m_powerButtonState ;
     bool    m_currentlyPastingText ;
@@ -121,6 +120,7 @@ private:
 
     QTimer*  m_floppyCheckTimer ;
     QTimer*  m_oneSecondTimer ;
+    QTimer*  m_driveSoundTimer ;
 
     int    m_floppyMotorCountDown[2] ;
     int    m_HDActivityCountDown[2] ;
@@ -134,6 +134,7 @@ private:
     int     m_ledWidth ;
     bool    m_firstTimerEvent ;
     int     m_scaleButtonKludge ;
+    int     m_soundNumber ;
 
     ApplepiButton* m_powerButton ;
     ApplepiButton* m_floppy1Button ;
@@ -220,6 +221,7 @@ private:
 
     void onDiskDriveCheckTimer (void) ;
     void setProdosDateTime (void) ;
+    void onPlayDriveSoundTimer (void) ;
 
     void onSelectRom      (void) ;
     void onUseInternalRom (void) ;

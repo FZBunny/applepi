@@ -214,25 +214,10 @@ void Speaker::setVolume (float value)
 //printf ("MID=%i  value=%f  volume=%f m_hi=%i  m_lo=%i\n", MID, value, volume, m_hi, m_lo) ;
 }
 
-/***
-void Speaker::playRecal (void)
-{
-    m_pcmLen = recal_pcm_len ;
-    m_pcmSound = recal_pcm ;
-}
-
-
-void Speaker::playStep (void)
-{
-    m_pcmLen = step_pcm_len ;
-    m_pcmSound = step_pcm ;
-}
-***/
 
 
 // ---  Entry point to the speaker thread  ---
 // This thread reads from the head of the sound queue, and writes to the speaker.
-
 
 void Speaker::run (void)
 {
@@ -251,29 +236,21 @@ void Speaker::run (void)
     while (true) {
         int len, oldHead ;
         if (m_qHead < m_qTail) {
-//putchar('a') ; fflush(stdout) ;
             m_qLock.lock() ;
-//putchar('b') ; fflush(stdout) ;
             oldHead = m_qHead ;
             len = m_qTail - oldHead ;
             m_qHead = m_qTail ;
-//putchar('c') ; fflush(stdout) ;
             m_qLock.unlock() ;
-//putchar('d') ; fflush(stdout) ;
             snd_pcm_writei (m_soundHandle, m_queue+oldHead, len) ;
-//putchar('1') ; fflush(stdout) ;
         } else if (m_qHead > m_qTail) {
             m_qLock.lock() ;
             len = SND_QUEUE_SIZE - m_qHead ;
             m_qHead = 0 ;
             m_qLock.unlock() ;
-putchar('d') ; fflush(stdout) ;
             snd_pcm_writei (m_soundHandle, m_queue+m_qHead, len) ;
-//putchar('2') ; fflush(stdout) ;
         } else {
             memset (dummyBuffer, m_previousValue, sizeof(dummyBuffer)) ;
             snd_pcm_writei (m_soundHandle, dummyBuffer, sizeof(dummyBuffer)) ;
-//putchar('3') ; fflush(stdout) ;
         }
                         // ( About the sleep-&-repeat hackery... poll calls refuse to work,)
         usleep (20) ;   // ( and ALSA callbacks are not implemented on some Linux distros. )

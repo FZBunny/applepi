@@ -26,6 +26,8 @@
 *****************************************************************************/
 
 
+#include <QAudioDeviceInfo>
+#include <QAudioOutput>
 
 #include "config.h"
 #include "volume_dial.h"
@@ -55,16 +57,18 @@ void VolumeDial::sliderChange (QAbstractSlider::SliderChange)
     m_parent->setVolume (newValue) ;
     CFG->Set ("speaker_volume", (uint)m_value) ;
     repaint () ;
+
+//    QAudioDeviceInfo info (QAudioDeviceInfo::defaultOutputDevice()) ;
 }
 
 
-void VolumeDial::keyPressEvent (QKeyEvent *e)
+void VolumeDial::keyPressEvent (QKeyEvent *e)  // Ignore all keyboard events
 {
     e->ignore() ;
 }
 
 
-void VolumeDial::keyReleaseEvent (QKeyEvent *e)
+void VolumeDial::keyReleaseEvent (QKeyEvent *e) // ditto
 {
     e->ignore() ;
 }
