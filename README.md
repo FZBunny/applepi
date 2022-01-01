@@ -11,7 +11,7 @@ This is only up to version 0.2.0, so expect bugs.   You can report them to jbwar
 To get a copy, go to "Releases" on the right of this page, download a .deb file, then use: 
 
 ###  ``` sudo apt install ./applepi-(rev-&-arch).deb``` 
---- Note that the "./" is necessary ---
+##### --- Note that the "./" is necessary ---
    
    
 - During installation, a 'desktop' file should have been dropped on your desktop.  If not, copy it manually: ```cp /usr/share/applepi/applepi.desktop ~/Desktop``` 
