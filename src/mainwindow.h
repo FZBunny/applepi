@@ -41,6 +41,7 @@
 #include "machine.h"
 #include "applepi_button.h"
 #include "volume_dial.h"
+#include "disk_sounds.h"
 #include "gamepad.h"
 #include "config.h"
 #include "defs.h"
@@ -56,6 +57,7 @@
 
 class Machine ;
 class VolumeDial ;
+class DiskSounds ;
 
 
 class MainWindow : public QMainWindow
@@ -87,7 +89,8 @@ public:
     void pastingText (bool pasting) ;
 
     void trapTraceIsStopping (void) ;
- void play (int n) ;   
+    void play (int n) ;  
+
     Speaker* speaker (void) ;
 
     void onPowerButton   (void) ;
@@ -135,6 +138,8 @@ private:
     bool    m_firstTimerEvent ;
     int     m_scaleButtonKludge ;
     int     m_soundNumber ;
+
+    DiskSounds* m_diskSounds ;
 
     ApplepiButton* m_powerButton ;
     ApplepiButton* m_floppy1Button ;

@@ -1,7 +1,7 @@
 
 
-#ifndef DISKIISOUNDS_H
-#define DISKIISOUNDS_H
+#ifndef DISKSOUNDS_H
+#define DISKSOUNDS_H
 
 #include "mainwindow.h"
 #include "defs.h"

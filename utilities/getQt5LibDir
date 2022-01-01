@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # A simple script to find the Qt5 library directory.
-# This may or may not work of other operating systems...
+# This may or may not work on other operating systems...
 #
 
 corepath=`find /usr/lib -name libQt5Core.so`

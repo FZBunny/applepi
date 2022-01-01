@@ -11,7 +11,6 @@ DESTDIR=bin
 INCLUDEPATH += .
 LIBS += -L/usr/lib/x86_64-linux-gnu/alsa-lib -lasound -no-pie
 QT += widgets printsupport gamepad multimedia
-RESOURCES = resources.qrc
 
 
 # The following define makes your compiler warn you if you use any
@@ -34,6 +33,7 @@ HEADERS += src/about.h \
            src/defs.h \
            src/device_roms.h \
            src/disassembler.h \
+           src/disk_sounds.h \
            src/disassemble_memory_dialog.h \
            src/floppy_controller.h \
            src/floppy_dialog.h \
@@ -70,6 +70,7 @@ SOURCES += src/about.cpp \
            src/defs.cpp \
            src/disassembler.cpp \
            src/disassemble_memory_dialog.cpp \
+           src/disk_sounds.cpp \
            src/fetch.cpp \
            src/floppy_controller.cpp \
            src/floppy_dialog.cpp \
@@ -87,6 +88,7 @@ SOURCES += src/about.cpp \
            src/printer.cpp \
            src/rom_dialog.cpp \
            src/screen.cpp \
+           src/step1_wav.cpp \
            src/store.cpp \
            src/traptrace.cpp \
            src/usleep.cpp \
