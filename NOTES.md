@@ -4,7 +4,7 @@ don't use "qmake -project" to recreate the .pro file. But if you must, add the f
 
 `QMAKE_CXXFLAGS += -Wno-implicit-fallthrough -Wno-deprecated-declarations`   
 `LIBS += -L/usr/lib/x86_64-linux-gnu/alsa-lib -lasound -no-pie`   
-`QT += widgets   printsupport   gamepad  webenginewidgets`   
+`QT += widgets   printsupport   gamepad  multimedia`  
 `OBJECTS_DIR=obj`  
 `DESTDIR=bin`   
   
@@ -14,7 +14,7 @@ You will also have to remove tape.cpp, tape\_dialog.cpp, tape.h, and tape_dialog
 #### Shortcomings and known bugs
 
 
-- The 'Apple //e enhanced' emulation has several bugs and anomalies. No ideas when they might be resolved.   
+- The 'Apple //e enhanced' emulation has several bugs and anomalies. No ideas when they might be resolved.   multimedia
 - The same character-set ROMS are used for all AppleII models. This results in older models anachronistic access to the enhanced character ROM.  I am also not certain that the character ROMS are otherwise accurate.  To be fixed eventually.
 - Only later versions of the ProDOS uitlities can be used to format disk II floppies. They will warn that the drive is too fast, but will succeed. The earliest ProDOS utility will immediately claim the drive is too fast, and abandon the operation.
 - ApplePi emulates a 65C02 (not the original 6502) processor, whether or not the IIe enhanced model is selected. This saves code, and few will care.  
