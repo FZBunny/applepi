@@ -1,7 +1,6 @@
 
 <!DOCTYPE RCC><RCC version="5.0">
 <qresource>
-    <file>sounds/calibrate1.wav</file>
     <file>sounds/step1.wav</file>
 </qresource>
 </RCC>

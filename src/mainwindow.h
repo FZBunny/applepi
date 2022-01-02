@@ -41,7 +41,7 @@
 #include "machine.h"
 #include "applepi_button.h"
 #include "volume_dial.h"
-#include "disk_sounds.h"
+// #include "disk_sounds.h"
 #include "gamepad.h"
 #include "config.h"
 #include "defs.h"
@@ -57,7 +57,7 @@
 
 class Machine ;
 class VolumeDial ;
-class DiskSounds ;
+// class DiskSounds ;
 
 
 class MainWindow : public QMainWindow
@@ -139,7 +139,7 @@ private:
     int     m_scaleButtonKludge ;
     int     m_soundNumber ;
 
-    DiskSounds* m_diskSounds ;
+//    DiskSounds* m_diskSounds ;
 
     ApplepiButton* m_powerButton ;
     ApplepiButton* m_floppy1Button ;

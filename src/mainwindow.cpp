@@ -125,7 +125,7 @@ MainWindow::MainWindow (void)
     m_screen->move (8,m_barHeight) ;
     m_screen->resize (m_screenSize) ;
     
-    m_diskSounds = new DiskSounds() ;
+ //   m_diskSounds = new DiskSounds() ;
 
     m_led_bright_red   = QIcon (QPixmap(xpm_led_bright_red)) ;
     m_led_dim_red      = QIcon (QPixmap(xpm_led_dim_red)) ;
@@ -743,7 +743,6 @@ void MainWindow::setProdosDateTime (void)
 
 }
 
-/*****   Using Qt5 Multimedia module
 
 void MainWindow::onPlayDriveSoundTimer (void)
 {
@@ -757,9 +756,8 @@ void MainWindow::onPlayDriveSoundTimer (void)
     }
 }
 
-******   Below:  using SDL     *****/
 
-
+/************************************************
 void MainWindow::onPlayDriveSoundTimer (void)
 {
     switch (m_soundNumber) {
@@ -771,7 +769,7 @@ void MainWindow::onPlayDriveSoundTimer (void)
             break ;
     }
 }
-
+************************************************/
 
 
 

@@ -53,13 +53,13 @@ extern const char* xpm_hires_1[] ;
 
 extern const char* xpm_redapple[] ;
 
-
+/*****
 // This is a .wav file, rather than an XPM;
 // just a convenient place to put it.
 
 #include <QtGlobal>
 extern const quint8* step1_wav ;
-
+*****/
 
 #endif
 
