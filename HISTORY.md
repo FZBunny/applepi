@@ -53,3 +53,10 @@ Added ability to print to PDF files.  'Print Shop' now works, but only one sheet
 Reworked method of displaying help (again).  Help has been brought up-to-date.
 - **utilities directory**  
 Moved source code for several small utility programs from src directory, and added a separate makefile for them.
+
+#### V 0.2.1
+- This release was simply a bug fix to the gamepad code.
+
+#### V 0.2.2
+- Added DiskII head sounds.
+- Affected source files: applepi-qt.pro, resources.qrc, floppy\_controller.cpp, lin-speaker.cpp, mainwindow.cpp, mainwindow.h, version.h, volume\_dial.cpp
