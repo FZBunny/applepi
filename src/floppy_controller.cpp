@@ -357,10 +357,8 @@ DBUG(0x0004) ("phase1_off m_trackTimes2[%i] = %2i\n", m_currentDrive, m_trackTim
 void FloppyDiskController::phase1_on  (void)
 {
     m_pole[m_currentDrive][1] = true ;
-//    MAC->fetch (0xc030) ;                    // Toggle the speaker to provide a sad excuse for a head-step sound
-//    main_window->speaker()->toggleSpeaker() ;
-//    main_window->m_diskIISounds->play (DiskIISounds::STEP1) ;
-    main_window->play (1) ;
+
+    main_window->play (1) ;           // Play a 'head step' .wav file from resources
 
     if (m_stepperPhase[m_currentDrive] == 2) {
         m_trackTimes2[m_currentDrive] -= 1 ;

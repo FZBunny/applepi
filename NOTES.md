@@ -1,6 +1,3 @@
-## ----------------- oops. -------------------
-## A warning, 2022-01-01:  ApplePi will fail to build on PiOS due to a missing multimedia module. Code using this module will be rewritten in the next few days.
-## ----------------- /oops-------------------
 
 #### A warning when building from source  
 ApplePi uses the Qt5 library.

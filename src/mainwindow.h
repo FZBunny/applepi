@@ -57,7 +57,6 @@
 
 class Machine ;
 class VolumeDial ;
-// class DiskSounds ;
 
 
 class MainWindow : public QMainWindow
@@ -138,8 +137,6 @@ private:
     bool    m_firstTimerEvent ;
     int     m_scaleButtonKludge ;
     int     m_soundNumber ;
-
-//    DiskSounds* m_diskSounds ;
 
     ApplepiButton* m_powerButton ;
     ApplepiButton* m_floppy1Button ;
