@@ -106,7 +106,7 @@ void Printer::close (void)
 //  This is called by Machine::fetch when fetching a byte from our fictitious printer ROM.
 //  This usually occurs when fetching 3 butes for a JSR $C100 (When a "PR#1" is entered),
 //  or 3 bytes when a JSR $C110 is executed to print a single character.
-//  ProDOS may also fetch single bytes when attempting to identify the device in slot 1. 
+//  ProDOS will also fetch single bytes when attempting to identify the device in slot 1. 
 
 quint8 Printer::fetch_Printer_ROM (int slotNumber, quint8 p)
 {                              
@@ -123,9 +123,9 @@ quint8 Printer::fetch_Printer_ROM (int slotNumber, quint8 p)
     if ((calledFrom==m_slotAddr)   && ((p==0x01) || (p==0x02))) return 0 ;
     if ((calledFrom==entryPoint) && ((p==0x11) || (p==0x12))) return 0 ;
 
-    if ((p==0) && (calledFrom==m_slotAddr)) {                        // Did someone say "PR#1" ?
+    if ((p==0) && (calledFrom==m_slotAddr)) {                      // Did someone say "PR#1" ?
         MAC->m_ram[0x36] = 0x10 ;            // Set the character output vector
-        MAC->m_ram[0x37] = m_slotAddr >> 8 ;   // to point to us
+        MAC->m_ram[0x37] = m_slotAddr >> 8 ; // to point to us
         ps->Areg = 0 ;
         ps->Pstat &= C ^ 0xff ;
         c = RTS ;

@@ -74,11 +74,13 @@ void MainWindow::createMenus (void)
     m_fileMenu->addAction (m_selectRomFile) ;
     connect (m_selectRomFile, &QAction::triggered, this, &MainWindow::onSelectRom) ;
 
-    m_selectPrint = m_fileMenu->addMenu (tr("Print to File")) ;
+//    m_printPrinter = m_fileMenu->addAction (tr("Print...")) ;
+    m_filePrint = m_fileMenu->addMenu (tr("Print to File")) ;
     m_printPDF = new QAction ("Print a PDF...") ;
     m_printText    = new QAction ("Print Text...") ;
-    m_selectPrint->addAction (m_printText) ;
-    m_selectPrint->addAction (m_printPDF) ;
+    m_filePrint->addAction (m_printText) ;
+    m_filePrint->addAction (m_printPDF) ;
+//    connect (m_printPrinter, &QAction::triggered, this, &MainWindow::onPrintPrinter) ;
     connect (m_printText,    &QAction::triggered, this, &MainWindow::onPrintText) ;
     connect (m_printPDF,     &QAction::triggered, this, &MainWindow::onPrintPDF) ;
 
@@ -156,6 +158,31 @@ void MainWindow::onSelectRom (void)
     delete dlg ;
 }
 
+/***
+#ifdef Q_OS_WINDOWS
+
+#else
+
+void MainWindow::onPrintPrinter (void)
+{
+    QPrinter printer ;
+    QPrintDialog dlg (&printer, this) ;
+    if (dlg.exec()) {
+printf ("OK\n") ;
+        QPrinterInfo printerInfo (printer) ;
+qStdOut() << "printer info = \"" << printerInfo.description() << "\"" << endl ;
+qStdOut() << "printer name = \"" << printerInfo.printerName() << "\"" << endl ;
+        int pid = fork() ;
+        char* dummyArg = NULL ;
+        if (pid == 0) {
+//            m_closePrinterButton->show() ;
+//            
+        }
+    }
+}
+
+#endif
+***/
 
 void MainWindow::onPrintText (void)
 {
@@ -196,7 +223,7 @@ void MainWindow::openPrintFile (QString suffix)
                 CFG->Set (fileKey, dir2) ;
                 m_closePrinterButton->show() ;
 //qStdOut() << "suffix = " << suffix << endl ;
-                m_selectPrint->setEnabled (false) ;
+                m_filePrint->setEnabled (false) ;
             } else {
                 QErrorMessage* msg = new QErrorMessage (this) ;
                 QString text ;

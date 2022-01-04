@@ -281,23 +281,6 @@ void Machine::closeEchoFile (void)
     m_echoToFile = NULL ;
 }
 
-/**
-void Machine::setFloppySound(quint8& floppySound, int  len)
-{
-//    m_floppyPCM = floppySound ;
-//    m_floppyPCMLength = len ;
-}
-
-
-bool Machine::getFloppySound(quint8* sound, int* len)
-{
-//    if (m_floppyPCM == 0) return false ;
-
-//    *sound = m_floppyPCM ;
-//    *len = m_floppyPCMLength ;
-    return true ;
-}
-**/
 
 void Machine::setTrap (uint trapIndex, QString addressString , bool flag)
 {
@@ -547,7 +530,7 @@ void Machine::sprint_6502_registers (ProcessorState& regs, char* buffer)
 {
     quint8 p = regs.Pstat ;
 
-    static quint8 processorType [256] =    //  0 : 6502
+    static quint8 processorType [256] =     //  0 : 6502
     {// 0 1 2 3 4 5 6 7 8 9 A B C D E F     //  1 : 65C02
 /* 0 */ 0,0,0,0,2,0,0,2,0,0,0,0,2,0,0,2,    //  2 : Rockwell & WDC additions to 65C02
 /* 1 */ 0,0,1,0,2,0,0,2,0,0,1,0,2,0,0,2,    //  3 : WDC-only additions to 65C02

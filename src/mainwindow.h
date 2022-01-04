@@ -36,6 +36,8 @@
 #include <QDial>
 #include <QPushButton>
 
+#include <unistd.h>
+
 #include "screen.h"
 #include "traptrace.h"
 #include "machine.h"
@@ -138,6 +140,8 @@ private:
     int     m_scaleButtonKludge ;
     int     m_soundNumber ;
 
+//    struct fd_pair m_printPipe ;
+
     ApplepiButton* m_powerButton ;
     ApplepiButton* m_floppy1Button ;
     ApplepiButton* m_floppy2Button ;
@@ -175,8 +179,8 @@ private:
 
 // File actions:
     QAction* m_selectRomFile ;
-    QMenu*   m_selectPrint ;
     QAction* m_printPrinter ;
+    QMenu*   m_filePrint ;
     QAction* m_printText ;
     QAction* m_printPDF ;
     QAction* m_exit;

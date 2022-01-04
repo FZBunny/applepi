@@ -914,7 +914,8 @@ void MainWindow::onClosePrinterButton (void)
 {
     m_mac->m_printer->close() ;
     m_closePrinterButton->hide() ;
-    m_selectPrint->setEnabled (true) ;
+    m_filePrint->setEnabled (true) ;
+//    m_printPrinter->setEnabled (true) ;
 }
 
 
