@@ -584,7 +584,7 @@ void MainWindow::pasteToKeyboard (void)
 
 
 // 'pastingText' is called by the Paste thread to indicate when
-//  it is pasting (a slow operation), and when it has finished.
+//  it is pasting (a very slow operation), and when it has finished.
 
 void MainWindow::pastingText (bool pasting)
 {
