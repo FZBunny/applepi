@@ -583,7 +583,7 @@ void Screen::refreshScreen (void)
     quint8 rd80Col    = MAC->m_ss[0x01f] ;
     quint8 rdDblHiRes = MAC->m_ss[0x07f] ;
 
-    int flashCount = 5 ;
+    int flashCount = 6 ;
     if (RdAltChar) {
          m_flash = false ;               // (Nothing in alt.char set flashes.)
     } else {
