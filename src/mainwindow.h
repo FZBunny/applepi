@@ -35,6 +35,7 @@
 #include <QSlider>
 #include <QDial>
 #include <QPushButton>
+#include <QSoundEffect>
 
 #include <unistd.h>
 
@@ -69,8 +70,7 @@ public:
     MainWindow (void) ;
     ~MainWindow();
 
-    Machine*      m_mac ;
-
+    Machine*   m_mac ;
     Config*    m_cfg ;
     Gamepad*   m_gamepad ;
 
@@ -113,6 +113,7 @@ private:
 
     Speaker*      m_speaker ;
     Screen*       m_screen ;
+    QWidget*      m_screenBorder ;
     
     bool    m_powerButtonState ;
     bool    m_currentlyPastingText ;
@@ -139,6 +140,8 @@ private:
     bool    m_firstTimerEvent ;
     int     m_scaleButtonKludge ;
     int     m_soundNumber ;
+
+    QSoundEffect m_soundEffect;
 
 //    struct fd_pair m_printPipe ;
 

@@ -44,7 +44,9 @@ using namespace std ;
 #include <QDebug>
 #include <QDate>
 #include <QTime>
+#include <QAudio>
 #include <QSound>
+#include <QPalette>
 
 #include "defs.h"
 #include "machine.h"
@@ -121,8 +123,17 @@ MainWindow::MainWindow (void)
     m_barHeight = this->menuBar()->size().height() ;  // ( height == 30)
 
     m_screen = new Screen (this) ; 
-    m_screen->move (8,m_barHeight) ;
+    m_screen->move (8,m_barHeight+2) ;
     m_screen->resize (m_screenSize) ;
+
+    m_screenBorder = new QWidget (this) ;
+    m_screenBorder->move (4,m_barHeight-2) ;
+    m_screenBorder->stackUnder (m_screen) ;
+    QPalette p ;
+    p.setColor (QPalette::Background, Qt::black) ;
+    m_screenBorder->setPalette (p) ;
+    m_screenBorder->setAutoFillBackground (true) ;
+    m_screenBorder->show() ;
 
     m_led_bright_red   = QIcon (QPixmap(xpm_led_bright_red)) ;
     m_led_dim_red      = QIcon (QPixmap(xpm_led_dim_red)) ;
@@ -223,8 +234,10 @@ MainWindow::MainWindow (void)
     uint volume ;
     m_cfg->Get ("speaker_volume", &volume) ;
     m_speaker = new Speaker (this) ;
-    m_speaker->setVolume (float(volume)) ;
     m_speaker->start() ;
+    m_soundEffect.setLoopCount (1) ;
+
+    this->setVolume (float(volume)) ;
 
     m_dial = new VolumeDial (this, 60, 60) ;
     m_gamepad = new Gamepad(this) ;
@@ -746,7 +759,9 @@ void MainWindow::onPlayDriveSoundTimer (void)
     switch (m_soundNumber) {
         case 1:
             m_soundNumber = 0 ;
-            QSound::play (":/sounds/step1.wav") ;
+m_soundEffect.setSource(QUrl::fromLocalFile(":/sounds/step1.wav")) ;
+m_soundEffect.play();
+//            QSound::play (":/sounds/step1.wav") ;
             break ;
         default:
             break ;
@@ -797,6 +812,8 @@ void MainWindow::resizeWindow (void)
         m_floppy2Label->move (floppy2ButtonX+piXAdjust, row1ButtonY+25) ;
         m_hd1Label->move (floppy2ButtonX-buttonWidth-5+piXAdjust, row2ButtonY+25) ;
         m_hd2Label->move (floppy2ButtonX+piXAdjust, row2ButtonY+25) ;
+
+        m_screenBorder->resize (SCREEN_PIXELS_WIDTH+8, SCREEN_PIXELS_HEIGHT+8) ;
     } else {                                                                         // Big screen
         this->resize (MAX_MAINWINDOW_WIDTH, MAX_MAINWINDOW_HEIGHT) ;
         floppy2ButtonX = this->size().width()/2 - buttonWidth/2 ;
@@ -820,10 +837,12 @@ void MainWindow::resizeWindow (void)
         m_floppy2Label->move (floppy2ButtonX+piXAdjust, row1ButtonY+25) ;
         m_hd1Label->move (floppy2ButtonX-buttonWidth-60+piXAdjust, row2ButtonY+25) ;
         m_hd2Label->move (floppy2ButtonX+piXAdjust, row2ButtonY+25) ;
+
+        m_screenBorder->resize (2*SCREEN_PIXELS_WIDTH+8, 2*SCREEN_PIXELS_HEIGHT+8) ;
     }
     m_dial->move (volumeX, volumeY) ;
     m_volText->move (volumeX+5, volumeY+55) ;
-
+    
 }
 
 
@@ -921,12 +940,16 @@ void MainWindow::onClosePrinterButton (void)
 
 void MainWindow::setVolume (int volume)
 {
-    m_speaker->setVolume (float(volume)) ;
+    m_speaker->setVolume (float(volume)) ;       // This is for the AppleII 'speaker'
+
+    qreal linearVolume = QAudio::convertVolume (float(volume)/100.0,
+                                                QAudio::LogarithmicVolumeScale,
+                                                QAudio::LinearVolumeScale) ;
+    m_soundEffect.setVolume (linearVolume) ;    // This is for recorded head-stepper sounds
 }
 
 
 void MainWindow::play (int n)
 {
-//putchar ('x') ;  fflush (stdout) ;
     m_soundNumber = n ;
 }

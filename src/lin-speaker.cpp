@@ -207,7 +207,7 @@ void Speaker::setVolume (float value)
     if (value > 100) value = 100 ;
     if (value < 0)   value = 0 ;
 
-    float volume = 1.28 * (value*value / 100) ;
+    float volume = 0.4 * (value*value / 100) ;   // ("0.4" is just a number that is roughly OK)
 
     m_hi = MID + volume ;
     m_lo = MID - volume ;

@@ -97,18 +97,17 @@ void write1LineOfBits (u_char c, int charNo, char* line)
 void write40ColChar (u_char* rom, int charNo)
 {
     char line[80] ;
-
+    if (charNo == 0x80) invert = ! invert ;
+//fprintf (stderr, "charNo=%2.2x  invert=%i\n", charNo, invert) ;
     for (int outputLine=0; outputLine<8; outputLine++) {
         line[0] = 0 ;
         strcat (line, "    \"") ;
         u_char c = rom[outputLine+(charNo*8)] ;
         write1LineOfBits (c, charNo, line) ;
         if (invert) {
-            if (charNo < 0x80) strcat (line, "--\",") ;
-            else               strcat (line, "XX\",") ;
+            strcat (line, "--\",") ;
         } else {
-            if (charNo < 0x80) strcat (line, "XX\",") ;
-            else               strcat (line, "--\",") ;
+            strcat (line, "XX\",") ;
         }
         if (outputLine == 0) {
             char charNoString[16] ;
@@ -117,14 +116,7 @@ void write40ColChar (u_char* rom, int charNo)
         }
 
         puts (line) ;
-
-        if (invert) {
-            if (charNo < 0x80) puts ("    \"----------------\",") ;
-            else               puts ("    \"XXXXXXXXXXXXXXXX\",") ;
-        } else {
-            if (charNo < 0x80) puts ("    \"XXXXXXXXXXXXXXXX\",") ;
-            else               puts ("    \"----------------\",") ;
-        }
+        puts ("    \"----------------\",") ;
     }
     puts ("\n") ;
 }
@@ -170,7 +162,7 @@ int main (int argc, char* argv[])
 
 // --------------------------------------------
 
-    puts   ("const char* xpm_XXXXX[] =") ;
+    puts   ("const char* xpm_40ColChars[] =") ;
     puts   ("{") ;
     printf ("    \"16 %i 2 1\",\n", romLen*2) ;
     puts   ("    \"X c #ffffff\",") ;

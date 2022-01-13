@@ -293,7 +293,7 @@ void Screen::drawLine_40 (uchar *characters, int dstX, int dstY)
 
     for (int i=0; i<40; i++) {
         quint8 c =  characters[i] ;
-        if (m_flash && (RdAltChar == OFF) && (c > 0x3f) && (c < 0x80))  c -= 0x40 ;
+        if (m_flash && (RdAltChar == OFF) && (c > 0x3f) && (c < 0x80))  c += 0x80 ;
         int srcPixmapOffset = 16 * c ;
         painter.drawPixmap (dstX+(14*i), dstY, *cSet, 0, srcPixmapOffset, 14, 16) ; // draw a single character
     }
@@ -589,7 +589,7 @@ void Screen::refreshScreen (void)
     } else {
         if (m_flashCounter-- <= 0) {
              m_flashCounter = flashCount ;
-             m_flash = !m_flash ;
+             m_flash = ! m_flash ;
         }
     }
 
