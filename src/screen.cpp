@@ -165,12 +165,13 @@ void Screen::initialize (void)
     m_screenBuffer = QPixmap (m_pixelsWidth, m_pixelsHeight) ;
     m_screenBuffer.fill (Qt::black) ;
 
-    m_flashCounter = 0 ;
+    m_flashCounter = FLASHDELAY ;
     m_flash = false ;
 
-    m_refreshTimer = new QTimer() ;
-    connect (m_refreshTimer, &QTimer::timeout, this, &Screen::refreshScreen) ;
-    m_refreshTimer->start (FAST) ;
+    if ( ! m_refreshTimer.isActive()) {  // Necessary test to avoid multiple triggering...
+        connect (&m_refreshTimer, &QTimer::timeout, this, &Screen::refreshScreen) ;
+        m_refreshTimer.start (FAST) ;
+    }
  
     this->show() ;
     this->update (this->rect()) ;
@@ -584,12 +585,11 @@ void Screen::refreshScreen (void)
     quint8 rd80Col    = MAC->m_ss[0x01f] ;
     quint8 rdDblHiRes = MAC->m_ss[0x07f] ;
 
-    int flashCount = 6 ;
     if (RdAltChar) {
          m_flash = false ;               // (Nothing in alt.char set flashes.)
     } else {
-        if (m_flashCounter-- <= 0) {
-             m_flashCounter = flashCount ;
+        if (--m_flashCounter < 0) {
+             m_flashCounter = FLASHDELAY ;
              m_flash = ! m_flash ;
         }
     }
@@ -607,15 +607,15 @@ void Screen::refreshScreen (void)
          && rdText == OFF
          && rd80Col)
     {
-        if (m_refreshTimer->interval() == FAST) {    // Use a slow refresh speed when displaying double hi-res to
-             m_refreshTimer->setInterval (SLOW) ;    // give Raspberry Pi CPUs a break.
+        if (m_refreshTimer.interval() == FAST) {    // Use a slow refresh speed when displaying double hi-res to
+             m_refreshTimer.setInterval (SLOW) ;    // give Raspberry Pi CPUs a break.
         }
         writeDoubleHiRes (page2) ;
         QWidget::update (this->rect()) ;
         return ;
     } else {
-        if (m_refreshTimer->interval() == SLOW) {
-            m_refreshTimer->setInterval (FAST) ;
+        if (m_refreshTimer.interval() == SLOW) {
+            m_refreshTimer.setInterval (FAST) ;
         }
     }
 

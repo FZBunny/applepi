@@ -68,9 +68,10 @@ private:
     const int m_pixelsWidth  = 560 ;
     const int m_pixelsHeight = 384 ;
     
-    QTimer*  m_refreshTimer ;
+    QTimer  m_refreshTimer ;
     const int SLOW = 200 ;   // mSec delay for slow timer (for double hi-res)
     const int FAST = 50 ;    // "            " fast timer (for everything else)
+    const int FLASHDELAY = 9 ;
 
     bool      m_flash ;         // Flag for flashing characters on screen
     int       m_flashCounter ;  // Counter for selecting which flash mask to apply
