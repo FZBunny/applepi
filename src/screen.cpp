@@ -287,12 +287,11 @@ void Screen::drawLine_40 (uchar *characters, int dstX, int dstY)
     QPainter painter (&m_screenBuffer) ;
 
     quint8 RdAltChar = MAC->m_ss[0x01e] ;
-    QPixmap* cSet ;
-    if (RdAltChar) cSet = &m_pixmap_40ColumnAlternate ;
-    else           cSet = &m_pixmap_40ColumnPrimary ;
+    QPixmap* cSet = &m_pixmap_40ColumnPrimary ;
 
     for (int i=0; i<40; i++) {
         quint8 c =  characters[i] ;
+        if (RdAltChar) c += 0x100 ;
         if (m_flash && (RdAltChar == OFF) && (c > 0x3f) && (c < 0x80))  c += 0x80 ;
         int srcPixmapOffset = 16 * c ;
         painter.drawPixmap (dstX+(14*i), dstY, *cSet, 0, srcPixmapOffset, 14, 16) ; // draw a single character
@@ -323,7 +322,7 @@ void Screen::draw40Column (int firstLine, quint8 *loresData)
 
 void Screen::drawLine_80 (int x, int y, quint8 *main, quint8 *aux)
 {
-    int i, charOffM, charOffA, dest_xM, dest_xA ;
+    int i, charOffM, charOffA, dest_xM, dest_xA ;  // (M->main; A->Auxiliary)
     QPainter painter(&m_screenBuffer) ;
 
     quint8 RdAltChar = MAC->m_ss[0x01e] ;
@@ -334,10 +333,12 @@ void Screen::drawLine_80 (int x, int y, quint8 *main, quint8 *aux)
     quint8 c ;
     for (i=0; i<40; i++) {
         c = main[i] ;
-        if (m_flash && (RdAltChar == OFF) && (c > 0x3f) && (c < 0x80))  c -= 0x40 ;
+        if (RdAltChar) c += 0x100 ;
+        if (m_flash && (RdAltChar == OFF) && (c > 0x3f) && (c < 0x80))  c += 0x80 ;
         charOffM = 16 * c ;
         c = aux[i] ;
-        if (m_flash && (RdAltChar == OFF) && (c > 0x3f) && (c < 0x80))  c -= 0x40 ;
+        if (RdAltChar) c += 0x100 ;
+        if (m_flash && (RdAltChar == OFF) && (c > 0x3f) && (c < 0x80))  c += 0x80 ;
         charOffA = 16 * c ;
 
         dest_xA = x + i*14 ;
