@@ -632,6 +632,7 @@ Qt::GroupSwitchModifier	0x40000000	X11 only (unless activated on Windows by a co
 void MainWindow::keyPressEvent (QKeyEvent *e)
 {
     int c = e->key() ;
+
     Qt::KeyboardModifiers mods = e->modifiers() ;
     quint32 nvkey = e->nativeVirtualKey() ;           // left alt  (open apple)   == 0000ffe9
     if ((nvkey==0xffe9) || (nvkey==0xffea))  return ; // right alt (closed apple) == 0000ffea  (c=$23 for either)
@@ -651,6 +652,9 @@ void MainWindow::keyPressEvent (QKeyEvent *e)
             c = 0x0d ;
             break ;
         case Qt::Key_Backspace:
+            c = 0x08 ;
+            break ;
+        case Qt::Key_Delete:
             c = 0x7f ;
             break ;
         case Qt::Key_Left:
