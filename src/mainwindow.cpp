@@ -651,7 +651,7 @@ void MainWindow::keyPressEvent (QKeyEvent *e)
             c = 0x0d ;
             break ;
         case Qt::Key_Backspace:
-            c = 0x08 ;
+            c = 0x7f ;
             break ;
         case Qt::Key_Left:
             c = 0x08 ;
