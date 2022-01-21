@@ -33,7 +33,7 @@
 #include <QTextStream>
 #include <stdio.h>
 
-#include "defs.h"
+//#include "defs.h"
 
 
 

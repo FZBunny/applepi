@@ -34,7 +34,6 @@
 #  include <unistd.h>
 #endif
 
-
 #include "defs.h"
 #include "disassembler.h"
 #include "debugging_dumps.h"
