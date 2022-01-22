@@ -42,11 +42,12 @@
 #include <fcntl.h>
 #include <errno.h>
 
-#include <QTextStream>
-#include <QFile>
-#include <QFileInfo>
+// #include <QTextStream>
+//#include <QFile>
+//#include <QFileInfo>
 
-#include "defs.h"
+//QTextStream& qStdOut() ;        // A Qt-friendly replacement for 'cout'
+//#include "defs.h"
 #include "disassembler.h"
 
 
@@ -132,33 +133,40 @@ int main (int argc, char *argv[])
 
 // -----------------------------------------------------
 
-    QString fileName (name) ;
-
-    QFile file (fileName) ;
-    if (file.isOpen() == false) exit(1) ;
-    QFileInfo fInfo (fileName) ;
-    int fileLength = fInfo.size() ;
+    int fd = open (name, O_RDONLY) ;
+    if (fd < 0) {
+        fprintf (stderr, "Can't open file \"%s\": %s\n", name, strerror(errno)) ;
+        exit(1) ;
+    }
 
     const int BUFFERSIZE = 0x10000 ;        // (This is all that a 16-bit address is good for...)
     quint8 buffer[BUFFERSIZE] ;
 
+    struct stat status ;
+    fstat (fd, &status) ;
+    off_t fileLength = status.st_size ;
+    int len = fileLength ;
+    if (fileLength > BUFFERSIZE) {
+        fprintf (stderr, "\nFile \"%s\" is too large; truncating disasssembly to 64K.\n\n", name) ;
+        len = BUFFERSIZE ;
+    }
+
     int disassembleLen = BUFFERSIZE ;
     if (cmdLen && (disassembleLen > cmdLen)) disassembleLen = cmdLen ;
-    if (disassembleLen > (fileLength - skip)) disassembleLen = fileLength - skip ;
+    if (disassembleLen > (len - skip)) disassembleLen = len - skip ;
     uint endAddress = startAddress + disassembleLen - 1 ;
 
-    if (skip) file.seek (skip) ;
+    if (skip) lseek (fd, skip, SEEK_SET) ;
 
-    int readLen = fileLength - skip ;
+    int readLen = len - skip ;
     if (readLen > BUFFERSIZE) readLen = BUFFERSIZE ;
 
-    int n = file.read ((char*)buffer, readLen) ;
-    if (n == -1) {
-        printf ("Error: Can't read file \"%s\": %s\n", name, strerror(errno)) ;
-        usage() ;
+    int n = read (fd, buffer, readLen) ;
+    if (n == -1) {        
+        fprintf (stderr, "Error reading \"%s\": %s\n", name, strerror(errno)) ;
         exit(1) ;
     }
-    file.close() ;
+    close (fd) ;
 
     disassemble (buffer, startAddress, endAddress) ;
 

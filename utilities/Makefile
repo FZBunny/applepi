@@ -16,8 +16,8 @@ endif
 
 
 # EXECS = $(BIN)/7bits  $(BIN)/create-printer-pins-xpm  $(BIN)/disassemble  $(BIN)/prodos  $(BIN)/video-40col-rom-to-xpm  (prodos.cpp is in bad shape. Ignore for now.)
-EXECS = $(BIN)/7bits  $(BIN)/create-printer-pins-xpm  $(BIN)/disassemble   $(BIN)/video-40col-rom-to-xpm
-OBJS = $(OBJ)/7bits.o  $(OBJ)/create-printer-pins-xpm.o  $(OBJ)/disassemble.o   $(OBJ)/video-40col-rom-to-xpm.o
+EXECS = $(BIN)/7bits  $(BIN)/create-printer-pins-xpm   $(BIN)/disassemble   $(BIN)/video-40col-rom-to-xpm   $(BIN)/video-40col-rom-to-xpm
+OBJS = $(OBJ)/7bits.o  $(OBJ)/create-printer-pins-xpm.o  $(OBJ)/disassemble.o   $(OBJ)/video-40col-rom-to-xpm.o  $(OBJ)/video-80col-rom-to-xpm.o
 
 all:
 	$(MAKE) $(EXECS)
@@ -51,6 +51,9 @@ $(BIN)/create-printer-pins-xpm: create-printer-pins-xpm.cpp
 
 $(BIN)/video-40col-rom-to-xpm: video-40col-rom-to-xpm.o
 	$(CXX) $(CXXFLAGS)  video-40col-rom-to-xpm.cpp   -o $(BIN)/video-40col-rom-to-xpm$(EXE)
+
+$(BIN)/video-80col-rom-to-xpm: video-80col-rom-to-xpm.o
+	$(CXX) $(CXXFLAGS)  video-80col-rom-to-xpm.cpp   -o $(BIN)/video-80col-rom-to-xpm$(EXE)
 
 $(BIN)/disassemble: $(OBJ)/disassembler.o disassemble.cpp
 	$(CXX) $(CXXFLAGS)  disassemble.cpp -I../src -I$(QTINCDIR) -I$(QTINCDIR)/QtGui -I$(QTINCDIR)/QtWidgets -I$(QTINCDIR)/QtGamepad -I$(QTINCDIR)/QtCore $(LDFLAGS) $(OBJ)/disassembler.o  -L$(QTLIBS) -lQt5Core -o $(BIN)/disassemble$(EXE)
