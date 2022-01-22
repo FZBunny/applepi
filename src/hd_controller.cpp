@@ -91,7 +91,6 @@ quint8 HdController::fetch_HD_ROM (int slotNumber, quint8 p)
                     ps->pc.pc_16 = 0x0801 ;                  // (The code on the 1st block takes care of the rest.)
                     c  = NOP ;
                 } else {                                     // No disk in drive; tell ROM to try slot 6.
-                //    m_mac->store (0xd6, 0x01) ;
                     ps->pc.pc_16 = SLOOP ;
                     c = NOP ;
                 }
@@ -144,7 +143,7 @@ quint8 HdController::fetch_HD_ROM (int slotNumber, quint8 p)
             break ;
         default:
 //printf ("2...fetch_HD_ROM, p=%2.2x\n", p) ;
-        c = 0 ;
+            c = 0 ;
             break ;
     }
 
@@ -159,7 +158,7 @@ int HdController::IO (void)
     int block = m_mac->fetch(0x47) << 8 | m_mac->fetch(0x46) ;
     quint8 operation = m_mac->fetch(0x42) ;
     if (m_mac->fetch(0x43) & 0x80)  m_driveIndex = 1 ;
-    else                          m_driveIndex = 0 ;
+    else                            m_driveIndex = 0 ;
 
     int stat = 0 ;
 
@@ -345,7 +344,7 @@ int HdController::status (void)        //  (See 'ProDos Tech. Notes', note 21 fo
     int stat = 0 ;
 
     if (m_mac->fetch(0x43) & 0x80) m_driveIndex = 1 ;
-    else                         m_driveIndex = 0 ;
+    else                           m_driveIndex = 0 ;
 
     if (m_file[m_driveIndex].isOpen() == false) return NODEVICE ;
 
@@ -370,9 +369,9 @@ fprintf (stderr, "*** FORMAT OPERATION NOT IMPLEMENTED ***\n") ;
 
 quint8 HdController::getDiskSize (quint8 byteNumber)
 {  
-    quint64 longSize ;   // (Coded in this eccentric way because g++ kept ) 
-    quint8*    p0 ;      // (puking on a simple 'union' statement. WTF?   )
-    quint8*    p1 ;
+    quint64  longSize ;   // (Coded in this eccentric way because g++ kept ) 
+    quint8*  p0 ;         // (puking on a simple 'union' statement. WTF?   )
+    quint8*  p1 ;
 
     longSize = (m_fileInfo[m_driveIndex].size() - m_offset[m_driveIndex]) / BLOCKSIZE ;  // (convert bytes size to blocks)
     p0 = (quint8*)&longSize ;
@@ -486,7 +485,7 @@ bool HdController::create (QString &path, int drive, int nBlocks)
 
 
 //  ------------------  SmartPort calls ----------------------
-
+//   XXXXXXXXXXXXXXXX  -NONE- of this code is called at the moment.  Maybe someday.
 
 //  Fix up the return address on the stack before returning from a SmartPort call.
 
