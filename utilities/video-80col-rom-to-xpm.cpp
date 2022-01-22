@@ -59,8 +59,8 @@ void usage (void)
 }
 
 
-bool reverse = false ;
-bool invert = false ;
+bool G_reverse = false ;
+bool G_invert = false ;
 
 void write1LineOfBits (u_char c, int charNo, char* line)
 {
@@ -71,10 +71,10 @@ void write1LineOfBits (u_char c, int charNo, char* line)
     char* light ;
     char* dark ;
 
-    if (reverse) bits = bitsDown ;
+    if (G_reverse) bits = bitsDown ;
     else         bits = bitsUp ;
 
-    if (invert) {
+    if (G_invert) {
         light = (char*)"-" ;
         dark  = (char*)"X" ;
     } else {
@@ -97,14 +97,14 @@ void write1LineOfBits (u_char c, int charNo, char* line)
 void write80ColChar (u_char* rom, int charNo)
 {
     char line[80] ;
-    if (charNo == 0x80) invert = ! invert ;
-//fprintf (stderr, "charNo=%2.2x  invert=%i\n", charNo, invert) ;
+    if (charNo == 0x80) G_invert = ! G_invert ;
+
     for (int outputLine=0; outputLine<8; outputLine++) {
         line[0] = 0 ;
         strcat (line, "    \"") ;
         u_char c = rom[outputLine+(charNo*8)] ;
         write1LineOfBits (c, charNo, line) ;
-        if (invert) {
+        if (G_invert) {
             strcat (line, "-\",") ;
         } else {
             strcat (line, "X\",") ;
@@ -116,7 +116,7 @@ void write80ColChar (u_char* rom, int charNo)
         }
 
         puts (line) ;
-        puts ("    \"----------------\",") ;
+        puts ("    \"--------\",") ;
     }
     puts ("\n") ;
 }
@@ -131,10 +131,10 @@ int main (int argc, char* argv[])
     while ((opt = getopt(argc, argv, "ir")) != -1) {
         switch (opt) {
             case 'i':
-                invert = true ;
+                G_invert = true ;
                 break ;
             case 'r':
-                reverse = true ;
+                G_reverse = true ;
                 break;
             default:
                 usage() ;
