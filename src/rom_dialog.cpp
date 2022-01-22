@@ -42,7 +42,6 @@ RomDialog::RomDialog (MainWindow* parent) : QDialog (parent)
     int windowWidth  = 300 ;
     int windowHeight = 280 ;
 
-    m_parent = parent ;
     resize (windowWidth,windowHeight) ;
     QPoint pPos = parent->pos() ;
     QSize pSize = parent->size() ;
