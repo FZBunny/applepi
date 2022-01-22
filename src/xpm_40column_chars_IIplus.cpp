@@ -1,4 +1,6 @@
-const char* xpm_XXXXX[] =
+
+
+const char* xpm_40ColChars_IIPlus[] =
 {
     "16 4096 2 1",
     "X c #ffffff",

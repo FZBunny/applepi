@@ -1,6 +1,5 @@
 
 
-
 const char*  xpm_40ColCharsEnhanced[] =
 {
     "16 4096 2 1",
