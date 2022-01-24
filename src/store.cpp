@@ -262,7 +262,7 @@ void Machine::store_sspage (quint8 c, quint16 p)
 //printf ("m_savedPC=%4.4X stored CLRALTCHAR\n", m_savedPC) ;
                     break ;
                 case 0xf:                      // C00F  RdALTCHAR on  (alternate character set)
-                    RdALTCHAR = ON ;
+                    if (m_parent->romNumber() >= APPLE2E) RdALTCHAR = ON ;
 //printf ("m_savedPC=%4.4X stored SETALTCHAR\n", m_savedPC) ;
                     break ;
             }
