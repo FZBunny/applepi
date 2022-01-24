@@ -117,8 +117,8 @@ quint8 Machine::fetch_ioSpace (quint16 p)     //  Addresses c000 - cfff
 
 
     if (p > 0xc7ff) {
-        if (RdSLOTCXROM) {
-            if (m_slotRomPointer) c = *m_slotRomPointer ;
+        if (RdSLOTCXROM == OFF) {
+            if (m_slotRomPointer) c = m_slotRomPointer[p-0xc800] ;
             else                  c = m_rom[p] ; 
         } else {
             c = m_rom[p] ;
