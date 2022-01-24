@@ -343,8 +343,10 @@ void Machine::addmem (quint16 p)
         if ((s & 0x80) == (m & 0x80)) {   // XXXXXX   V flag is sometimes wrong
             if ((A & 0x80) != (s & 0x80)) P |= V ;
         }
+//printf ("addmem: m_parent->romNumber() = %i\n", m_parent->romNumber()) ;
         if (m_parent->romNumber() != APPLE2E_ENHANCED) {
-            if (A == 0) P |= Z ;     // only on 6502.  65C02 does not set N on decimal addition.
+//printf ("addmem: not APPLE2E_ENHANCED\n") ;
+            if (A == 0) P |= N ;     // only on 6502.  65C02 does not set N on decimal addition.
         }
 //printf ("PC=%4.4x  romNumber=%i  P=%2.2x\n", m_savedPC, m_parent->romNumber(), P) ;
     } else {           // binary addition.
