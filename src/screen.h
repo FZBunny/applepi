@@ -38,7 +38,7 @@
 #include <QEvent> 
 #include <QMainWindow> 
 
-//#include "machine.h"
+#include "mainwindow.h"
 
 
 
@@ -46,7 +46,7 @@ class Screen : public QWidget
 {
 public:
 
-    Screen (QWidget *parent = 0) ;
+    Screen (QWidget *parent) ;
     void initialize (void) ;
     void setScale (uint scale) ;
     void splashScreen (void) ;
@@ -73,20 +73,20 @@ private:
     const int FAST = 50 ;    // "            " fast timer (for everything else)
     const int FLASHDELAY = 9 ;
 
+    QWidget*  m_parent ;
     bool      m_flash ;         // Flag for flashing characters on screen
     int       m_flashCounter ;  // Counter for selecting which flash mask to apply
 
-    uint     m_scale ;
-    QPixmap  m_screenBuffer ;
-    QPixmap  m_pixmap_40ColumnPrimary ;
-    QPixmap  m_pixmap_40ColumnAlternate ;
-    QPixmap  m_pixmap_80ColumnPrimary ;
-    QPixmap  m_pixmap_80ColumnAlternate ;
-    QPixmap  m_pixmap_xpm_hires_0 ;
-    QPixmap  m_pixmap_xpm_hires_1 ;
-    QPixmap  m_pixmap_empty_hires_line ;
-    QPixmap *m_loResBlocks[16] ;
-    QPixmap *m_dblHiResBlock[16] ;
+    uint      m_romNumber ;
+    uint      m_scale ;
+    QPixmap   m_screenBuffer ;
+    QPixmap   m_pixmap_40Column ;
+    QPixmap   m_pixmap_80Column ;
+    QPixmap   m_pixmap_xpm_hires_0 ;
+    QPixmap   m_pixmap_xpm_hires_1 ;
+    QPixmap   m_pixmap_empty_hires_line ;
+    QPixmap*  m_loResBlocks[16] ;
+    QPixmap*  m_dblHiResBlock[16] ;
 
 } ;
 
