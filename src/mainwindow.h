@@ -111,9 +111,9 @@ private:
 
     virtual void  keyPressEvent (QKeyEvent *event) override ;
 
-    Speaker*      m_speaker ;
-    Screen*       m_screen ;
-    QWidget*      m_screenBorder ;
+    Speaker*  m_speaker ;
+    Screen*   m_screen ;
+    QWidget*  m_screenBorder ;
     
     bool    m_powerButtonState ;
     bool    m_currentlyPastingText ;
