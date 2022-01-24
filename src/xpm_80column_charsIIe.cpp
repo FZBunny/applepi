@@ -1,4 +1,4 @@
-const char* xpm_80ColChars[] =
+const char* xpm_80ColChars_IIe[] =
 {
     "8 8192 2 1",
     "X c #ffffff",
