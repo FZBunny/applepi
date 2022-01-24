@@ -92,11 +92,12 @@ SOURCES += src/about.cpp \
            src/usleep.cpp \
            src/view_memory.cpp \
            src/volume_dial.cpp \
-           src/xpm_40column_chars.cpp \
+           src/xpm_40column_chars_IIe.cpp \
+           src/xpm_40column_chars_IIplus.cpp \
            src/xpm_40column_chars_enhanced.cpp \
            src/xpm_40column_chars_mono.cpp \
            src/xpm_40column_mousetext.cpp \
-           src/xpm_80column_chars.cpp \
+           src/xpm_80column_charsIIe.cpp \
            src/xpm_80column_chars_enhanced.cpp \
            src/xpm_80column_chars_mono.cpp \
            src/xpm_80column_mousetext.cpp \
