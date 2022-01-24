@@ -1,1 +1,1 @@
-#define APPLEPI_VERSION "0.2.2"
+#define APPLEPI_VERSION "0.2.3"

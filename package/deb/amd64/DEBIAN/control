@@ -1,6 +1,6 @@
 Package: applepi
 Source:
-Version: 0.2.2
+Version: 0.2.3
 Architecture: amd64
 Maintainer: J.B.Ward <j.bruce.ward@gmail.com>
 Installed-Size: 63488
