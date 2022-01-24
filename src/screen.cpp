@@ -45,6 +45,7 @@
 
 #include <unistd.h>
 
+#include "mainwindow.h"
 #include "machine.h"
 #include "version.h"
 #include "defs.h"
@@ -77,20 +78,35 @@ static quint16 screen_RdTEXT_offsets[24] = {
 
 Screen::Screen (QWidget *parent) : QWidget (parent)
 {
- //   this->setAutoFillBackground (true) ;
+    m_parent = parent ;
     initialize() ;
 }
 
 
 void Screen::initialize (void)
 {
-    m_pixmap_40ColumnPrimary   = QPixmap(xpm_40ColChars) ;
-    m_pixmap_40ColumnAlternate = QPixmap(xpm_40ColCharsEnhanced) ;
-    m_pixmap_80ColumnPrimary   = QPixmap(xpm_80ColChars) ;
-    m_pixmap_80ColumnAlternate = QPixmap(xpm_80ColCharsEnhanced) ;
+    int m_romNumber = ((MainWindow*)m_parent)->romNumber() ;
 
-    m_pixmap_xpm_hires_0 = QPixmap(xpm_hires_0) ;
-    m_pixmap_xpm_hires_1 = QPixmap(xpm_hires_1) ;
+    switch (m_romNumber) {
+        case APPLE2:
+        case APPLE2PLUS:
+            m_pixmap_40Column = QPixmap (xpm_40ColChars_IIPlus) ;   // (Only 40-column display available on II & II+ motherboards)
+            break ;                                                 // (They will use 80-column card soon... 2022-01-24)
+        case APPLE2E:
+            m_pixmap_40Column = QPixmap (xpm_40ColChars_IIe) ;
+            m_pixmap_80Column = QPixmap (xpm_80ColChars_IIe) ;
+//            m_pixmap_80Column = QPixmap (xpm_80ColCharsEnhanced) ;
+            break ;
+        case APPLE2E_ENHANCED:
+            m_pixmap_40Column = QPixmap (xpm_40ColCharsEnhanced) ; 
+            m_pixmap_80Column = QPixmap (xpm_80ColCharsEnhanced) ;
+            break ;
+        default:
+            break ;
+    }
+
+    m_pixmap_xpm_hires_0 = QPixmap (xpm_hires_0) ;
+    m_pixmap_xpm_hires_1 = QPixmap (xpm_hires_1) ;
 
     m_pixmap_empty_hires_line = QPixmap (280, 1) ;
     m_pixmap_empty_hires_line.fill (Qt::black) ;
@@ -288,14 +304,13 @@ void Screen::drawLine_40 (uchar *characters, int dstX, int dstY)
     QPainter painter (&m_screenBuffer) ;
 
     quint8 RdAltChar = MAC->m_ss[0x01e] ;
-    QPixmap* cSet = &m_pixmap_40ColumnPrimary ;
 
     for (int i=0; i<40; i++) {
         quint8 c =  characters[i] ;
         if (RdAltChar) c += 0x100 ;
         if (m_flash && (RdAltChar == OFF) && (c > 0x3f) && (c < 0x80))  c += 0x80 ;
         int srcPixmapOffset = 16 * c ;
-        painter.drawPixmap (dstX+(14*i), dstY, *cSet, 0, srcPixmapOffset, 14, 16) ; // draw a single character
+        painter.drawPixmap (dstX+(14*i), dstY, m_pixmap_40Column, 0, srcPixmapOffset, 14, 16) ; // draw a single character
     }
 }
 
@@ -325,11 +340,7 @@ void Screen::drawLine_80 (int x, int y, quint8 *main, quint8 *aux)
 {
     int i, charOffM, charOffA, dest_xM, dest_xA ;  // (M->main; A->Auxiliary)
     QPainter painter(&m_screenBuffer) ;
-
     quint8 RdAltChar = MAC->m_ss[0x01e] ;
-    QPixmap* cSet ;
-    if (RdAltChar) cSet = &m_pixmap_80ColumnAlternate ;
-    else           cSet = &m_pixmap_80ColumnPrimary ;
 
     quint8 c ;
     for (i=0; i<40; i++) {
@@ -344,8 +355,8 @@ void Screen::drawLine_80 (int x, int y, quint8 *main, quint8 *aux)
 
         dest_xA = x + i*14 ;
         dest_xM = dest_xA + 7 ;
-        painter.drawPixmap (dest_xA, y, *cSet, 0, charOffA, 7, 16) ;
-        painter.drawPixmap (dest_xM, y, *cSet, 0, charOffM, 7, 16) ;
+        painter.drawPixmap (dest_xA, y, m_pixmap_80Column, 0, charOffA, 7, 16) ;
+        painter.drawPixmap (dest_xM, y, m_pixmap_80Column, 0, charOffM, 7, 16) ;
     }
 }
 
