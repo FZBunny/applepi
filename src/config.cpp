@@ -93,7 +93,7 @@ Config::Config() : QSettings (QSettings::NativeFormat, QSettings::UserScope, "ap
         Set (QString("help_size"), QSize(420,500)) ;
         Set (QString("help_position"), QPoint(10,10)) ;
         Set ("history_dump", (uint)0) ;
-        Set ("internal_rom_number", (uint)2) ;
+        Set ("internal_rom_number", (uint)3) ;
         tmpStr = "0" ;
         Set ("lines2dump", tmpStr) ;
         Set ("rom_path", defaultDir) ;
