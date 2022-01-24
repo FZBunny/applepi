@@ -15,10 +15,9 @@ You will also have to remove tape.cpp, tape\_dialog.cpp, tape.h, and tape_dialog
   
 #### Shortcomings and known bugs
 
-- As of v0.2.2, ApplePi can now generate diskII floppy sounds.  While these are reasonably authentic, the volume knob on the front panel can't control their volume.  This will be fixed soon.
-- The 'Apple //e enhanced' emulation has several bugs and anomalies. No ideas when they might be resolved.
-- The same character-set ROMS are used for all AppleII models. This results in older models anachronistic access to the enhanced character ROM. To be fixed eventually.
-- The volume control dial controls does not (yet) control the diskII head-seek sounds.  Soon.
+
+- There is some confusion about which ROM is the IIe and which is the enhanced IIe ROM. Selecting the IIe model may really select the enhanced IIe. Or not... 
+- The 80-column character ROM for the II and II+ is still missing.  To be fixed soon.
 - Only later versions of the ProDOS uitlities can be used to format disk II floppies. They will warn that the drive is too fast, but will succeed. The earliest ProDOS utility will immediately claim the drive is too fast, and abandon the operation.
 - ApplePi emulates a 65C02 (not the original 6502) processor, whether or not the IIe enhanced model is selected. This saves code, and few will care.  
 - Cassette tape I/O is temporarily disabled. A workaround for the format differences between monitor and BASIC formats will eventually be devised.
