@@ -203,7 +203,11 @@ void Machine::store_ioSpace (quint8 c, quint16 p)
 
 void Machine::store_sspage (quint8 c, quint16 p)
 {
-    if (m_snoopSSStores) ss_store_snoop (c, p) ;
+    if (m_trace && m_snoopSSStores) {
+        if ((m_savedPC >= m_tracelo) && (m_savedPC <= m_tracehi)) {
+            ss_store_snoop (c, p) ;
+        }
+    }
 
     int hiNibble = (p & 0x00f0) >> 4 ;
     int loNibble = p & 0x000f ;
@@ -392,7 +396,7 @@ void Machine::store_sspage (quint8 c, quint16 p)
              storeToBankSwitches (p) ;         // Do something with high mem bank switches
              break ;
         case 9:                        // Slot 1      C090 - C09F
-printf ("Store %2.2x to slot 1, p=%4.4x\n", c, p) ;
+//printf ("Store %2.2x to slot 1, p=%4.4x\n", c, p) ;
             m_printer->store (c) ;
             break ;
         case 0xa:                      // Slot 2      C0A0 - C0AF

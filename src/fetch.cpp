@@ -211,7 +211,11 @@ quint8 Machine::fetch_sspage (quint16 p)
     quint8  c ;
     quint32 mods ;   // used only for open & closed Apple keys ($C061 & $C062)
 
-    if (m_snoopSSFetches) ss_fetch_snoop (p) ;
+    if (m_trace && m_snoopSSFetches) {
+        if ((m_savedPC >= m_tracelo) && (m_savedPC <= m_tracehi)) {
+            ss_fetch_snoop (p) ;
+        }
+    }
 
     int hiNibble = (p & 0x00f0) >> 4 ;
     int loNibble =  p & 0x000f ;
