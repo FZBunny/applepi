@@ -6,6 +6,9 @@
   Extracted from  https://www.youtube.com/watch?v=Dub4nraPLlQ
   posted by 'kevgordon' Nov 6, 2009
 
+***  Not yet used as of 2022-02-09; to be used later when    ***
+***  (or if) use of Qt5 'multimedia' module is discontinued  ***
+
 ************************************************************/
 
 
