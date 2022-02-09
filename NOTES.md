@@ -17,7 +17,6 @@ You will also have to remove tape.cpp, tape\_dialog.cpp, tape.h, and tape_dialog
 
 
 - There is some confusion about which ROM is the IIe and which is the enhanced IIe ROM. Selecting the IIe model may really select the enhanced IIe. Or not... 
-- The 80-column character ROM for the II and II+ is still missing.  To be fixed soon.
 - Only later versions of the ProDOS uitlities can be used to format disk II floppies. They will warn that the drive is too fast, but will succeed. The earliest ProDOS utility will immediately claim the drive is too fast, and abandon the operation.
 - ApplePi emulates a 65C02 (not the original 6502) processor, whether or not the IIe enhanced model is selected. This saves code, and few will care.  
 - Cassette tape I/O is temporarily disabled. A workaround for the format differences between monitor and BASIC formats will eventually be devised.
