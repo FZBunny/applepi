@@ -2,6 +2,7 @@
 #####  - Go to "Releases" on the right for installable files. Pi users want the "..armhf.deb" file. -
 ![Screenshot of ApplePi](https://github.com/FZBunny/applepi/blob/main/images/Screenshot.png)
 
+
 "ApplePi" is an apple IIe emulator for the Raspberry Pi, but can be built on most Linux distributions. (See "NOTES.md" for a build warning.)
 It runs easily on a Pi4B, and acceptably on a Pi3B; the original Pi can't quite handle the load.  
 It also runs well on Ubuntu 20.04, the O/S used for development.  To build from source, you will need the development packages for Qt5 for your distro. (See 'NOTES.md' before running qmake.)
