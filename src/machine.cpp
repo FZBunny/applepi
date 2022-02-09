@@ -656,12 +656,6 @@ void Machine::run (void)
     quint64 testK = 1e6 ;
 #endif
 
-//m_snoopSSFetches = true ;  // XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-//m_trace = true ;
-//m_tracelo = 0x0000 ;
-//m_tracehi = 0xffff ;
-
-
 //  -------------------------------------------------------------------------------------
 //     Main loop to execute one 65C02 instruction each time through; repeats forever...
 //  -------------------------------------------------------------------------------------
