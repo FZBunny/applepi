@@ -15,7 +15,7 @@ You will also have to remove tape.cpp, tape\_dialog.cpp, tape.h, and tape_dialog
   
 #### Shortcomings and known bugs
 
-
+- Using `PR#3` to display 80-column text does not work for the original AppleII or the AppleII+ models.  To be fixed soon.
 - There is some confusion about which ROM is the IIe and which is the enhanced IIe ROM. Selecting the IIe model may really select the enhanced IIe. Or not... 
 - Only later versions of the ProDOS uitlities can be used to format disk II floppies. They will warn that the drive is too fast, but will succeed. The earliest ProDOS utility will immediately claim the drive is too fast, and abandon the operation.
 - ApplePi emulates a 65C02 (not the original 6502) processor, whether or not the IIe enhanced model is selected. This saves code, and few will care.  
