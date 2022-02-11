@@ -91,7 +91,7 @@ void Machine::initialize (bool power)
     m_WAI_executed = false ;
     m_STP_executed = false ;
 
-    RdSLOTCXROM = ON ;
+    RdCXROM = ON ;
 
     m_historyOldest = 0 ;
     m_historyNewest = 0 ;
@@ -641,7 +641,7 @@ void Machine::clearCPUWait (void)
 void Machine::run (void)
 {
 
-    RdSLOTCXROM = ON ;
+    RdCXROM = ON ;
     m_halted = false ;
     m_previousCycles = 0 ;
     m_previousUsecs = microseconds() ;

@@ -191,7 +191,7 @@ void Machine::store_ioSpace (quint8 c, quint16 p)
     } else {
         if (p == 0xcfff) {         // (Reference of 0xCFFF turns off all peripheral ROM in range 0xC800-0xCFFE)
             m_romSlot = 0 ;
-            RdSLOTCXROM = OFF ;
+            RdCXROM = OFF ;
         } else {
             printf ("*** ILLEGAL store at PC=%4.4X: tried to store c=%2.2X to ROM at %4.4X\n", PC, c, p) ;
         }
@@ -234,11 +234,11 @@ void Machine::store_sspage (quint8 c, quint16 p)
                     RdRAMWRT = ON ;
                     break ;
                 case 6:                        // C006  SETSLOTCXROM  (read peripheral rom $C800-$CFFF)
-                    RdSLOTCXROM = OFF ;
+                    RdCXROM = OFF ;
 //printf ("X on  pc=%4.4X\n", m_savedPC) ;
                     break ;
                 case 7:                        // C007  SETINTCXROM   (read internal rom $C100-$CFFF)
-                    RdSLOTCXROM = ON ;
+                    RdCXROM = ON ;
 //printf ("X off pc=%4.4X\n", m_savedPC) ;
                     break ;
                 case 8:                        // C008  ALTZP off     (main stack and zero page)
@@ -350,8 +350,8 @@ void Machine::store_sspage (quint8 c, quint16 p)
                     break ;
                 case 8:                            // ProDos 8 v2.0.3 does a 'TRB  $C068' with A=01, but most docs
                     STATEREG = c ;                 // say $C068 is implemented only on the IIgs and later...
-                    if (c & 0x01) RdSLOTCXROM  = ON ;
-                    else          RdSLOTCXROM  = OFF ;
+                    if (c & 0x01) RdCXROM  = ON ;
+                    else          RdCXROM  = OFF ;
                     if (c & 0x04) RdBNK2   = ON ;
                     else          RdBNK2   = OFF ;
                     if (c & 0x08) RdLCRAM  = ON ;

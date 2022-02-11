@@ -103,7 +103,7 @@ quint8 Machine::fetch_ioSpace (quint16 p)     //  Addresses c000 - cfff
 
     if (p == 0xcfff) {
 //printf ("0xCFFF fetched at %4.4X\n", m_savedPC) ;
-        RdSLOTCXROM = OFF ;         // (Reference of 0xCFFF turns off all peripheral ROM in range 0xC800-0xCFFE)
+        RdCXROM = OFF ;         // (Reference of 0xCFFF turns off all peripheral ROM in range 0xC800-0xCFFE)
         m_romSlot = 0 ;
         return 0 ;   // (No idea what would actually be returned...)
     }
@@ -117,14 +117,14 @@ quint8 Machine::fetch_ioSpace (quint16 p)     //  Addresses c000 - cfff
 
 
     if (p > 0xc7ff) {
-        if (RdSLOTCXROM == OFF) {
+        if (RdCXROM == OFF) {
             if (m_slotRomPointer) c = m_slotRomPointer[p-0xc800] ;
             else                  c = m_rom[p] ; 
         } else {
             c = m_rom[p] ;
         }
     } else {
-        if (RdSLOTCXROM) {
+        if (RdCXROM) {
             c = m_rom[p] ;
         } else {
             int loByte = p & 0xff ;
@@ -248,8 +248,8 @@ quint8 Machine::fetch_sspage (quint16 p)
                 case 4:                        // C014  read RAMWRT switch
                     c = RdRAMWRT ;
                     break ;
-                case 5:                        // C015  read RdSLOTCXROM switch
-                    c = RdSLOTCXROM ;//printf ("RdSLOTCXROM = %2.2x  m_savedPC=%4.4X\n", RdSLOTCXROM, m_savedPC) ;
+                case 5:                        // C015  read RdCXROM switch
+                    c = RdCXROM ;//printf ("RdCXROM = %2.2x  m_savedPC=%4.4X\n", RdCXROM, m_savedPC) ;
                     break ;
                 case 6:                        // C016  read ALTZP switch
                     c = RdALTZP ;
@@ -372,7 +372,7 @@ quint8 Machine::fetch_sspage (quint16 p)
                     break ;
                 case 8:                        // C068 STATEREG
                     c = 0 ;                         // ( ProDos 8 v2.0.3 does a 'TRB  $C068', but most docs )
-                    if (RdSLOTCXROM)   c =  0x01 ;  // ( say 'STATEREG' is implemented only on the IIgs and later... )
+                    if (RdCXROM)   c =  0x01 ;  // ( say 'STATEREG' is implemented only on the IIgs and later... )
                     if (RdBNK2)        c |= 0x04 ;
              //               if (RdBNK2 == OFF) c |= 0x08 ;RdLCRAM
                     if (RdLCRAM)       c &= 0xf7 ;
@@ -559,7 +559,7 @@ void Machine::ss_fetch_snoop (quint16 p)
     const char* switchName[] = {
 /* 00 */  "KBD",        "-wrt only-", "-wrt only-", "-wrt only-", "-wrt only-", "-wrt only-", "-wrt only-",  "-wrt only-", // 07
 /* 08 */  "-wrt only-", "-wrt only-", "-wrt only-", "-wrt only-", "-wrt only-", "-wrt only-", "-wrt only-",  "-wrt only-", // 0F
-/* 10 */  "KBDSTRB",    "RdBNK2",     "RdLCRAM",    "RdRAMRD",    "RdRAMWRT",   "RdSLOTCXROM","RdALTZP",     "RdC3ROM",    // 17
+/* 10 */  "KBDSTRB",    "RdBNK2",     "RdLCRAM",    "RdRAMRD",    "RdRAMWRT",   "RdCXROM","RdALTZP",     "RdC3ROM",    // 17
 /* 18 */  "Rd80STORE",  "RdVBL",      "RdTEXT",     "RdMIXED",    "RdPAGE2",    "RdHIRES",    "RdALTCHAR",   "Rd80COL",    // 1F
 /* 20 */  "TAPEOUT",    "-wrt only-", "-wrt only-", "-wrt only-", "-wrt only-", "-wrt only-", "-wrt only-",  "-wrt only-", // 27
 /* 28 */  "ROMBANK",    "?",          "?",          "?",          "?",          "?",          "?",           "?",          // 2F

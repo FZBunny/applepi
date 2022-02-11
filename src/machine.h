@@ -122,7 +122,7 @@ typedef struct HistoryEntry {
 #define RdLCRAM     m_ss[0x012]
 #define RdRAMRD     m_ss[0x013]
 #define RdRAMWRT    m_ss[0x014]
-#define RdSLOTCXROM m_ss[0x015]
+#define RdCXROM m_ss[0x015]
 #define RdALTZP     m_ss[0x016]
 #define RdC3ROM     m_ss[0x017]
 #define Rd80STORE   m_ss[0x018]
