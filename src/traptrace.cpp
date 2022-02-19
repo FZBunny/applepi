@@ -65,6 +65,14 @@ TrapTrace::TrapTrace (MainWindow* parent) :  QDialog (parent)
 #endif
 
 
+    QLabel* lab1 = new QLabel ("T R A P", this) ;
+    lab1->move (140,5) ;
+    lab1->resize (70,20) ;
+
+    QLabel* lab2 = new QLabel ("T R A C E", this) ;
+    lab2->move (455,5) ;
+    lab2->resize (70,20) ;
+
 //---------  T R A P  -----------
 
 
@@ -80,14 +88,14 @@ TrapTrace::TrapTrace (MainWindow* parent) :  QDialog (parent)
     QSize addressBoxSize (50,24) ;
 
     QFrame* box1 = new QFrame (this, Qt::Widget) ;
-    box1->move (10,25) ;
+    box1->move (10,30) ;
     box1->resize (300, 188) ;
     box1->setFrameStyle (QFrame::Panel | QFrame::Raised) ;
     box1->setLineWidth(3) ;
     box1->show() ;
 
     QFrame* box2 = new QFrame (this, Qt::Widget) ;
-    box2->move (335,25) ;
+    box2->move (335,30) ;
     box2->resize (300, 188) ;
     box2->setFrameStyle (QFrame::Panel | QFrame::Raised) ;
     box2->setLineWidth(3) ;
@@ -149,9 +157,9 @@ TrapTrace::TrapTrace (MainWindow* parent) :  QDialog (parent)
     m_requestedDumpLinesBox->setAlignment (Qt::AlignRight) ;
     m_requestedDumpLinesBox->setValidator (m_decimalValidator) ;
 
-    QLabel* lab1 = new QLabel ("Lines (decimal)", this) ;
-    lab1->move (trap_X+170,trap_Y+165) ;
-    lab1->resize (100,40) ;
+    QLabel* lab3 = new QLabel ("Lines (decimal)", this) ;
+    lab3->move (trap_X+170,trap_Y+165) ;
+    lab3->resize (100,40) ;
 
     getBoolConfigData ((char*)"trap0_enable", m_trap0_checkBox) ;
     getBoolConfigData ((char*)"trap1_enable", m_trap1_checkBox) ;
