@@ -9,8 +9,9 @@ QMAKE_CXXFLAGS += -Wno-implicit-fallthrough -Wno-deprecated-declarations
 OBJECTS_DIR=obj
 DESTDIR=bin
 INCLUDEPATH += .
-LIBS += -L/usr/lib/x86_64-linux-gnu/alsa-lib -lasound -no-pie 
-QT += widgets printsupport gamepad multimedia
+LIBS += -L/usr/lib/x86_64-linux-gnu/alsa-lib -lasound -lpulse -lpulse-simple -no-pie 
+#  QT += widgets printsupport gamepad multimedia
+QT += widgets printsupport gamepad
 RESOURCES = resources.qrc
 
 
@@ -59,6 +60,7 @@ HEADERS += src/about.h \
            src/view_memory.h \
            src/volume_dial.h \
            src/version.h \
+           src/wav_step1.h \
            src/xpm_images.h
 
 SOURCES += src/about.cpp \

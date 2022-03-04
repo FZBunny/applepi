@@ -31,6 +31,7 @@
 #include "machine.h"
 #include "usleep.h"
 #include "config.h"
+#include "device_roms.h"
 #include "floppy_controller.h"
 #include "traptrace.h"
 
@@ -81,6 +82,7 @@ Machine::Machine (MainWindow* parent)
 
 void Machine::initialize (bool power)
 {
+//printf ("AE_Viewmaster80 = %16.16llx\n", (quint64)AE_Viewmaster80) ;
     m_powerIsOn = power ;
 
     if ( ! power) return ;  // Don't clear anything if power has been turned off;
@@ -118,6 +120,7 @@ void Machine::initialize (bool power)
     m_nCycles = 0 ;
     m_previousCycles = 0 ;
     m_romSlot = 0 ;
+    m_slotRomPointer = NULL ;
     m_highRamWrite = true ;   // See "Understanding the Apple IIe" p. 5-23
     m_highWritePreset = false ;
 
@@ -225,6 +228,8 @@ void Machine::reset (void)
     PCLO = m_rom[RESET] ;
     PCHI = m_rom[RESET+1] ;
 //printf ("2... Machine::reset  PC = %4.4X\n\n", PC) ;
+    m_romSlot = 0 ;
+    m_slotRomPointer = NULL ;
 }
 
 

@@ -358,7 +358,7 @@ void FloppyDiskController::phase1_on  (void)
 {
     m_pole[m_currentDrive][1] = true ;
 
-    main_window->play (1) ;           // Play a 'head step' .wav file from resources
+    main_window->play (1) ;           // Play a 'head step' .wav sound
 
     if (m_stepperPhase[m_currentDrive] == 2) {
         m_trackTimes2[m_currentDrive] -= 1 ;

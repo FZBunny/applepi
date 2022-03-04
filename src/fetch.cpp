@@ -105,6 +105,7 @@ quint8 Machine::fetch_ioSpace (quint16 p)     //  Addresses c000 - cfff
 //printf ("0xCFFF fetched at %4.4X\n", m_savedPC) ;
         RdCXROM = OFF ;             // (Reference of 0xCFFF turns off all peripheral ROM in range 0xC800-0xCFFE)
         m_romSlot = 0 ;
+        m_slotRomPointer = NULL ;
         return 0 ;   // (No idea what would actually be returned...)
     }
 
@@ -116,8 +117,10 @@ quint8 Machine::fetch_ioSpace (quint16 p)     //  Addresses c000 - cfff
 //     ------------------------------------------------
 
     if (p > 0xc7ff) {
-        if (RdCXROM == OFF) {
-            if (m_slotRomPointer) c = m_slotRomPointer[p-0xc800] ;
+        if (m_slotRomPointer) {
+            if (m_slotRomPointer) {
+                if (m_romSlot == 3) c = m_slotRomPointer[p-0xc700] ;
+            }
             else                  c = m_rom[p] ; 
         } else {
             c = m_rom[p] ;
@@ -144,14 +147,13 @@ quint8 Machine::fetch_ioSpace (quint16 p)     //  Addresses c000 - cfff
                 break ;
               case 3:                                                           // Slot 3 $C3xx   (80-col. display)
                 if (IDBYTE == 6) {
-                    c = m_rom[p] ;            // IDBYTE = 6 on Apple IIe & later;
-                    m_slotRomPointer = NULL ; // Use main ROM for C300+ on those models.
+                    c = m_rom[p] ;               // IDBYTE = 6 on Apple IIe & later;
+                    m_slotRomPointer = NULL ;    // Use main ROM for C300+ on those models.
                     m_romSlot = 0 ;
-                } else {  
-                    c = AE_Viewmaster80_C300[loByte] ;
-                    m_romSlot = 3 ;
-                    m_slotRomPointer = AE_Viewmaster80_C800 ;
-//printf ("C3xx fetch:  p=%2.2x, c=%2.2x\n", p, c) ;
+                } else {                         // Original apple II & II+: use Card in slot 3.
+//                    c = AE_Viewmaster80[loByte] ;        ** NOT IMPLEMENTD as of 2022-03-03 **
+//                    m_romSlot = 3 ;
+//                    m_slotRomPointer = AE_Viewmaster80 ;
                 }
                 break ;
               case 4:                                                           // Slot 4 $C4xx

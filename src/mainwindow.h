@@ -35,9 +35,6 @@
 #include <QSlider>
 #include <QDial>
 #include <QPushButton>
-#include <QSoundEffect>
-
-#include <unistd.h>
 
 #include "screen.h"
 #include "traptrace.h"
@@ -49,11 +46,13 @@
 #include "config.h"
 #include "defs.h"
 
-
-
 #ifdef Q_OS_WINDOWS
+#  include <QSoundEffect>
 #  include "win-speaker.h"
 #else
+#  include <unistd.h>
+#  include <pulse/simple.h>
+#  include <pulse/error.h>
 #  include "lin-speaker.h"
 #endif
 
@@ -86,11 +85,11 @@ public:
     void setHDLabel (uint drive) ;
     void setFloppyLabel (uint drive, QString label) ;
     void setFloppyLabel (uint drive) ;
+    void play (int n) ;
     void paste (void) ;
     void pastingText (bool pasting) ;
 
     void trapTraceIsStopping (void) ;
-    void play (int n) ;  
 
     Speaker* speaker (void) ;
 
@@ -127,8 +126,8 @@ private:
     QTimer*  m_oneSecondTimer ;
     QTimer*  m_driveSoundTimer ;
 
-    int    m_floppyMotorCountDown[2] ;
-    int    m_HDActivityCountDown[2] ;
+    int     m_floppyMotorCountDown[2] ;
+    int     m_HDActivityCountDown[2] ;
 
     uint    m_scale ;
     uint    m_internalRomNumber ;
@@ -141,7 +140,11 @@ private:
     int     m_scaleButtonKludge ;
     int     m_soundNumber ;
 
+#ifdef Q_OS_WINDOWS
     QSoundEffect m_soundEffect;
+#else
+    pa_simple*  m_pulseAudioConnectionObject ;
+#endif
 
 //    struct fd_pair m_printPipe ;
 
@@ -189,9 +192,9 @@ private:
     QAction* m_exit;
 
 // Edit actions:
-    QAction* m_screenSnapshot;
-    QAction* m_copyText;
-    QAction* m_pasteTextToKeyboardInput;
+    QAction* m_screenSnapshot ;
+    QAction* m_copyText ;
+    QAction* m_pasteTextToKeyboardInput ;
 
 // Preferences  menu:
     QAction* m_gameController ;
@@ -230,7 +233,7 @@ private:
 
     void onDiskDriveCheckTimer (void) ;
     void setProdosDateTime (void) ;
-    void onPlayDriveSoundTimer (void) ;
+    void onPlaySoundTimer (void) ;
 
     void onSelectRom      (void) ;
     void onUseInternalRom (void) ;

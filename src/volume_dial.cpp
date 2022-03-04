@@ -25,9 +25,10 @@
 
 *****************************************************************************/
 
-
-#include <QAudioDeviceInfo>
-#include <QAudioOutput>
+#ifdef Q_OS_WINDOWS
+#   include <QAudioDeviceInfo>
+#   include <QAudioOutput>
+#endif
 
 #include "config.h"
 #include "volume_dial.h"
