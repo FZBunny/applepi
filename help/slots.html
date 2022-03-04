@@ -22,7 +22,7 @@
 <center><h1 style="color:crimson;"><BR>Slots</h1></center>
 <BR>
 
-ApplePi emulates the first 4 models of Apple II computers.&nbsp; These models have seven expansion slots<sup>note1</sup>, numbered 1-7, which can hold peripheral controller cards.
+ApplePi emulates the first 4 models of Apple II computers.&nbsp; These models have seven expansion slots, numbered 1-7, which can hold peripheral controller cards.
 <BR><BR>
 When ApplePi is turned on, it (i.e. the internal ROM) will search for a disk controller in decreasing order beginning with slot 7, and boot from the first inserted disk image it finds.
 <BR><BR>
@@ -31,7 +31,7 @@ Populated slots in the ApplePi:
 <b>Slot 1:&nbsp;&nbsp;&nbsp;&nbsp;</b>Printer card <BR>
 <b>Slot 3:&nbsp;&nbsp;&nbsp;&nbsp;</b>80-column card <BR>
 <b>Slot 6:&nbsp;&nbsp;&nbsp;&nbsp;</b>'Disk II' 5&frac14;" floppy controller card <BR>
-<b>Slot 7:&nbsp;&nbsp;&nbsp;&nbsp;</b>A combination 3&frac12;" floppy / hard drive controller card<sup>note2</sup> <BR><BR>
+<b>Slot 7:&nbsp;&nbsp;&nbsp;&nbsp;</b>A combination 3&frac12;" floppy / hard drive controller card<sup>note1</sup> <BR><BR>
 
 To use a slot, enter <font face=courier><b>PR#n,</b></font>&nbsp;(i.e, "print to slot n") , where 'n' is a number from 1-7.<BR><BR>
 
@@ -50,7 +50,7 @@ To use a slot, enter <font face=courier><b>PR#n,</b></font>&nbsp;(i.e, "print to
 <p style="margin-left: 0px">
 <b>Slot 6</b>
   <p style="margin-left: 20px">
-  <font face=courier><b>PR#6</b></font> &nbsp; boots from the 5&frac14;" disk image in the Disk II drive labelled "Floppy 1". <sup>note3</sup>
+  <font face=courier><b>PR#6</b></font> &nbsp; boots from the 5&frac14;" disk image in the Disk II drive labelled "Floppy 1". <sup>note2</sup>
   <\p>
  <BR></p>
 
@@ -64,14 +64,11 @@ To use a slot, enter <font face=courier><b>PR#n,</b></font>&nbsp;(i.e, "print to
 
 
 <BR><BR><BR><BR>
-Note1:<BR>
-There was also a special 'slot 0', called the 'language card slot' on the AppleII and II+, or the 'auxiliary slot' on the IIe.&nbsp; This was physically and electronically incompatible with the expansion slots, and used for 80-column display circuitry and/or memory expansion.&nbsp;  Its existence in ApplePi is currently a combination of both.
-<BR><BR>
 
-Note 2:<BR>
+Note 1:<BR>
 (This type of controller may or may not have actually existed in the real world.&nbsp;&nbsp;Just pretend, OK?)
 <BR><BR>
-Note 3:<BR>
+Note 2:<BR>
 The Disk II controller was an utterly brilliant design by Steve Wozniak which allowed the controller to be sold for <i>far</i> less than anything else on the market at that time, and small enough to fit inside the AppleII case. &nbsp;  An unavoidable side-effect of the design was a format completely incompatible with anything else on the planet. &nbsp; So AppleII owners gained a lot (a disk drive they could afford), and lost only a little. &nbsp; This is the reason it is not possible to share disk images between slots 6 and 7.
  
 <BR><center>
