@@ -16,11 +16,11 @@ To get a copy, go to "Releases" on the right of this page, download a .deb file,
    
    
 - During installation, a 'desktop' file should have been dropped on your desktop.  If not, drag /usr/share/applepi/applepi.desktop to your desktop, or copy it manually: ```cp /usr/share/applepi/applepi.desktop ~/Desktop``` 
-- Of course, an Apple II of any kind isn't much use without a disk or two. 
+- Of course, an Apple II of any kind isn't much use without a disk or two... 
   
   For games, go to https://archive.org/details/TotalReplay for an amazing 32MB hard drive full of of HUNDREDS of games.  
-  To find disk-image files on the 'web, google "apple ii disk images".   
-  For Apple disk masters, try https://www.apple.asimov.net/images/masters/.  Also a good source: http://virtualapple.org/. 
+  For Apple disk masters, try https://www.apple.asimov.net/images/masters/.  Also a good source: http://virtualapple.org/.  
+To find disk-image files on the 'web, google "apple ii disk images".   
 
 - A note about games:  if a game floppy fails to boot, put it in the 'Floppy 2' drive, and boot dos3. Then enter   ``` RUN HELLO,D2 ``` . If that fails (it won't), catalog disk 2 to find the game's file name: ``` CATALOG,D2 ``` ; then ``` BRUN ``` whatever the name is.   
 - See "NOTES.md" for a (short!) list of known bugs and shortcomings.
