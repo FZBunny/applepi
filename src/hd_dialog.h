@@ -40,12 +40,7 @@
 class HardDriveDialog: public QDialog
 {
 	public:
-/**
-		HardDriveDialog (wxWindow*      parent,
-                         wxWindowID     id=wxID_ANY,
-                         const QPoint& pos=wxDefaultPosition,
-                         const QSize&  size=wxDefaultSize) ;
-**/
+    
 		HardDriveDialog (MainWindow* parent, int drive) ;
 		~HardDriveDialog() ;
 

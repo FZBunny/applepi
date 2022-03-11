@@ -26,10 +26,6 @@
 *****************************************************************************/
 
 
-//#include <wx/types.h>
-// #include <wx/defs.h>
-
-
 #ifdef Q_OS_WINDOWS
   void usleep(unsigned int usec) ;
 #endif

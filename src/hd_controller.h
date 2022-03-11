@@ -31,9 +31,6 @@
 #ifndef HD_CONTROLLER_H
 #define HD_CONTROLLER_H
 
-//#include <wx/string.h>
-//#include <wx/filename.h>
-
 #include <QtGlobal>
 #include <QFile>
 #include <QFileInfo>

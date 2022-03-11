@@ -35,8 +35,6 @@
 #include <QtCore/QString>
 #include <QtCore/QFile>
 #include <QtCore/QFileInfo>
-// #include <wx/sound.h>
-// #include <wx/event.h>
 
 #include "defs.h"
 #include "machine.h"
@@ -103,9 +101,6 @@ private:
     void     write (void) ;
 
     quint64 m_lastAccess[2] ;
-
-//    wxSound* m_soundRecal ;
-//    wxSound* m_soundStep ;
 
     int  m_currentDrive ;
     int  m_trackTimes2[2] ;

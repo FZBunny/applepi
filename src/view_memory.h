@@ -69,7 +69,6 @@ private:
     
     void OnRadioBox1Select  (void) ;
     void OnSetButtonClick   (void) ;
-    //   void onSliderThumbUp (wxScrollEvent& event) ;
     void onSliderEvent      (void) ;
     void onRomButtonSelect  (void) ;
     void onMainButtonSelect (void) ;

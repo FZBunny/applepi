@@ -1,7 +1,5 @@
 
 
-//  #include <wx/defs.h>
-
 //
 // Boot block (block 0) of a ProDOS disk
 //

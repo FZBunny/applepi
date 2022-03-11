@@ -221,32 +221,6 @@ void HardDriveDialog::ejectVolume (void)  // XXXXXX  DOESN'T WORK IF FILE DNE XX
 
 void HardDriveDialog::onNewButtonClick (void) {} ;
 
-/***
-void HardDriveDialog::onNewButtonClick (wxCommandEvent&)
-{
-    QString filter ("Any (*)|*") ;
-    QFileDialog dlg (this, "Create new HD volume", m_volumePath, "", filter, wxFD_SAVE|wxFD_OVERWRITE_PROMPT) ;
-    dlg.SetDirectory (m_volumePath) ;
-
-    int ret = dlg.ShowModal() ;
-
-    if (ret == wxID_OK) {
-        m_volumePath = dlg.GetPath() ;
-
-        int err = MAC->m_hardDrive->create (m_volumePath, m_driveIndex, 1600) ;  //  XXXXX FIX THIS CONSTANT ! XXXXXXXXXXXXXX
-        if (err) {
-            wxMessageDialog msg (this, "Can't create the file.",
-                                 "Error", wxOK|wxCENTRE|wxICON_ERROR) ;
-            msg.ShowModal() ;
-        } else {
-            CFG->Set (m_volumePathKey, m_volumePath) ;
-        }
-        this->EndModal (true) ;
-        m_ejectInsertButton->SetLabel ("Eject") ;
-    }
-
-}
-***/
 
 QString HardDriveDialog::GetPath(void)
 {

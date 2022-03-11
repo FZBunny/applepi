@@ -81,8 +81,6 @@ private:
 
     qint32   m_pcmLen ;
     quint8*  m_pcmSound ;
- //   wxSound*  m_soundRecal ;
- //   wxSound*  m_soundStep ;
 
     snd_pcm_uframes_t  m_buffer_size ;
 

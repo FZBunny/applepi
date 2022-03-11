@@ -79,8 +79,6 @@ class TrapTrace: public QDialog
         void  onTrap3Entered (void) ;
         void  onLinesToDumpEntered (void) ;
 
-//        void  onTrap0LostFocus (wxFocusEvent& event) ;   //   XXXXX ? XXXXX
-
         void  onTrap0CheckBox   (void) ;
         void  onTrap1CheckBox   (void) ;
         void  onTrap2CheckBox   (void) ;
