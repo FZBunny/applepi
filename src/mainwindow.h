@@ -35,27 +35,17 @@
 #include <QSlider>
 #include <QDial>
 #include <QPushButton>
+#include <QSoundEffect>
 
 #include "screen.h"
 #include "traptrace.h"
 #include "machine.h"
 #include "applepi_button.h"
 #include "volume_dial.h"
-// #include "disk_sounds.h"
+#include "speaker.h"
 #include "gamepad.h"
 #include "config.h"
 #include "defs.h"
-
-#ifdef Q_OS_WINDOWS
-#  include <QSoundEffect>
-#  include "win-speaker.h"
-#else
-#  include <unistd.h>
-#  include <pulse/simple.h>
-#  include <pulse/error.h>
-#  include "lin-speaker.h"
-#endif
-
 
 class Machine ;
 class VolumeDial ;
@@ -140,11 +130,7 @@ private:
     int     m_scaleButtonKludge ;
     int     m_soundNumber ;
 
-#ifdef Q_OS_WINDOWS
     QSoundEffect m_soundEffect;
-#else
-    pa_simple*  m_pulseAudioConnectionObject ;
-#endif
 
 //    struct fd_pair m_printPipe ;
 

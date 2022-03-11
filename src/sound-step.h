@@ -3,7 +3,8 @@
 #ifndef  STEPPCM_H
 #define  STEPPCM_H
 
-#include <wx/defs.h>
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX   obsolete  XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
 
 
 unsigned int step_pcm_len = 8956;

@@ -3,8 +3,7 @@
 #ifndef  RECALPCM_H
 #define  RECALPCM_H
 
-#include <wx/defs.h>
-
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX   obsolete  XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 unsigned int recal_pcm_len = 2184;
 

@@ -10,8 +10,7 @@ OBJECTS_DIR=obj
 DESTDIR=bin
 INCLUDEPATH += .
 LIBS += -L/usr/lib/x86_64-linux-gnu/alsa-lib -lasound -lpulse -lpulse-simple -no-pie 
-#  QT += widgets printsupport gamepad multimedia
-QT += widgets printsupport gamepad
+QT += widgets printsupport gamepad multimedia
 RESOURCES = resources.qrc
 
 

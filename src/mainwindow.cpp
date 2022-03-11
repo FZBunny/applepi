@@ -26,8 +26,6 @@
 *****************************************************************************/
 
 
-
-
 using namespace std ;
 
 #include <iostream>
@@ -45,6 +43,9 @@ using namespace std ;
 #include <QDate>
 #include <QTime>
 #include <QPalette>
+#include <QAudio>
+#include <QSound>
+
 
 #include "defs.h"
 #include "machine.h"
@@ -64,15 +65,9 @@ using namespace std ;
 #include "rom_apple2e.h"
 #include "rom_apple2e_enhanced.h"
 
-#ifdef Q_OS_WINDOWS
-#  include <QAudio>
-#  include <QSound>
-#else
-#  include <pulse/simple.h>
-#  include <pulse/volume.h>
-#  include <pulse/error.h>
-#  include "wav_step1.h"
-#endif
+#include <QAudio>
+#include <QSound>
+
 
 MainWindow* main_window ;
 
@@ -243,28 +238,7 @@ MainWindow::MainWindow (void)
     m_speaker = new Speaker (this) ;
     m_speaker->start() ;
 
-#ifdef Q_OS_WINDOWS
     m_soundEffect.setLoopCount (1) ;
-#else         //  ---  We don't use Qt5 audio/sound calls for *NIX because of the -HUGE-
-              //  ---  number of libraries that will be installed to support it.
-    const pa_sample_spec sndSpec = {
-        .format = PA_SAMPLE_S16LE,
-        .rate = 44100,
-        .channels = 1
-    } ;
-    int error ;
-
-    m_pulseAudioConnectionObject = pa_simple_new (NULL,
-                                                  "applepi",
-                                                  PA_STREAM_PLAYBACK,
-                                                  NULL,
-                                                  "playback",
-                                                  &sndSpec,
-                                                  NULL, NULL,
-                                                  &error) ;
-//    if (error) printf ("pa_simple_new error = %i\n", error) ;
-//     if (error) fprintf (stderr, "pa_simple_drain() failed: %s\n", pa_strerror(error)) ;
-#endif
 
     this->setVolume (float(volume)) ;
 
@@ -795,8 +769,6 @@ void MainWindow::play (int n)    // Currently (as of v0.2.3) called only by 'Flo
 }
 
 
-#ifdef Q_OS_WINDOWS
-
 void MainWindow::onPlaySoundTimer (void)
 {
     switch (m_soundNumber) {
@@ -809,28 +781,6 @@ void MainWindow::onPlaySoundTimer (void)
     }
     m_soundNumber = 0 ;
 }
-
-#else         //  ---  We don't use Qt5 audio/sound calls for *NIX because of the -HUGE-
-              //  ---  number of libraries that will be installed to support it.
-
-void MainWindow::onPlaySoundTimer (void)
-{
-    int error ;
-
-    switch (m_soundNumber) {
-        case 1:
-            pa_simple_write (m_pulseAudioConnectionObject, headStep1_wav, (size_t)headStep1_len, &error) ;
-            if (pa_simple_drain (m_pulseAudioConnectionObject, &error) < 0) {
-                fprintf(stderr, "pa_simple_drain() failed: %i\n", error) ;
-            }
-            break ;
-        default:
-            break ;
-    }
-    m_soundNumber = 0 ;
-}
-
-#endif
 
 
 void MainWindow::onScreenScale (void)
@@ -1005,41 +955,11 @@ void MainWindow::onClosePrinterButton (void)
 void MainWindow::setVolume (int volume)
 {
     m_speaker->setVolume (float(volume)) ;       // This is for the AppleII 'speaker'
-#ifdef Q_OS_WINDOWS
+    
     qreal linearVolume = QAudio::convertVolume (float(volume)/100.0,
                                                 QAudio::LogarithmicVolumeScale,
                                                 QAudio::LinearVolumeScale) ;
     m_soundEffect.setVolume (linearVolume) ;    // This is for recorded head-stepper sounds
 
-#else 
-
-printf ("volume=%i\n", volume) ;
-    pa_cvolume cVol ;
-    cVol.channels = 1 ;
-    cVol.values[0] = volume ;
-
- //   if (!(o = pa_context_set_source_output_volume (pulsesrc->context, pulsesrc->source_output_idx, &v, NULL, NULL)))
- //       goto volume_failed;
-
-//  From /usr/include/pulse/introspect.h
-// /** Set the volume of a source output stream \since 1.0 */
-// pa_operation* pa_context_set_source_output_volume (pa_context *c,
-//                                                    uint32_t idx,
-//                                                    const pa_cvolume *volume,
-//                                                    pa_context_success_cb_t cb,
-//                                                    void *userdata)
-
-// ****   /usr/include/pulse/introspect.h:72: * pa_context_get_server_info() provides access to a pa_server_info structure
-//  pa_operation* pa_context_get_server_info (pa_context *c,
-//                                            pa_server_info_cb_t cb,
-//                                            void *userdata);
-
-
-
-#endif
 }
 
-//pa_cvolume* pa_cvolume_set (pa_cvolume *a,
-//		                      unsigned    channels,
-//		                      pa_volume_t v 
-//	)
