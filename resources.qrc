@@ -2,5 +2,6 @@
 <!DOCTYPE RCC><RCC version="5.0">
 <qresource>
     <file>sounds/step1.wav</file>
+    <file>sounds/floppy-motor.wav</file>
 </qresource>
 </RCC>

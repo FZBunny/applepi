@@ -130,7 +130,9 @@ private:
     int     m_scaleButtonKludge ;
     int     m_soundNumber ;
 
-    QSoundEffect m_soundEffect;
+    QSoundEffect  m_soundEffect;
+    QSoundEffect  m_motorSound ;
+    bool          m_floppyMotorSoundIsPlaying ;
 
 //    struct fd_pair m_printPipe ;
 

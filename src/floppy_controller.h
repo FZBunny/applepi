@@ -78,8 +78,8 @@ public:
     void phase3_off (void) ;
     void phase3_on  (void) ;
 
-    void motorOff (void) ;
-    void motorOn  (void) ;
+    void motorOff  (void) ;
+    void motorOn   (void) ;
 
     void drive0_enable (void) ;
     void drive1_enable (void) ;
@@ -93,12 +93,12 @@ private:
 
     void embarassingKludge(void) ;
 
-    bool     checkDiskType (int driveIndex) ;
-    uint     logicalSector (void) ;
-    uint     getFileOffset (void) ;
+    bool    checkDiskType (int driveIndex) ;
+    uint    logicalSector (void) ;
+    uint    getFileOffset (void) ;
     quint8  addressData (quint8 xx, quint8 yy) ;
     quint8  read (void) ;
-    void     write (void) ;
+    void    write (void) ;
 
     quint64 m_lastAccess[2] ;
 
@@ -108,7 +108,7 @@ private:
     int  m_sector[2] ;
 
     quint8  m_latchedData[2] ;
-    int      m_dataLatchedForOutput[2] ;
+    int     m_dataLatchedForOutput[2] ;
 
     int  m_stepperPhase[2] ;   // 0..3
     int  m_stepperState[2] ;   // on(1) or off(0)
@@ -128,7 +128,7 @@ private:
 
     quint8  m_image[2][143360] ;
 
-    int      m_bufferIndex[2] ;
+    int     m_bufferIndex[2] ;
     quint8  m_buffer[2][256] ;
     quint8  m_rawBuffer [2][344] ;
     quint8  m_encodedBuffer[2][344] ;

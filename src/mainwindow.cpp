@@ -240,6 +240,10 @@ MainWindow::MainWindow (void)
 
     m_soundEffect.setLoopCount (1) ;
 
+    m_motorSound.setSource(QUrl::fromLocalFile(":/sounds/floppy-motor.wav")) ;
+    m_motorSound.setLoopCount (QSoundEffect::Infinite) ;
+    m_floppyMotorSoundIsPlaying = false ;
+
     this->setVolume (float(volume)) ;
 
     m_dial = new VolumeDial (this, 60, 60) ;
@@ -731,6 +735,22 @@ void MainWindow::onDiskDriveCheckTimer (void)
         if (m_HDActivityCountDown[1] < 0) m_HDActivityCountDown[1] = 0 ;
         if (m_HDActivityCountDown[1] == 0) m_hd2Button->setIcon (m_led_dim_red) ;
     }
+
+    if (m_floppyMotorCountDown[0] || m_floppyMotorCountDown[1]) {
+        if (m_floppyMotorSoundIsPlaying == false) {
+//printf ("play motor sound\n") ;
+            m_floppyMotorSoundIsPlaying = true ;
+            m_motorSound.play() ;
+        }
+    } else {
+        if (m_floppyMotorSoundIsPlaying) {
+//printf ("stop motor sound\n") ;
+            m_floppyMotorSoundIsPlaying = false ;
+            m_motorSound.stop() ;
+        }
+    }
+
+
 
 }
 
