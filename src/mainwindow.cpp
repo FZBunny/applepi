@@ -974,12 +974,12 @@ void MainWindow::onClosePrinterButton (void)
 
 void MainWindow::setVolume (int volume)
 {
-    m_speaker->setVolume (float(volume)) ;       // This is for the AppleII 'speaker'
+    m_speaker->setVolume (float(volume)) ;      // This is for the AppleII 'speaker'
     
     qreal linearVolume = QAudio::convertVolume (float(volume)/100.0,
                                                 QAudio::LogarithmicVolumeScale,
                                                 QAudio::LinearVolumeScale) ;
     m_soundEffect.setVolume (linearVolume) ;    // This is for recorded head-stepper sounds
-
+    m_motorSound.setVolume (linearVolume) ;     // and Disk II motor sound
 }
 
