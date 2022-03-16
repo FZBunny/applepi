@@ -185,6 +185,7 @@ void HardDriveDialog::insertVolume (void)
         slashLabel += label ;
         m_parent->setHDLabel (m_driveIndex+1, slashLabel) ;
         CFG->Set (m_volumePathKey, newPath) ;
+        this->accept() ;
         break ;
     }
 
