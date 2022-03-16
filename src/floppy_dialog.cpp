@@ -194,8 +194,8 @@ void FloppyDialog::insertFloppy (void)
         if (ok) {
             CFG->Set (m_floppyPathKey, newPath) ;
             m_parent->setFloppyLabel (m_driveIndex+1) ;
+            this->accept() ;
         }
-//        this->accept() ;
         break ;
     }
 }
