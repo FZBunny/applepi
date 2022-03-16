@@ -968,6 +968,8 @@ void MainWindow::onResetButton (void)
 {
 //printf ("onResetButton\n") ;
     if (m_mac->powerIsOn()) {
+        m_floppyMotorCountDown[0] = DISK_CHECK_INTERVAL ;
+        m_floppyMotorCountDown[1] = DISK_CHECK_INTERVAL ;
         m_mac->reset() ;
     }
 }
