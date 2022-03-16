@@ -1068,7 +1068,7 @@ DBUG(0x1000) ("Q6L  writing;  bix = %4d;  c=%2.2X\n", bix, c) ;
 unsigned char FloppyDiskController::Q6L (void)
 {
     m_lastAccess[m_currentDrive] = (qint64)time(NULL) ;
-    if (m_diskInDriveFlag[m_currentDrive] == false) return 0 ;
+    if (m_diskInDriveFlag[m_currentDrive] == false) return 0xff ;
 
     if (m_bufferIndex[m_currentDrive]<-18 || m_bufferIndex[m_currentDrive]>345) {
         m_bufferIndex[m_currentDrive] = -18 ;
