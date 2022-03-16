@@ -230,6 +230,8 @@ MainWindow::MainWindow (void)
 
     m_floppyMotorCountDown[0] = 0 ;
     m_floppyMotorCountDown[1] = 0 ;
+    m_floppyMotorIsOn[0] = false ;
+    m_floppyMotorIsOn[1] = false ;
     m_HDActivityCountDown[0] = 0 ;
     m_HDActivityCountDown[1] = 0 ;
 
@@ -435,6 +437,21 @@ void MainWindow::floppyMotorHasStarted (int driveIndex)
     if (driveIndex) m_floppy2Button->setIcon (m_led_bright_red) ;
     else            m_floppy1Button->setIcon (m_led_bright_red) ;
 
+    m_motorSound.play() ;
+    m_floppyMotorIsOn[driveIndex] = true ;
+
+    // The following is a kludge to set the motor off delay only if 
+    // the motor has been turned on -outside- the initial boot code.
+    quint16 pc = MAC->processorState()->pc.pc_16 ;
+    if ((pc < 0xc600) || (pc > 0xc6ff)) {
+        m_floppyMotorCountDown[driveIndex] = FLOPPY_MOTOR_OFF_DELAY ;
+    }
+
+}
+
+
+void MainWindow::floppyMotorHasBeenCommandedOff (int driveIndex)
+{
     m_floppyMotorCountDown[driveIndex] = FLOPPY_MOTOR_OFF_DELAY ;
 }
 
@@ -715,14 +732,22 @@ void MainWindow::onDiskDriveCheckTimer (void)
     if (m_floppyMotorCountDown[0]) {
         m_floppyMotorCountDown[0] -= DISK_CHECK_INTERVAL ;
         if (m_floppyMotorCountDown[0] < 0) m_floppyMotorCountDown[0] = 0 ;
-        if (m_floppyMotorCountDown[0] == 0) m_floppy1Button->setIcon (m_led_dim_red) ;
+        if (m_floppyMotorCountDown[0] == 0) {
+            m_floppy1Button->setIcon (m_led_dim_red) ;
+            m_floppyMotorIsOn[0] = false ;
+        }
     }
 
     if (m_floppyMotorCountDown[1]) {
         m_floppyMotorCountDown[1] -= DISK_CHECK_INTERVAL ;
         if (m_floppyMotorCountDown[1] < 0) m_floppyMotorCountDown[1] = 0 ;
-        if (m_floppyMotorCountDown[1] == 0) m_floppy2Button->setIcon (m_led_dim_red) ;
+        if (m_floppyMotorCountDown[1] == 0) {
+            m_floppy2Button->setIcon (m_led_dim_red) ;
+            m_floppyMotorIsOn[1] = false ;
+        }
     }
+
+    if ((m_floppyMotorIsOn[0] || m_floppyMotorIsOn[1]) == false) m_motorSound.stop() ;
 
     if (m_HDActivityCountDown[0]) {
         m_HDActivityCountDown[0] -= DISK_CHECK_INTERVAL ;
@@ -735,21 +760,6 @@ void MainWindow::onDiskDriveCheckTimer (void)
         if (m_HDActivityCountDown[1] < 0) m_HDActivityCountDown[1] = 0 ;
         if (m_HDActivityCountDown[1] == 0) m_hd2Button->setIcon (m_led_dim_red) ;
     }
-
-    if (m_floppyMotorCountDown[0] || m_floppyMotorCountDown[1]) {
-        if (m_floppyMotorSoundIsPlaying == false) {
-//printf ("play motor sound\n") ;
-            m_floppyMotorSoundIsPlaying = true ;
-            m_motorSound.play() ;
-        }
-    } else {
-        if (m_floppyMotorSoundIsPlaying) {
-//printf ("stop motor sound\n") ;
-            m_floppyMotorSoundIsPlaying = false ;
-            m_motorSound.stop() ;
-        }
-    }
-
 
 
 }

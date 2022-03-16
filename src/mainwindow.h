@@ -70,6 +70,7 @@ public:
     void resizeWindow (void) ;
     bool powerIsOn (void) ;
     void floppyMotorHasStarted (int driveIndex) ;
+    void floppyMotorHasBeenCommandedOff (int driveIndex) ;
     void HDActivityStarted (int driveIndex) ;
     void setHDLabel (uint drive, QString label) ;
     void setHDLabel (uint drive) ;
@@ -118,6 +119,7 @@ private:
 
     int     m_floppyMotorCountDown[2] ;
     int     m_HDActivityCountDown[2] ;
+    bool    m_floppyMotorIsOn[2] ;
 
     uint    m_scale ;
     uint    m_internalRomNumber ;

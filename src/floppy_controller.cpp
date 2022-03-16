@@ -436,12 +436,6 @@ DBUG(0x0080) ("phase3_on  m_trackTimes2[%i] = %2i\n", m_currentDrive, m_trackTim
 // --------- drive motor ----------
 //
 
-void FloppyDiskController::motorOff (void)
-{
-DBUG(0x0100) ("motorOff\n") ; fflush(stdout) ;
-}
-
-
 // This function seem backwards (the floppy tells the main frame that is has started a motor,
 // so that the frame can start a motor timer to control it's LEDs).   But this way prevents 
 // complaints that timers should be started only in the main thread.
@@ -449,7 +443,14 @@ DBUG(0x0100) ("motorOff\n") ; fflush(stdout) ;
 void FloppyDiskController::motorOn  (void)
 {
     m_parent->m_parent->floppyMotorHasStarted (m_currentDrive) ;
-DBUG(0x0200) ("motorOn\n") ; fflush(stdout) ;
+DBUG(0x0200) ("motorOn  %i\n", m_currentDrive) ; fflush(stdout) ;
+}
+
+
+void FloppyDiskController::motorOff (void)
+{
+    m_parent->m_parent->floppyMotorHasBeenCommandedOff (m_currentDrive) ;
+DBUG(0x0100) ("motorOff %i\n", m_currentDrive) ; fflush(stdout) ;
 }
 
 
@@ -471,6 +472,9 @@ void FloppyDiskController::drive1_enable (void)
 DBUG(0x0800) ("drive1_enable\n") ; fflush(stdout) ;
 }
 
+
+// 2022-03-14  Have noticed that NONE of the ProDos Disk II images I have encountered
+// so far have been in ProDos order.  This function may be pointless.  Hm...
 
 bool FloppyDiskController::checkDiskType (int driveIndex)
 {
@@ -607,6 +611,7 @@ DBUG(0x10000)("proDos_dos:    driveIndex=%x  offset=%6.6x value=%2.2x   m_image=
 
     if (ok) {
 DBUG(0x20000)("driveIndex %i: PRDOS order, DOS image\n", driveIndex) ;
+printf ("*** DOS disk, PRODOS order ***\n") ;
         m_sectorSkew[driveIndex] = PRODOS ;
         m_OS[driveIndex] = DOS3 ;
         return true ;
@@ -628,6 +633,7 @@ DBUG(0x10000)("proDos_ProDos:    driveIndex=%x  offset=%6.6x value=%2.2x   m_ima
 
     if (ok) {
 DBUG(0x20000)("driveIndex %i: PRODOS order, PRODOS image\n", driveIndex) ;
+printf ("*** PRODOS disk, PRODOS order ***\n") ;
         m_sectorSkew[driveIndex] = PRODOS ;
         m_OS[driveIndex] = PRODOS ;
         return true ;
@@ -688,7 +694,7 @@ uint FloppyDiskController::logicalSector (void)
        14, 12, 10,  8,  6,  4,  2, 15
     } ;
 
-    static const int  prodosLogicalToPhysicalSector[16] = {
+    static const int  prodosLogicalToPhysicalSector[16] = {     // <--- NB: This table has -never- been tested.
         0, 2, 4, 6, 8, 10, 12, 14,
         1, 3, 5, 7, 9, 11, 13, 15
     } ;
