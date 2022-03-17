@@ -73,6 +73,7 @@ TrapTrace::TrapTrace (MainWindow* parent) :  QDialog (parent)
     lab2->move (455,5) ;
     lab2->resize (70,20) ;
 
+
 //---------  T R A P  -----------
 
 
@@ -165,7 +166,7 @@ TrapTrace::TrapTrace (MainWindow* parent) :  QDialog (parent)
     getBoolConfigData ((char*)"trap1_enable", m_trap1_checkBox) ;
     getBoolConfigData ((char*)"trap2_enable", m_trap2_checkBox) ;
     getBoolConfigData ((char*)"trap3_enable", m_trap3_checkBox) ;
-    getBoolConfigData ((char*)"history_dump", m_history_checkBox) ;
+    getBoolConfigData ((char*)"trap_history_dump", m_history_checkBox) ;
 
     get16bitConfigData ((char*)"trap0_address", m_trap0_AddressBox) ;
     get16bitConfigData ((char*)"trap1_address", m_trap1_AddressBox) ;
@@ -206,7 +207,7 @@ TrapTrace::TrapTrace (MainWindow* parent) :  QDialog (parent)
     MAC->setTrap (3, addr, m_trap3_checkBox->isChecked()) ;
 
     QString  tmpString ;
-    CFG->Get ("lines2dump", &tmpString) ;
+    CFG->Get ("trap_history_lines", &tmpString) ;
 
     m_requestedDumpLinesBox->selectAll() ;
     m_requestedDumpLinesBox->insert (tmpString) ;
@@ -407,7 +408,7 @@ void TrapTrace::onLinesToDumpEntered (void)
         m_requestedDumpLinesBox->insert (str) ;
     }
     MAC->setLines2Dump (str) ;
-    CFG->Set ("lines2dump", str) ;
+    CFG->Set ("trap_history_lines", str) ;
 }
 
 
@@ -477,7 +478,7 @@ void TrapTrace::onHistoryCheckBox (void)
 {
     bool enabled = m_history_checkBox->isChecked() ;
 //printf ("m_history_checkBox = %i\n", enabled) ;
-    CFG->Set ("history_dump", enabled) ;
+    CFG->Set ("trap_history_dump", enabled) ;
     MAC->enableHistory (enabled) ;
 }
 

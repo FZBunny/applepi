@@ -92,10 +92,7 @@ Config::Config() : QSettings (QSettings::NativeFormat, QSettings::UserScope, "ap
         Set ("hd2_volume_path", defaultDir) ;
         Set (QString("help_size"), QSize(420,500)) ;
         Set (QString("help_position"), QPoint(10,10)) ;
-        Set ("history_dump", (uint)0) ;
         Set ("internal_rom_number", (uint)3) ;
-        tmpStr = "0" ;
-        Set ("lines2dump", tmpStr) ;
         Set ("rom_path", defaultDir) ;
         Set ("speaker_volume", (uint)20) ;
         Set ("tape_path",    defaultDir) ;
@@ -103,6 +100,9 @@ Config::Config() : QSettings (QSettings::NativeFormat, QSettings::UserScope, "ap
         Set ("text_echo_path", defaultDir) ;
         Set ("trace_start_address", zeros) ;
         Set ("trace_end_address",   ffff) ;
+        tmpStr = "0" ;
+        Set ("trap_history_lines", tmpStr) ;
+        Set ("trap_history_dump", (uint)0) ;
         Set ("trap0_address", zeros) ;
         Set ("trap1_address", zeros) ;
         Set ("trap2_address", zeros) ;
