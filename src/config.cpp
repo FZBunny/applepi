@@ -81,8 +81,8 @@ Config::Config() : QSettings (QSettings::NativeFormat, QSettings::UserScope, "ap
         Set ("directory_for_slot1_print", defaultDir) ;
         Set ("disassemble_start_address", zeros) ;
         Set ("disassemble_end", zeros) ;
-//        Set ("disassemble_mem_type", uint(1)) ;
-//        Set ("disassemble_end_criterion", uint(1)) ;
+        Set ("disassemble_mem_type", uint(0)) ;
+        Set ("disassemble_end_criterion", uint(0)) ;
         Set ("floppy1_path", defaultDir) ;
         Set ("floppy2_path", defaultDir) ;
         tmpStr = "/dev/input/mouse0" ;

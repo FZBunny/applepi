@@ -37,6 +37,7 @@
 
 
 #include "machine.h"
+#include "applepi_button.h"
 #include "disassembler.h"
 
 
@@ -56,10 +57,17 @@ private:
     void onDoItButtonClicked (void) ;
 
     void editAddress (QLineEdit* box) ;
+
     void onStartEdited   (void) ;
     void onStartFinished (void) ;
     void onEndEdited     (void) ;
     void onEndFinished   (void) ;
+    void onMainButton    (void) ;
+    void onAuxButton     (void) ;
+    void onRomButton     (void) ;
+    void onNInstructions (void) ;
+    void onNBytes        (void) ;
+    void onThisAddress   (void) ;
 
     void get16bitConfigData (char* key, QLineEdit* box) ;
     void getBoolConfigData  (char* key, QCheckBox* box) ;
@@ -69,7 +77,7 @@ private:
     QRadioButton* m_mainButton ;
     QRadioButton* m_auxButton ;
     QRadioButton* m_romButton ;
-    QRadioButton* m_nIstructions ;
+    QRadioButton* m_nInstructions ;
     QRadioButton* m_nBytes ;
     QRadioButton* m_thisAddress ;
 
@@ -80,16 +88,10 @@ private:
     QLineEdit*  m_startBox ;
     QLineEdit*  m_endBox ;
 
-
     QLabel*     m_startText ;
     QLabel*     m_endText ;
 
-    quint16     m_startAddr ;
-    int         m_lineHeight ;
-    int         m_historyIndex ;
-    int         m_nLines ;
     QFont      *m_panelFont ;
-    QPixmap     m_bufferBits ;
 
     Disassembler *m_disassembler ;
 

@@ -31,6 +31,7 @@
 #include <QRegExpValidator>
 
 //#include "disassembler.h"
+#include "applepi_button.h"
 #include "disassemble_memory_dialog.h"
 
 
@@ -55,6 +56,7 @@ DisassembleMemory::DisassembleMemory (QWidget* parent) :  QDialog (parent)
 
     m_doItButton = new ApplepiButton ("Disassemble", this) ;
     m_doItButton->move (100,windowHeight-50) ;
+    m_doItButton->setFocusPolicy (Qt::NoFocus) ;
 
     QFrame* box1 = new QFrame (this) ;
     box1->resize (120, 80) ;
@@ -89,7 +91,7 @@ DisassembleMemory::DisassembleMemory (QWidget* parent) :  QDialog (parent)
     get16bitConfigData ((char*)"disassemble_end", m_endBox) ;
 
     m_endText = new QLabel ("End After", this) ;
-    m_endText->move   (box2_X-130, box2_Y+28) ;
+    m_endText->move (box2_X-130, box2_Y+28) ;
 
     m_mainButton = new QRadioButton ("Main RAM", box1) ;
     m_auxButton  = new QRadioButton ("Aux RAM", box1) ;
@@ -97,17 +99,59 @@ DisassembleMemory::DisassembleMemory (QWidget* parent) :  QDialog (parent)
     m_mainButton->move (10, 10) ;
     m_auxButton->move  (10, 30) ;
     m_romButton->move  (10, 50) ;
-    m_mainButton->setChecked (true) ;
 
-    m_nIstructions = new QRadioButton ("Instructions", box2)  ;
-    m_nBytes       = new QRadioButton ("Bytes", box2) ;
-    m_thisAddress  = new QRadioButton ("Address", box2)  ;
-    m_nIstructions->move (10, 10) ;
-    m_nBytes->move       (10, 30) ;
-    m_thisAddress->move  (10, 50) ;
-    m_nIstructions->setChecked (true) ;
+    m_nInstructions = new QRadioButton ("Instructions", box2)  ;
+    m_nBytes        = new QRadioButton ("Bytes", box2) ;
+    m_thisAddress   = new QRadioButton ("Address", box2)  ;
+    m_nInstructions->move (10, 10) ;
+    m_nBytes->move        (10, 30) ;
+    m_thisAddress->move   (10, 50) ;
+
+ //XXXXX    m_nInstructions->setChecked (true) ; // XXXXX
+    uint  memType ;
+    CFG->Get ("disassemble_mem_type", &memType) ;
+    switch (memType) {
+      case 0:
+         m_mainButton->setChecked (true) ;
+         break ;
+      case 1:
+         m_auxButton->setChecked (true) ;
+         break ;
+      case 2:
+         m_romButton->setChecked (true) ;
+         break ;
+      default:
+         m_mainButton->setChecked (true) ;
+    }
+
+    uint  endCriterion ;
+    CFG->Get ("disassemble_end_criterion", &endCriterion) ;
+    switch (endCriterion) {
+      case 0:
+         m_nInstructions->setChecked (true) ;
+         break ;
+      case 1:
+         m_nBytes->setChecked (true) ;
+         break ;
+      case 2:
+         m_thisAddress->setChecked (true) ;
+         break ;
+      default:
+         m_nInstructions->setChecked (true) ;
+    }
+
+
+
 
     connect (m_doItButton, &ApplepiButton::clicked, this, &DisassembleMemory::onDoItButtonClicked) ;
+
+    connect (m_mainButton, &QRadioButton::toggled, this, &DisassembleMemory::onMainButton) ;
+    connect (m_auxButton,  &QRadioButton::toggled, this, &DisassembleMemory::onAuxButton) ;
+    connect (m_romButton,  &QRadioButton::toggled, this, &DisassembleMemory::onRomButton) ;
+
+    connect (m_nInstructions, &QRadioButton::toggled, this, &DisassembleMemory::onNInstructions) ;
+    connect (m_nBytes,        &QRadioButton::toggled, this, &DisassembleMemory::onNBytes) ;
+    connect (m_thisAddress,   &QRadioButton::toggled, this, &DisassembleMemory::onThisAddress) ;
 
     connect (m_startBox, &QLineEdit::textEdited,      this, &DisassembleMemory::onStartEdited) ;
     connect (m_startBox, &QLineEdit::editingFinished, this, &DisassembleMemory::onStartFinished) ;
@@ -196,9 +240,47 @@ void DisassembleMemory::editAddress (QLineEdit* box)
 }
 
 
+void DisassembleMemory::onMainButton (void)
+{
+    CFG->Set ("disassemble_mem_type", uint(0)) ;
+}
+
+
+void DisassembleMemory::onAuxButton (void)
+{
+    CFG->Set ("disassemble_mem_type", uint(1)) ;
+}
+
+
+void DisassembleMemory::onRomButton (void)
+{
+    CFG->Set ("disassemble_mem_type", uint(2)) ;
+}
+
+void DisassembleMemory::onNInstructions (void)
+{
+    CFG->Set ("disassemble_end_criterion", uint(0)) ;
+}
+
+
+void DisassembleMemory::onNBytes (void)
+{
+    CFG->Set ("disassemble_end_criterion", uint(1)) ;
+}
+
+
+void DisassembleMemory::onThisAddress (void)
+{
+    CFG->Set ("disassemble_end_criterion", uint(2)) ;
+}
+
+
 void DisassembleMemory::onDoItButtonClicked (void)
 {
+//    QRect rect = m_doItButton->geometry() ;
 
+
+printf ("onDoItButtonClicked\n") ;
     quint8* mem ;
 
     if      (m_mainButton->isChecked()) mem = MAC->m_ram ;
@@ -225,7 +307,7 @@ void DisassembleMemory::onDoItButtonClicked (void)
         printf ("%s\n", buffer) ;
         count++ ;
 
-        if (m_nIstructions->isChecked()) {
+        if (m_nInstructions->isChecked()) {
             if (count >= end) break ;
         } else if (m_nBytes->isChecked()) {
             if ((address - start) >= end) break ;
