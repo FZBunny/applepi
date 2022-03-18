@@ -73,9 +73,7 @@ TrapTrace::TrapTrace (MainWindow* parent) :  QDialog (parent)
     lab2->move (455,5) ;
     lab2->resize (70,20) ;
 
-
 //---------  T R A P  -----------
-
 
     int trap_X = 20 ;
     int trap_Y = 0 ;
@@ -159,7 +157,7 @@ TrapTrace::TrapTrace (MainWindow* parent) :  QDialog (parent)
     m_requestedDumpLinesBox->setValidator (m_decimalValidator) ;
 
     QLabel* lab3 = new QLabel ("Lines (decimal)", this) ;
-    lab3->move (trap_X+170,trap_Y+165) ;
+    lab3->move (trap_X+170,trap_Y+170) ;
     lab3->resize (100,40) ;
 
     getBoolConfigData ((char*)"trap0_enable", m_trap0_checkBox) ;
@@ -218,9 +216,6 @@ TrapTrace::TrapTrace (MainWindow* parent) :  QDialog (parent)
     setHalted (false) ;
 
 //---------  T R A C E  -----------
-
- //   int traceRef_X = 335 ;
- //   int traceRef_Y = 10 ;
 
     int traceButton_X   = 175 ;
     int traceStartBox_Y = 50 ;
