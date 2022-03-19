@@ -299,11 +299,27 @@ void Machine::setTrap (uint trapIndex, QString addressString , bool flag)
 }
 
 
+void Machine::setWatch (uint watchIndex, QString addressString , bool flag)
+{
+    if (watchIndex > 3) watchIndex = 3 ;
+    ulong longAddress ;
+    longAddress = addressString.toULong (nullptr, 16) ;
+    quint16 shortAddress = longAddress ;
+    m_watchAddr[watchIndex] = shortAddress ;
+    m_watchAddrSet[watchIndex] = flag ;
+printf ("Machine::setWatch  watchIndex=%i; shortAddress=%4.4X  flag=%i\n", watchIndex, shortAddress, flag) ;
+}
+
 void Machine::setTrapTraceDialogPointer (TrapTrace *dialog)
 {
     m_trapTraceDialogPointer = dialog ;
 }
 
+
+void Machine::setWatchAddrDialogPointer (WatchAddr *dialog)
+{
+    m_watchAddrDialogPointer = dialog ;
+}
 
 void Machine::setLines2Dump (QString nLines)
 {

@@ -43,6 +43,7 @@
 #include "help.h"
 
 #include "traptrace.h"
+#include "watchaddr.h"
 
 #include "gamepad_dialog.h"
 #include "rom_dialog.h"
@@ -50,8 +51,6 @@
 //#include "about.h"
 #include "disassemble_memory_dialog.h"
 
-// QAction(const QString &text, QObject *parent = nullptr)
-// connect(newAct, &QAction::triggered, this, &MainWindow::newFile);
 
 
 extern "C" void trim (char* buffer, int len) ;
@@ -133,6 +132,10 @@ void MainWindow::createMenus (void)
     m_trapTrace = new QAction (tr("Trap and Trace..."), this) ;
     m_debugMenu->addAction (m_trapTrace) ;
     connect (m_trapTrace, &QAction::triggered, this, &MainWindow::onTrapTrace) ;
+
+    m_watchAddr = new QAction (tr("Watch Addresses..."), this) ;
+    m_debugMenu->addAction (m_watchAddr) ;
+    connect (m_watchAddr, &QAction::triggered, this, &MainWindow::onWatchAddr) ;
 
 // ------ "Help" menu  ------
 
@@ -419,6 +422,26 @@ void MainWindow::trapTraceIsStopping (void)  // (Called in "TrapTrace::done" jus
 {
     m_trapTraceIsRunning = false ;
     m_trapTrace->setEnabled (true) ;
+}
+
+
+void MainWindow::onWatchAddr (void)
+{
+    if (m_watchAddrIsRunning) return ;  // Again, probably can't happen, but WTF.
+
+    m_watchAddr->setEnabled (false) ;   // Only allow one instance of a WatchAddr object.
+    m_watchAddrIsRunning = true ;
+
+    WatchAddr *watchAddr = new WatchAddr (this) ;
+    watchAddr->show() ;
+
+}
+
+
+void MainWindow::watchAddrIsStopping (void)  // (Called in "WatchAddr::done" just before it exits.)
+{
+    m_watchAddrIsRunning = false ;
+    m_watchAddr->setEnabled (true) ;
 }
 
 

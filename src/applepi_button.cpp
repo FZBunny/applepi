@@ -35,16 +35,19 @@
 
 ApplepiButton::ApplepiButton (const QIcon &icon, const QString &text, QWidget *parent)
              : QPushButton   (icon, text, parent)
-{}
+{
+    this->setFocusPolicy (Qt::NoFocus) ;
+}
 
 
 ApplepiButton::ApplepiButton (const QString &text, QWidget *parent)
              : QPushButton   (text, parent)
-{}
-
+{
+    this->setFocusPolicy (Qt::NoFocus) ;
+}
 
 void ApplepiButton::keyPressEvent(QKeyEvent *e)
 {
     e->ignore() ;
+    this->setFocusPolicy (Qt::NoFocus) ;
 }
-

@@ -113,6 +113,16 @@ Config::Config() : QSettings (QSettings::NativeFormat, QSettings::UserScope, "ap
         Set ("trap3_enable",  (uint)0) ;
         Set ("text_echo_path", defaultDir) ;
         Set ("use_internal_rom", yes) ;
+        Set ("watch0_address", zeros) ;
+        Set ("watch1_address", zeros) ;
+        Set ("watch2_address", zeros) ;
+        Set ("watch3_address", zeros) ;
+        Set ("watch0_enable",  (uint)0) ;
+        Set ("watch1_enable",  (uint)0) ;
+        Set ("watch2_enable",  (uint)0) ;
+        Set ("watch3_enable",  (uint)0) ;
+        Set ("watch_history_lines",  (uint)0) ;
+        Set ("watch_history_dump", (uint)0) ;
         tmpStr = "10,10" ;
         Set ("window_position", tmpStr) ;
         Set ("window_scale", (uint)1) ;

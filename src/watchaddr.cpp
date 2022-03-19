@@ -1,6 +1,6 @@
 /*****************************************************************************
 
-    File: "watchtrace.cpp"
+    File: "watchaddr.cpp"
 
     Copyright (C) 2021, Bruce Ward
 
@@ -28,11 +28,11 @@
 //using namespace std ;
 //#include  <iomanip>
 
-#include "watchtrace.h"
+#include "watchaddr.h"
 #include "machine.h"
 
 
-MemWatch::MemWatch (MainWindow* parent) :  QDialog (parent)
+WatchAddr::WatchAddr (MainWindow* parent) :  QDialog (parent)
 {
     this->setWindowTitle ("Watch Memory") ;
     
@@ -49,7 +49,7 @@ MemWatch::MemWatch (MainWindow* parent) :  QDialog (parent)
     
     this->setAttribute (Qt::WA_DeleteOnClose) ;
 
-    MAC->setMemWatchDialogPointer (this) ;  // (machine has to know how to tell us a watch has been hit)
+    MAC->setWatchAddrDialogPointer (this) ;  // (machine has to know how to tell us a watch has been hit)
 
     m_hexValidator = new QRegExpValidator (QRegExp ("[0123456789ABCDEFabcdef]{1,5}"), this) ;
     m_decimalValidator = new QRegExpValidator (QRegExp ("[0123456789]{1,6}"), this) ;
@@ -64,14 +64,9 @@ MemWatch::MemWatch (MainWindow* parent) :  QDialog (parent)
     this->setFont (font1) ;
 #endif
 
-
-    QLabel* lab1 = new QLabel ("T R A P", this) ;
-    lab1->move (140,5) ;
+    QLabel* lab1 = new QLabel ("W A T C H   A D R E S S", this) ;
+    lab1->move (100,5) ;
     lab1->resize (70,20) ;
-
-    QLabel* lab2 = new QLabel ("T R A C E", this) ;
-    lab2->move (455,5) ;
-    lab2->resize (70,20) ;
 
     int watch_X = 20 ;
     int watch_Y = 0 ;
@@ -169,28 +164,28 @@ MemWatch::MemWatch (MainWindow* parent) :  QDialog (parent)
     get16bitConfigData ((char*)"watch2_address", m_watch2_AddressBox) ;
     get16bitConfigData ((char*)"watch3_address", m_watch3_AddressBox) ;
 
-    connect (m_singleStepButton, &ApplepiButton::clicked, this, &MemWatch::onSingleStepClicked) ;
-    connect (m_runFreeButton,    &ApplepiButton::clicked, this, &MemWatch::onRunFreeClicked) ;
-    connect (m_haltButton,       &ApplepiButton::clicked, this, &MemWatch::onHaltClicked) ;
+    connect (m_singleStepButton, &ApplepiButton::clicked, this, &WatchAddr::onSingleStepClicked) ;
+    connect (m_runFreeButton,    &ApplepiButton::clicked, this, &WatchAddr::onRunFreeClicked) ;
+    connect (m_haltButton,       &ApplepiButton::clicked, this, &WatchAddr::onHaltClicked) ;
 
-    connect (m_watch0_checkBox,   &QCheckBox::stateChanged, this, &MemWatch::onWatch0CheckBox) ;
-    connect (m_watch1_checkBox,   &QCheckBox::stateChanged, this, &MemWatch::onWatch1CheckBox) ;
-    connect (m_watch2_checkBox,   &QCheckBox::stateChanged, this, &MemWatch::onWatch2CheckBox) ;
-    connect (m_watch3_checkBox,   &QCheckBox::stateChanged, this, &MemWatch::onWatch3CheckBox) ;
+    connect (m_watch0_checkBox,   &QCheckBox::stateChanged, this, &WatchAddr::onWatch0CheckBox) ;
+    connect (m_watch1_checkBox,   &QCheckBox::stateChanged, this, &WatchAddr::onWatch1CheckBox) ;
+    connect (m_watch2_checkBox,   &QCheckBox::stateChanged, this, &WatchAddr::onWatch2CheckBox) ;
+    connect (m_watch3_checkBox,   &QCheckBox::stateChanged, this, &WatchAddr::onWatch3CheckBox) ;
 
-    connect (m_history_checkBox, &QCheckBox::stateChanged, this, &MemWatch::onHistoryCheckBox) ;
+    connect (m_history_checkBox, &QCheckBox::stateChanged, this, &WatchAddr::onHistoryCheckBox) ;
 
-    connect (m_watch0_AddressBox, &QLineEdit::textEdited, this,  &MemWatch::onWatch0Edited) ;
-    connect (m_watch1_AddressBox, &QLineEdit::textEdited, this,  &MemWatch::onWatch1Edited) ;
-    connect (m_watch2_AddressBox, &QLineEdit::textEdited, this,  &MemWatch::onWatch2Edited) ;
-    connect (m_watch3_AddressBox, &QLineEdit::textEdited, this,  &MemWatch::onWatch3Edited) ;
+    connect (m_watch0_AddressBox, &QLineEdit::textEdited, this,  &WatchAddr::onWatch0Edited) ;
+    connect (m_watch1_AddressBox, &QLineEdit::textEdited, this,  &WatchAddr::onWatch1Edited) ;
+    connect (m_watch2_AddressBox, &QLineEdit::textEdited, this,  &WatchAddr::onWatch2Edited) ;
+    connect (m_watch3_AddressBox, &QLineEdit::textEdited, this,  &WatchAddr::onWatch3Edited) ;
 
-    connect (m_watch0_AddressBox, &QLineEdit::editingFinished, this,  &MemWatch::onWatch0Finshed) ;
-    connect (m_watch1_AddressBox, &QLineEdit::editingFinished, this,  &MemWatch::onWatch1Finshed) ;
-    connect (m_watch2_AddressBox, &QLineEdit::editingFinished, this,  &MemWatch::onWatch2Finshed) ;
-    connect (m_watch3_AddressBox, &QLineEdit::editingFinished, this,  &MemWatch::onWatch3Finshed) ;
+    connect (m_watch0_AddressBox, &QLineEdit::editingFinished, this,  &WatchAddr::onWatch0Finshed) ;
+    connect (m_watch1_AddressBox, &QLineEdit::editingFinished, this,  &WatchAddr::onWatch1Finshed) ;
+    connect (m_watch2_AddressBox, &QLineEdit::editingFinished, this,  &WatchAddr::onWatch2Finshed) ;
+    connect (m_watch3_AddressBox, &QLineEdit::editingFinished, this,  &WatchAddr::onWatch3Finshed) ;
 
-    connect (m_requestedDumpLinesBox, &QLineEdit::editingFinished, this,  &MemWatch::onLinesToDumpEntered) ;
+    connect (m_requestedDumpLinesBox, &QLineEdit::editingFinished, this,  &WatchAddr::onLinesToDumpEntered) ;
     
     QString addr ;
     addr = m_watch0_AddressBox->text() ;
@@ -216,7 +211,7 @@ MemWatch::MemWatch (MainWindow* parent) :  QDialog (parent)
 }
 
 
-void MemWatch::get16bitConfigData (char* key, QLineEdit* box)
+void WatchAddr::get16bitConfigData (char* key, QLineEdit* box)
 {
     QString tmpString ;
     CFG->Get ((char*)key, &tmpString) ;
@@ -224,7 +219,7 @@ void MemWatch::get16bitConfigData (char* key, QLineEdit* box)
 }
 
 
-void MemWatch::getBoolConfigData (char* key, QCheckBox* box)
+void WatchAddr::getBoolConfigData (char* key, QCheckBox* box)
 {
     bool  value ;
     CFG->Get (key, &value) ;
@@ -234,10 +229,10 @@ void MemWatch::getBoolConfigData (char* key, QCheckBox* box)
 
 // Clear all machine watchs and disable instruction tracing when this dialog is dismissed.
 
-void MemWatch::reject (void)
+void WatchAddr::reject (void)
 {
-//printf ("void MemWatch::reject\n") ;
-    m_parent->watchTraceIsStopping() ;
+//printf ("void WatchAddr::reject\n") ;
+    m_parent->watchAddrIsStopping() ;
 
     for (int i=0; i<3; i++) {
         MAC->setWatch (i, QString("0"), 0) ;
@@ -253,13 +248,13 @@ void MemWatch::reject (void)
 // would otherwise be seen by the buttons as 'click' events.
 // That would be bad.
 
-void MemWatch::keyPressEvent (QKeyEvent *)
+void WatchAddr::keyPressEvent (QKeyEvent *)
 {
 //printf ("keyPressEvent\n") ;
 }
 
 
-void MemWatch::editAddress (QLineEdit* box)
+void WatchAddr::editAddress (QLineEdit* box)
 {
     QString text = box->text() ;
     int pos = box->cursorPosition() ;
@@ -275,7 +270,7 @@ void MemWatch::editAddress (QLineEdit* box)
 }
 
 
-QString* MemWatch::finishAddress (QLineEdit* box)
+QString* WatchAddr::finishAddress (QLineEdit* box)
 {
     QString* text = new QString (box->text()) ;
     quint16 value = text->toUShort (NULL, 16) ;
@@ -292,7 +287,7 @@ QString* MemWatch::finishAddress (QLineEdit* box)
 //---------------------------------------------------
 
 
-void MemWatch::onWatch0Finshed (void)
+void WatchAddr::onWatch0Finshed (void)
 {
     QString* text = finishAddress (m_watch0_AddressBox) ;
     CFG->Set ("watch0_address", *text) ;
@@ -300,7 +295,7 @@ void MemWatch::onWatch0Finshed (void)
 }
 
 
-void MemWatch::onWatch1Finshed (void)
+void WatchAddr::onWatch1Finshed (void)
 {
     QString* text = finishAddress (m_watch1_AddressBox) ;
     CFG->Set ("watch1_address", *text) ;
@@ -308,7 +303,7 @@ void MemWatch::onWatch1Finshed (void)
 }
 
 
-void MemWatch::onWatch2Finshed (void)
+void WatchAddr::onWatch2Finshed (void)
 {
     QString* text = finishAddress (m_watch2_AddressBox) ;
     CFG->Set ("watch2_address", *text) ;
@@ -316,7 +311,7 @@ void MemWatch::onWatch2Finshed (void)
 }
 
 
-void MemWatch::onWatch3Finshed (void)
+void WatchAddr::onWatch3Finshed (void)
 {
     QString* text = finishAddress (m_watch3_AddressBox) ;
     CFG->Set ("watch3_address", *text) ;
@@ -324,31 +319,31 @@ void MemWatch::onWatch3Finshed (void)
 }
 
 
-void MemWatch::onWatch0Edited (void)
+void WatchAddr::onWatch0Edited (void)
 {
     editAddress (m_watch0_AddressBox) ;
 }
 
 
-void MemWatch::onWatch1Edited (void)
+void WatchAddr::onWatch1Edited (void)
 {
     editAddress (m_watch1_AddressBox) ;
 }
 
 
-void MemWatch::onWatch2Edited (void)
+void WatchAddr::onWatch2Edited (void)
 {
     editAddress (m_watch2_AddressBox) ;
 }
 
 
-void MemWatch::onWatch3Edited (void)
+void WatchAddr::onWatch3Edited (void)
 {
     editAddress (m_watch3_AddressBox) ;
 }
 
 
-void MemWatch::onLinesToDumpEntered (void)
+void WatchAddr::onLinesToDumpEntered (void)
 {
     QString str = m_requestedDumpLinesBox->text() ;
     ulong nLines ;
@@ -363,28 +358,28 @@ void MemWatch::onLinesToDumpEntered (void)
 }
 
 
-void MemWatch::onSingleStepClicked (void)
+void WatchAddr::onSingleStepClicked (void)
 {
     MAC->singleStep() ;
     fflush (stdout) ;
 }
 
 
-void MemWatch::onRunFreeClicked (void)
+void WatchAddr::onRunFreeClicked (void)
 {
     MAC->runFree() ;
     setHalted (false) ;
 }
 
 
-void MemWatch::onHaltClicked ()
+void WatchAddr::onHaltClicked ()
 {
     MAC->halt() ;
     setHalted (true) ;
 }
 
 
-void MemWatch::setHalted (bool halted)
+void WatchAddr::setHalted (bool halted)
 {
     m_singleStepButton->setEnabled (halted) ;
     m_runFreeButton->setEnabled (halted) ;
@@ -393,7 +388,7 @@ void MemWatch::setHalted (bool halted)
 
 
 
-void MemWatch::onWatch0CheckBox (void)
+void WatchAddr::onWatch0CheckBox (void)
 {
     bool enabled = m_watch0_checkBox->isChecked() ;
     CFG->Set ("watch0_enable", enabled) ;
@@ -401,7 +396,7 @@ void MemWatch::onWatch0CheckBox (void)
 }
 
 
-void MemWatch::onWatch1CheckBox (void)
+void WatchAddr::onWatch1CheckBox (void)
 {
     bool enabled = m_watch1_checkBox->isChecked() ;
     CFG->Set ("watch1_enable", enabled) ;
@@ -409,7 +404,7 @@ void MemWatch::onWatch1CheckBox (void)
 }
 
 
-void MemWatch::onWatch2CheckBox (void)
+void WatchAddr::onWatch2CheckBox (void)
 {
     bool enabled = m_watch2_checkBox->isChecked() ;
     CFG->Set ("watch2_enable", enabled) ;
@@ -417,7 +412,7 @@ void MemWatch::onWatch2CheckBox (void)
 }
 
 
-void MemWatch::onWatch3CheckBox (void)
+void WatchAddr::onWatch3CheckBox (void)
 {
     bool enabled = m_watch3_checkBox->isChecked() ;
     CFG->Set ("watch3_enable", enabled) ;
@@ -425,7 +420,7 @@ void MemWatch::onWatch3CheckBox (void)
 }
 
 
-void MemWatch::onHistoryCheckBox (void)
+void WatchAddr::onHistoryCheckBox (void)
 {
     bool enabled = m_history_checkBox->isChecked() ;
 //printf ("m_history_checkBox = %i\n", enabled) ;

@@ -59,6 +59,7 @@ HEADERS += src/about.h \
            src/view_memory.h \
            src/volume_dial.h \
            src/version.h \
+           src/watchaddr.h \
            src/wav_step1.h \
            src/xpm_images.h
 
@@ -93,6 +94,7 @@ SOURCES += src/about.cpp \
            src/usleep.cpp \
            src/view_memory.cpp \
            src/volume_dial.cpp \
+           src/watchaddr.cpp \
            src/xpm_40column_chars_IIe.cpp \
            src/xpm_40column_chars_IIplus.cpp \
            src/xpm_40column_chars_enhanced.cpp \

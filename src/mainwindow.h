@@ -39,6 +39,7 @@
 
 #include "screen.h"
 #include "traptrace.h"
+#include "watchaddr.h"
 #include "machine.h"
 #include "applepi_button.h"
 #include "volume_dial.h"
@@ -81,6 +82,7 @@ public:
     void pastingText (bool pasting) ;
 
     void trapTraceIsStopping (void) ;
+    void watchAddrIsStopping (void) ;
 
     Speaker* speaker (void) ;
 
@@ -195,6 +197,7 @@ private:
 // Debug actions:
     QAction* m_viewMemory ;
     QAction* m_trapTrace ;
+    QAction* m_watchAddr ;
     QAction* m_disassembleMemory ;
 
 // Help actions:
@@ -217,6 +220,7 @@ private:
     QLabel*  m_maxText ;
 
     bool m_trapTraceIsRunning ;
+    bool m_watchAddrIsRunning ;
 
     void createMenus (void) ;
     void setCPuTimer (void) ;
@@ -249,6 +253,7 @@ private:
 
     void onViewMemory    (void) ;
     void onTrapTrace     (void) ;
+    void onWatchAddr     (void) ;
     void onDisassembleMemory (void) ;
 
     void onHelp  (void) ;

@@ -44,6 +44,7 @@
 #include "gamepad.h"
 #include "printer.h"
 #include "traptrace.h"
+#include "watchaddr.h"
 #include "usleep.h"
 
 // #include "tape.h"
@@ -384,11 +385,13 @@ class MainWindow ;
 //class HdController ;
 //class Tape ;
 class TrapTrace ;
+class WatchAddr ;
 
 
 // ====================================
 
 #include "traptrace.h"
+//#include "watchaddr.h"
 
 class Machine : public QThread
 {
@@ -425,6 +428,8 @@ public:
     void setTraceEnd (quint16 hiAddress) ;
     void setTrap (uint trapIndex, QString address, bool flag) ;
     void setTrapTraceDialogPointer (TrapTrace *trapTraceDialog) ;
+    void setWatch (uint watchIndex, QString address, bool flag) ;
+    void setWatchAddrDialogPointer (WatchAddr *WatchAddrDialog) ;
     void setLines2Dump (QString nLines) ;
     void enableHistory (bool flag) ;
 
@@ -527,13 +532,16 @@ private:
     bool      m_paused ;
     bool      m_WAI_executed ;    // Set to true if "WAI" (wait for interrupt) instruction is executed
     bool      m_STP_executed ;    // Set to true if "STP" (wait for reset) instruction is executed
-    quint16  m_trapPointAddr[4] ;
+    quint16   m_trapPointAddr[4] ;
     bool      m_trapPointSet[4] ;
+    quint16   m_watchAddr[4] ;
+    quint16   m_watchAddrSet[4] ;
     bool      m_dumpHistory ;
     int       m_halted ;
     int       m_singleStepPhase ;
 
-    TrapTrace *m_trapTraceDialogPointer ;
+    TrapTrace  *m_trapTraceDialogPointer ;
+    WatchAddr   *m_watchAddrDialogPointer ;
 
     ProcessorState  m_registers ;
 

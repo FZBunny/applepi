@@ -1,6 +1,6 @@
 /*****************************************************************************
 
-    File: "watchtrace.h"
+    File: "watchmem.h"
 
     Copyright (C) 2021, Bruce Ward
 
@@ -26,8 +26,8 @@
 *****************************************************************************/
 
 
-#ifndef TRAPTRACE_H
-#define TRAPTRACE_H
+#ifndef WATCHADDR_H
+#define WATCHADDR_H
 
 
 #include <QDialog>
@@ -42,12 +42,12 @@
 class MainWindow ;
 
 
-class MemWatch: public QDialog
+class WatchAddr: public QDialog
 {
     public:
 
-        MemWatch (MainWindow* parent) ;
-        virtual ~MemWatch(){} ;
+        WatchAddr (MainWindow* parent) ;
+        virtual ~WatchAddr(){} ;
 
         void setHalted (bool halted) ;
         void reject (void) ;
@@ -81,14 +81,8 @@ class MemWatch: public QDialog
         void  onWatch1CheckBox   (void) ;
         void  onWatch2CheckBox   (void) ;
         void  onWatch3CheckBox   (void) ;
-        void  onHistoryCheckBox (void) ;
+        void  onHistoryCheckBox  (void) ;
 
-        void  onTraceStartEdited (void) ;
-        void  onTraceStartFinshed (void) ;
-        void  onTraceEndEdited   (void) ;
-        void  onTraceEndFinshed   (void) ;
-
-        void  onTraceButtonClicked (void) ;
         void  onSingleStepClicked  (void) ;
         void  onRunFreeClicked     (void) ;
         void  onHaltClicked        (void) ;
@@ -107,8 +101,6 @@ class MemWatch: public QDialog
         QRegExpValidator* m_decimalValidator ;
 
         QWindow*     m_panel ;
-        QLineEdit*   m_traceStartBox ;
-        QLineEdit*   m_traceEndBox ;
         QLineEdit*   m_watch0_AddressBox ;
         QLineEdit*   m_watch1_AddressBox ;
         QLineEdit*   m_watch2_AddressBox ;
@@ -122,7 +114,6 @@ class MemWatch: public QDialog
         QPushButton* m_singleStepButton ;
         QPushButton* m_runFreeButton ;
         QPushButton* m_haltButton ;
-        QPushButton* m_traceButton ;
 
         quint16       m_startAddr ;
         int           m_lineHeight ;
