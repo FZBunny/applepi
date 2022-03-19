@@ -133,8 +133,8 @@ void MainWindow::createMenus (void)
     m_debugMenu->addAction (m_trapTrace) ;
     connect (m_trapTrace, &QAction::triggered, this, &MainWindow::onTrapTrace) ;
 
-//    m_watchAddr = new QAction (tr("Watch Addresses..."), this) ;
-//    m_debugMenu->addAction (m_watchAddr) ;
+//    m_watchAddr = new QAction (tr("Watch Addresses..."), this) ;     XXXXXXXXXXXXX development of "watch address" feature has been temporarily(?)
+//    m_debugMenu->addAction (m_watchAddr) ;                           XXXXXXXXXXXXX abandoned, with preliminary code left in place.
 //    connect (m_watchAddr, &QAction::triggered, this, &MainWindow::onWatchAddr) ;
 
 // ------ "Help" menu  ------
