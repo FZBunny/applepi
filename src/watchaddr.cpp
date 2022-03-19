@@ -34,12 +34,12 @@
 
 WatchAddr::WatchAddr (MainWindow* parent) :  QDialog (parent)
 {
-    this->setWindowTitle ("Watch Memory") ;
+    this->setWindowTitle ("Watch Address") ;
     
     MAC->enableTrace (false) ;
     
     m_parent = parent ;
-    int width = 650 ;
+    int width = 322 ;
     int height = 235 ;
     setMinimumSize (width,height) ;
     setMaximumSize (width,height) ;
@@ -64,9 +64,9 @@ WatchAddr::WatchAddr (MainWindow* parent) :  QDialog (parent)
     this->setFont (font1) ;
 #endif
 
-    QLabel* lab1 = new QLabel ("W A T C H   A D R E S S", this) ;
-    lab1->move (100,5) ;
-    lab1->resize (70,20) ;
+    QLabel* lab1 = new QLabel ("W A T C H   A D D R E S S", this) ;
+    lab1->move (88,5) ;
+    lab1->resize (200,20) ;
 
     int watch_X = 20 ;
     int watch_Y = 0 ;
@@ -85,13 +85,6 @@ WatchAddr::WatchAddr (MainWindow* parent) :  QDialog (parent)
     box1->setFrameStyle (QFrame::Panel | QFrame::Raised) ;
     box1->setLineWidth(3) ;
     box1->show() ;
-
-    QFrame* box2 = new QFrame (this, Qt::Widget) ;
-    box2->move (335,30) ;
-    box2->resize (300, 188) ;
-    box2->setFrameStyle (QFrame::Panel | QFrame::Raised) ;
-    box2->setLineWidth(3) ;
-    box2->show() ;
 
     m_singleStepButton = new ApplepiButton ("Single Step", box1) ;
     m_runFreeButton    = new ApplepiButton ("Continue", box1) ;

@@ -77,7 +77,7 @@ void Machine::store (quint8 c, quint16 p)
         return ;
     }
 
-    *store_highMem(p) = c ;          // d000 - ffff   ank-switched area
+    *store_highMem(p) = c ;           // d000 - ffff   bank-switched area
 
 }
 

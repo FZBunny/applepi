@@ -133,9 +133,9 @@ void MainWindow::createMenus (void)
     m_debugMenu->addAction (m_trapTrace) ;
     connect (m_trapTrace, &QAction::triggered, this, &MainWindow::onTrapTrace) ;
 
-    m_watchAddr = new QAction (tr("Watch Addresses..."), this) ;
-    m_debugMenu->addAction (m_watchAddr) ;
-    connect (m_watchAddr, &QAction::triggered, this, &MainWindow::onWatchAddr) ;
+//    m_watchAddr = new QAction (tr("Watch Addresses..."), this) ;
+//    m_debugMenu->addAction (m_watchAddr) ;
+//    connect (m_watchAddr, &QAction::triggered, this, &MainWindow::onWatchAddr) ;
 
 // ------ "Help" menu  ------
 
