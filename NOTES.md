@@ -1,3 +1,13 @@
+#### To build from source:    
+For Debian-derived distributions, you will need to install these libraries:   
+
+- libasound2-dev
+- libpulse-dev
+- qt5-qmake       (Not a lib, but a utility needed to create a Makefile)   
+- qtdeclarative5-dev
+- libqt5gamepad5-dev
+- qtmultimedia5-dev
+
 
 #### A warning when building from source  
 ApplePi uses the Qt5 library.
