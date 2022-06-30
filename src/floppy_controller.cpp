@@ -473,8 +473,14 @@ DBUG(0x0800) ("drive1_enable\n") ; fflush(stdout) ;
 }
 
 
-// 2022-03-14  Have noticed that NONE of the ProDos Disk II images I have encountered
-// so far have been in ProDos order.  This function may be pointless.  Hm...
+//
+// 2022-03-14 : Have noticed that NONE of the ProDos Disk II images I have 
+// encountered on the web so far have been in ProDos order.
+// This fuction may need to ONLY determine OS type (DOS/ProDOS/Pascal)
+//
+// --- Note that none of the 'ProDOS order' code has been     ---
+// --- tested as I have never found a disk that in that order --- 
+// --- It is therefore almost certainly rubbish.              ---
 
 bool FloppyDiskController::checkDiskType (int driveIndex)
 {
@@ -594,6 +600,7 @@ DBUG(0x20000)("driveIndex %i: DOS order, PRODOS image\n", driveIndex) ;
 
 
 // ============= PRODOS checks
+
 
 //  Check for PRODOS order image of a DOS disk
 

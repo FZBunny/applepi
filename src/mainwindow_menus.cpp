@@ -102,9 +102,9 @@ void MainWindow::createMenus (void)
 
 // "Preferences" menu  ------------------------------------
 
- //   m_gameController = new QAction (tr("Select Game Controller...")) ;
- //   m_preferencesMenu->addAction (m_gameController) ;
- //   connect (m_gameController, &QAction::triggered, this, &MainWindow::onGameController) ;
+    m_gameController = new QAction (tr("Select Game Controller...")) ;
+    m_preferencesMenu->addAction (m_gameController) ;
+    connect (m_gameController, &QAction::triggered, this, &MainWindow::onGameController) ;
 
   
     m_keyboardcase = new QAction (tr("Use Mixed-Case Keyboard"), this) ;

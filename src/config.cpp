@@ -38,7 +38,7 @@
 
 using namespace std ;
 
-//Config::Config()
+
 
 Config::Config() : QSettings (QSettings::NativeFormat, QSettings::UserScope, "applepi", "applepi")
 {

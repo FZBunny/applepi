@@ -536,9 +536,8 @@ void MainWindow::setFloppyLabel (uint drive)
             case DOS3:
                 n = m_mac->m_floppy->readSector (buffer, drive, 17, 0) ;    // (DOS VTOC is on track 17, sector 0)
                 if (n == SECTORSIZE) {
-                    int releaseNumber = buffer[3] ;
                     int volumeNumber  = buffer[6] ;
-                    QTextStream (&slashLabel) << "DOS" << releaseNumber << " Vol." << volumeNumber ;
+                    QTextStream (&slashLabel) << "DOS" << "3.3" << " Vol." << volumeNumber ;
                 } else {
                     slashLabel = " *** I/O Error *** " ;
                 }
@@ -913,6 +912,7 @@ void MainWindow::onPowerButton (void)
         m_hd2Button->setIcon (m_led_dim_red) ;
         m_tapeButton->setIcon (m_led_dim_red) ;
         m_screen->initialize() ;
+        m_motorSound.stop() ;
     }
 
 }
