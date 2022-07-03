@@ -40,15 +40,10 @@
 #include <errno.h>
 #include <poll.h>
 #include <signal.h>
-
 #include <alsa/asoundlib.h>
 #include <alsa/pcm.h>
 
-
 #include "mainwindow.h"
-//#include "speaker.h"
-//#include "sound-recal.h"
-//#include "sound-step.h"
 #include "defs.h"
 #include "lin-speaker.h"
 #include "debugging_dumps.h"
@@ -160,7 +155,6 @@ error16:
 
 void Speaker::toggleSpeaker (void)
 {
-//putchar('.') ; fflush(stdout) ;
     quint64 processorCycles = MAC->getCycles() ;
     if (m_previousCycles == 0) m_previousCycles = processorCycles ;
 
@@ -170,9 +164,7 @@ void Speaker::toggleSpeaker (void)
     }
     int cyclesDifference = processorCycles - m_previousCycles ;
 
-//putchar('1') ; fflush(stdout) ;
     m_qLock.lock() ;
-//putchar('2') ; fflush(stdout) ;
     if (cyclesDifference > SND_QUEUE_SIZE) {
         m_qHead = m_qTail = 0 ;
         m_previousCycles = processorCycles ;
@@ -192,9 +184,7 @@ void Speaker::toggleSpeaker (void)
     } else {
         for (uint i=oldTail; i<m_qTail; i++) m_queue[i] = m_previousValue ;
     }
-//putchar('3') ; fflush(stdout) ;
     m_qLock.unlock() ;
-//putchar('4') ; fflush(stdout) ;
 
     m_previousCycles = processorCycles ;
     m_previousValue = (m_previousValue==m_lo) ? m_hi : m_lo ;

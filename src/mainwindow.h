@@ -43,12 +43,17 @@
 #include "machine.h"
 #include "applepi_button.h"
 #include "volume_dial.h"
-#include "speaker.h"
+#ifdef Q_OS_WINDOWS
+    #include "win-speaker.h"
+#else
+    #include "lin-speaker.h"
+#endif
 #include "gamepad.h"
 #include "config.h"
 #include "defs.h"
 
 class Machine ;
+class Speaker ;
 class VolumeDial ;
 
 

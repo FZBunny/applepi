@@ -29,14 +29,12 @@
 
 #include "machine.h"
 #include "floppy_controller.h"
-
-/*
 #ifdef Q_OS_WINDOWS
-#  include "win-speaker.h"
+    #include "win-speaker.h"
 #else
-#  include "speaker.h"
+    #include "lin-speaker.h"
 #endif
-*/
+
 #define DBUG(bits) if(m_debugFlags & bits)
 #define PBUG(bits) if(m_debugFlags & bits)printf
 

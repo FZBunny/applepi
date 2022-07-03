@@ -31,14 +31,11 @@
 #include "machine.h"
 #include "device_roms.h"
 #include "printer.h"
-
-/*
 #ifdef Q_OS_WINDOWS
 #  include "win-speaker.h"
 #else
-#  include "speaker.h"
+#  include "lin-speaker.h"
 #endif
-*/
 
 //#include "tape.h"
 //#include "serial_card.h"

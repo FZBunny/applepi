@@ -49,13 +49,11 @@
 
 // #include "tape.h"
 // #include "analog_input.h"
-/*
 #ifdef Q_OS_WINDOWS
-#  include "win-speaker.h"
+    #include "win-speaker.h"
 #else
-#  include "speaker.h"
+    #include "lin-speaker.h"
 #endif
-*/
 
 typedef struct ProcessorState {
     union {
