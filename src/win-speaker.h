@@ -30,7 +30,6 @@
 #ifndef WIN_SPEAKER_H
 #define WIN_SPEAKER_H
 
-// #pragma message ("............  including win-speaker.h")
 
 #include "defs.h"
 #include "mainwindow.h"

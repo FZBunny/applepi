@@ -29,7 +29,6 @@
 #include "win-speaker.h"
 #include "mainwindow.h"
 
-#pragma message ("************  compiling win-speaker.cpp")
 
 Speaker::Speaker (MainWindow* parent)
 {
