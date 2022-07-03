@@ -40,24 +40,30 @@ using namespace std ;
 
 
 
-Config::Config() : QSettings (QSettings::NativeFormat, QSettings::UserScope, "applepi", "applepi")
+Config::Config() : QSettings (QSettings::IniFormat, QSettings::UserScope, "applepi", "applepi")
 {
-    QString defaultDir = QDir::homePath() ;
+    QString   defaultDir = QDir::homePath() ;
+    QString   testName = defaultDir ;
+    QFileInfo test (testName) ;
     char sep = QDir::separator().cell() ;
     m_cfgName = defaultDir ;
-    m_cfgName.append (sep) ;
-    m_cfgName.append (".config") ;
 
-    QFileInfo test (m_cfgName) ;
-    if (test.exists()) {                 // does directory "~/.config" exist?
+#ifdef Q_OS_WINDOWS
+    m_cfgName.append (sep) ;
+    m_cfgName.append ("ApplepiConfig.ini") ;  
+#else 
+    testName.append (sep) ;
+    testName.append (".config") ;
+    if (test.exists() && test.isDir()) {     // Does directory "~/.config" exist?
+        m_cfgName = testName ;               // Yes; config file is "~/.config/applepi.conf"
         m_cfgName.append (sep) ;
-        m_cfgName.append ("applepi.conf") ;   // if so, config file is "~/.config/applepi.conf"
+        m_cfgName.append ("applepi.conf") ;
     } else {
-        m_cfgName = defaultDir ;
         m_cfgName.append (sep) ;
-        m_cfgName.append (".applepi.conf") ;  // else it is "~/.applepi.conf"
+        m_cfgName.append (".applepi.conf") ; // No; file is "~/.applepi.conf"
     }
-    
+  #endif
+
     test.setFile (m_cfgName) ;
     if ( ! test.exists()) {
         QFile newFile (m_cfgName) ;
@@ -65,7 +71,7 @@ Config::Config() : QSettings (QSettings::NativeFormat, QSettings::UserScope, "ap
         newFile.close() ;
     }
 
-    m_settings = new QSettings (m_cfgName, QSettings::NativeFormat) ;
+    m_settings = new QSettings (m_cfgName, QSettings::IniFormat) ;
 
     QString checkValue ;
     checkValue = m_settings->value ("check-key", "oops").value<QString>() ;

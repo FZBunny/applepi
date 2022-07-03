@@ -681,7 +681,7 @@ void Machine::run (void)
 //     Main loop to execute one 65C02 instruction each time through; repeats forever...
 //  -------------------------------------------------------------------------------------
 
-    quint64 sliceCycles = 500 ;
+    const quint64 SLICECYCLES = 500 ;
 
     for (;;) {
 
@@ -698,14 +698,28 @@ void Machine::run (void)
         // (Note that storing microseconds as 64 bits is good for 500,000+ years)
 
         quint64 deltaCycles = m_nCycles - m_previousCycles ;
-
-        if (deltaCycles > sliceCycles) { 
+#ifdef Q_OS_WINDOWS
+        if (deltaCycles > SLICECYCLES) {
             m_previousCycles = m_nCycles ;
+            LARGE_INTEGER ticks ;            // (One 'tick' = 100 nSec; ticks count from boot of Windows system)
+            QueryPerformanceCounter (&ticks) ;
+            quint64 uSecs = ticks.QuadPart / 10 ;
+            qint64 nextSlice = uSecs + SLICECYCLES - (uSecs % SLICECYCLES) ;
+            bool keepLooping = true ;
+            while (keepLooping) {            // This being Windows, we must just sit in a CPU-wasting
+                LARGE_INTEGER test ;         // loop until it's time to execute some more 6502 code.
+                QueryPerformanceCounter (&test) ;
+                if (test.QuadPart/10 >= nextSlice) keepLooping = false ;
+            }
+#else
+        if (deltaCycles > SLICECYCLES) {
+            m_previousCycles = m_nCycles ;         
             quint64 now = microseconds() ;
-            quint64 then = now + sliceCycles - (now % sliceCycles) ;
-            while (microseconds() < then) usleep (5) ;
-        }
-        
+            quint64 nextSlice = now + SLICECYCLES - (now % SLICECYCLES) ;
+            while (microseconds() < nextSlice) usleep (5) ; // Keep sleeping until it's time to
+#endif                                                      // execute some more 6502 code, as all
+        }                                                   // civilized OS's are accustomed to do.
+
         // See if we hit a trap.
 
         bool historyHasBeenDumped = false ;
@@ -788,7 +802,6 @@ void Machine::run (void)
         m_savedPC = PC ;
 
         m_registers.opcode = fetch(PC++) ;
-//printf ("m_savedPC=%4.4x  opcode=%2.2x\n", m_savedPC, m_registers.opcode) ;  // #########################################################
         switch (m_registers.opcode) {
             case 0x00:        // BRK
                 PC++ ;
@@ -802,8 +815,8 @@ void Machine::run (void)
                 PCLO = fetch(IRQ) ;
                 PCHI = fetch(IRQ+1) ;
                 P |= (UN | B | I) ;
-                P &= (D ^ 0xff); // This is a 65c02 convention; the 'D' flag is cleared on BRK.  NMOS 6502 does not do this.
-                cycles(7) ;
+                P &= (D ^ 0xff); // This is a 65c02 convention; the 'D' flag is cleared on BRK.
+                cycles(7) ;      // NMOS 6502 does not do this.
                 break ;
             case 0x01:        // ORA (zero page,X)
                 INDIRECTX(p) ;

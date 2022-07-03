@@ -66,7 +66,7 @@ extern "C" void trim (char* buffer, int len) ;
 // disk types
 #define DOS3    0
 #define PRODOS  1
-#define PASCAL  2
+#define PASCAL_DISK  2
 #define UNKNOWN 3
 
 #define CENTER_DIALOG \

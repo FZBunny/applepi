@@ -660,10 +660,10 @@ printf ("*** PRODOS disk, PRODOS order ***\n") ;
             if (c > 0x7e) break ;
             if ((c=='=') || (c=='$') || (c=='?') || (c==',')) break ;
         }
-        if (i==n) m_OS[driveIndex] = PASCAL ;
+        if (i==n) m_OS[driveIndex] = PASCAL_DISK ;
     }
 
-    if (m_OS[driveIndex] == PASCAL) return true ;
+    if (m_OS[driveIndex] == PASCAL_DISK) return true ;
 
     m_OS[driveIndex] = UNKNOWN ;
 

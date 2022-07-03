@@ -250,10 +250,17 @@ void Screen::splashScreen (void)
     painter.setPen (bPen) ;
     painter.drawLine (0,y0+100, w,y0+100) ;
 
+#ifdef Q_OS_WINDOWS
+    QFont font1 ("Times New Roman",  72, QFont::Bold) ;
+    QFont font2 ("Times New Roman",  16, QFont::Bold) ;
+    QFont font3 ("Times New Roman",  32, QFont::Bold) ;
+    QFont font4 ("Courier", 9, QFont::Bold) ;
+#else
     QFont font1 ("Times",  72, QFont::Bold) ;
     QFont font2 ("Times",  16, QFont::Bold) ;
     QFont font3 ("Times",  32, QFont::Bold) ;
     QFont font4 ("Courier", 9, QFont::Bold) ;
+#endif
     QFontMetrics fm1 (font1);
     QFontMetrics fm2 (font2);
     QFontMetrics fm3 (font3);

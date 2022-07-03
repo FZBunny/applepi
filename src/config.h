@@ -41,9 +41,9 @@
 class Config : public QSettings
 {
 public:
+
     Config() ;
     ~Config() {} ;
-
 
     void Set (const QString& key, QString& value) ;
     void Set (const QString& key, uint value) ;

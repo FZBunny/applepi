@@ -30,18 +30,14 @@
 #ifndef WIN_SPEAKER_H
 #define WIN_SPEAKER_H
 
-#include <wx/defs.h>
-#include <wx/thread.h>
-#include <wx/timer.h>
-#include <wx/event.h>
+// #pragma message ("............  including win-speaker.h")
 
-
-//#include "defs.h"
+#include "defs.h"
 #include "mainwindow.h"
 
 class MainWindow ;
 
-class Speaker : public wxThread, public wxEvtHandler
+class Speaker : public QThread
 {
 public:
 
@@ -49,9 +45,7 @@ public:
     ~Speaker(void) {} ;
 
     void setVolume (float value) ;
-    void toggleSpeaker (quint64 processorCycles) ;   // Called in Machine::fetch_sspage upon fetch from $C030
- //   void playRecal (void) ;
- //   void playStep  (void) ;
+    void toggleSpeaker (void) ;   // Called in Machine::fetch_sspage upon fetch from $C030
 
 private:
 

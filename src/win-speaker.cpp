@@ -26,21 +26,23 @@
 *****************************************************************************/
 
 
-
 #include "win-speaker.h"
 #include "mainwindow.h"
 
+#pragma message ("************  compiling win-speaker.cpp")
 
 Speaker::Speaker (MainWindow* parent)
 {
     m_parent = parent ;
 }
 
-void Speaker::toggleSpeaker (quint64 processorCycles)
+
+void Speaker::toggleSpeaker (void)
 {
 
     
 }
+
 
 void* Speaker::Entry (void)
 {

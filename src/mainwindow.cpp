@@ -556,7 +556,7 @@ void MainWindow::setFloppyLabel (uint drive)
                     slashLabel = " *** I/O Error *** " ;
                 }
                 break ;
-            case PASCAL:
+            case PASCAL_DISK:
                 n = m_mac->m_floppy->readSector (buffer, drive, 0, 11) ;    // Track 0, Sector 11 contains the volume
                 if (n == SECTORSIZE) {                                      // name of a Pascal disk.
                     int nameLen = buffer[6] ;
