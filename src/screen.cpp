@@ -279,21 +279,28 @@ void Screen::splashScreen (void)
     painter.setFont (font2) ;
     rect = fm2.boundingRect (splashText2) ;
     w = rect.width() ;
-    painter.drawText ((midX-w/2), (midY-22), splashText2) ;
+    int lowerTextY = midY + 10 ;
+ //   painter.drawText ((midX-w/2), (midY-22), splashText2) ;
+    if (m_scale == 2) lowerTextY += 90 ;
+
+    painter.drawText ((midX-w/2), (lowerTextY), splashText2) ;
 
     painter.setFont (font3) ;
     rect = fm3.boundingRect (splashText3) ;
     w = rect.width() ;
-    painter.drawText ((midX-w/2), midY+20, splashText3) ;
+ //   painter.drawText ((midX-w/2), midY+20, splashText3) ;
+    painter.drawText ((midX-w/2), lowerTextY+40, splashText3) ;
 
     rect = fm3.boundingRect (splashText4) ;
     w = rect.width() ;
-    painter.drawText ((midX-w/2), midY+80, splashText4) ;
+ //   painter.drawText ((midX-w/2), midY+80, splashText4) ;
+    painter.drawText ((midX-w/2), lowerTextY+80, splashText4) ;
 
     painter.setFont (font2) ;
     rect = fm2.boundingRect (splashText5) ;
     w = rect.width() ;
-    painter.drawText ((midX-w/2), midY+150, splashText5) ;
+ //  painter.drawText ((midX-w/2), midY+150, splashText5) ;
+    painter.drawText ((midX-w/2), lowerTextY+110, splashText5) ;
 
     painter.setFont (font4) ;
     rect = fm4.boundingRect (splashText6) ;
