@@ -6,6 +6,7 @@ CONFIG += qt debug
 TEMPLATE = app
 TARGET = applepi
 QMAKE_CXXFLAGS += -Wno-implicit-fallthrough -Wno-deprecated-declarations
+# QMAKE_CXXFLAGS += -Wno-deprecated-copy -Wno-implicit-fallthrough -Wno-deprecated-declarations
 OBJECTS_DIR=obj
 DESTDIR=bin
 INCLUDEPATH += .

@@ -908,7 +908,7 @@ void Machine::run (void)
                 STATNZ(A) ;
                 cycles(5) ;
                 break ;
-            case 0x13:        //  --- Unimplented opcode 
+            case 0x13:        //  --- Unimplemented opcode 
                 UNIMPLEMENTED
                 cycles(1) ;
                 break ;
@@ -988,11 +988,11 @@ void Machine::run (void)
                 STATNZ(A) ;
                 cycles(6) ;
                 break ;
-            case 0x22:        //  --- Unimplented opcode  
+            case 0x22:        //  --- Unimplemented opcode  
                 UNIMPLEMENTED
                 PC++ ; 
                 break ;
-            case 0x23:        //  --- Unimplented opcode 
+            case 0x23:        //  --- Unimplemented opcode 
                 UNIMPLEMENTED
                 cycles(1) ;
                 break ;
@@ -1153,14 +1153,14 @@ void Machine::run (void)
                 STATNZ(A) ;
                 cycles(6) ;
                 break ;
-            case 0x42:        //  --- Unimplented opcode, but the 65C02 skips the following byte.  I think. 
+            case 0x42:        //  --- Unimplemented opcode, but the 65C02 skips the following byte.  I think. 
                 UNIMPLEMENTED
                 PC++ ;
                 cycles(2) ;
                 break ;
             case 0x43:
                 break ;
-            case 0x44:        //  --- Unimplented opcode, but the 65C02 skips the following byte.  I think. 
+            case 0x44:        //  --- Unimplemented opcode, but the 65C02 skips the following byte.  I think. 
                 UNIMPLEMENTED
                 PC++ ;
                 cycles(2) ;
@@ -1239,7 +1239,7 @@ void Machine::run (void)
                 break ;
             case 0x53:                          // XXXXXXXXXX  overlooked opcode; FIX ME
                 break ;
-            case 0x54:        //  --- Unimplented opcode, but the 65C02 skips the following byte.  I think. 
+            case 0x54:        //  --- Unimplemented opcode, but the 65C02 skips the following byte.  I think. 
                 UNIMPLEMENTED
                 PC++ ;
                 cycles(2) ;
@@ -1276,7 +1276,7 @@ void Machine::run (void)
                 break ;
             case 0x5b:
                 break ;
-            case 0x5c:        //  --- Unimplented opcode, but the 65C02 skips the following two bytes.  I think. 
+            case 0x5c:        //  --- Unimplemented opcode, but the 65C02 skips the following two bytes.  I think. 
                 UNIMPLEMENTED
                 PC += 2 ;
                 cycles(8) ;
@@ -1469,7 +1469,7 @@ void Machine::run (void)
                 store (A, p) ;
                 cycles(6) ;
                 break ;
-            case 0x82:        //  --- Unimplented opcode, but the 65C02 skips the following byte.  I think. 
+            case 0x82:        //  --- Unimplemented opcode, but the 65C02 skips the following byte.  I think. 
                 UNIMPLEMENTED
                 PC++ ;
                 cycles(2) ;
@@ -1778,7 +1778,7 @@ void Machine::run (void)
                 COMPARE(A,p) ;
                 cycles(6) ;
                 break ;
-            case 0xc2:       //  --- Unimplented opcode, but the 65C02 skips the following byte.  I think. 
+            case 0xc2:       //  --- Unimplemented opcode, but the 65C02 skips the following byte.  I think. 
                 UNIMPLEMENTED
                 PC++ ;
                 cycles(2) ;
@@ -1861,7 +1861,7 @@ void Machine::run (void)
                 break ;
             case 0xd3:
                 break ;
-            case 0xd4:        //  --- Unimplented opcode, but the 65C02 skips the following byte.  I think. 
+            case 0xd4:        //  --- Unimplemented opcode, but the 65C02 skips the following byte.  I think. 
                 UNIMPLEMENTED
                 PC++ ;
                 cycles(2) ;
@@ -1897,7 +1897,7 @@ void Machine::run (void)
             case 0xdb:        // STP                  * 65C02 (WDC only)
                 m_STP_executed = true ;
                 break ;
-            case 0xdc:        //  --- Unimplented opcode, but the 65C02 skips the following two bytes.  I think. 
+            case 0xdc:        //  --- Unimplemented opcode, but the 65C02 skips the following two bytes.  I think. 
                 UNIMPLEMENTED
                 PC += 2 ;
                 cycles(2) ;
@@ -1928,7 +1928,7 @@ void Machine::run (void)
                 submem(p) ;
                 cycles(6) ;
                 break ;
-            case 0xe2:       //  --- Unimplented opcode, but the 65C02 skips the following byte.  I think. 
+            case 0xe2:       //  --- Unimplemented opcode, but the 65C02 skips the following byte.  I think. 
                 UNIMPLEMENTED
                 PC++ ;
                 cycles(2) ;
@@ -2006,7 +2006,7 @@ void Machine::run (void)
                 break ;
             case 0xf3:
                 break ;
-            case 0xf4:        //  --- Unimplented opcode, but the 65C02 skips the following byte.  I think. 
+            case 0xf4:        //  --- Unimplemented opcode, but the 65C02 skips the following byte.  I think. 
                 UNIMPLEMENTED
                 PC++ ;
                 cycles(2) ;
@@ -2042,7 +2042,7 @@ void Machine::run (void)
                 break ;
             case 0xfb:
                 break ;
-            case 0xfc:        //  --- Unimplented opcode, but the 65C02 skips the following two bytes.  I think. 
+            case 0xfc:        //  --- Unimplemented opcode, but the 65C02 skips the following two bytes.  I think. 
                 UNIMPLEMENTED
                 PC += 2 ;
                 cycles(2) ;

@@ -487,13 +487,15 @@ void Screen::drawHiRes (quint8 *screenData)
 
 // -------------------------  Double Hi-Res Graphics  -------------------------
 
+
+// ----------------------------------------------------------------------------
+//    Use 4 bytes of screen data to write 7 dots to the screen buffer DC
+//
 //     Double hi-res bit packing: 7 "dots" are packed in 4 bytes of screen data
 //     (Bit 7 of the screen data bytes is unused; a dot is 2x2 pixels)
 //
 // |   b0   |   b1   |   b2   |   b3   | ...  bytes
 // |-BBBAAAA|-DDCCCCB|-FEEEEDD|-GGGGFFF| ...  color #s
-
-//    Use 4 bytes of screen data to write 7 dots to the screen buffer DC
 
 inline void Screen::doubleHiRes4bytes (quint8* main, quint8* aux, int rowOffset, int row, int column)
 {
@@ -513,7 +515,7 @@ inline void Screen::doubleHiRes4bytes (quint8* main, quint8* aux, int rowOffset,
     int iF = ((b2 & 0x40)>>6) | ((b3 & 0x07)<<1) ;
     int iG = (b3 & 0x78)>>3 ;
 
-    int x = 7*4*column + 2 ;
+    int x = 7*4*column ;
     int y = 2*row ;
     QPainter painter (&m_screenBuffer) ;
 
@@ -545,8 +547,7 @@ void Screen::writeDoubleHiRes (quint8 page2)
     }
 }
 
-
-//--------------------------------------------------
+//--------------------- End double-hires -----------------------------
 
 
 void Screen::paintEvent (QPaintEvent* e)
@@ -628,16 +629,16 @@ void Screen::refreshScreen (void)
          && rdText == OFF
          && rd80Col)
     {
-        if (m_refreshTimer.interval() == FAST) {    // Use a slow refresh speed when displaying double hi-res to
-             m_refreshTimer.setInterval (SLOW) ;    // give Raspberry Pi CPUs a break.
-        }
+#ifdef Q_PROCESSOR_ARM
+        m_refreshTimer.setInterval (SLOW) ;           // Give Raspberry Pi CPUs a break on refresh speed
+#endif
         writeDoubleHiRes (page2) ;
         QWidget::update (this->rect()) ;
-        return ;
-    } else {
-        if (m_refreshTimer.interval() == SLOW) {
-            m_refreshTimer.setInterval (FAST) ;
-        }
+        return ;                                      // <--- Note the return here on dbl hires ...
+    }
+
+    if (m_refreshTimer.interval() == SLOW) {
+        m_refreshTimer.setInterval (FAST) ;
     }
 
     if (rdText) {                     // TEXT
