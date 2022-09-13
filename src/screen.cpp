@@ -178,7 +178,35 @@ void Screen::initialize (void)
         m_dblHiResBlock[i]->fill (color[i]) ;
     }
 
-    m_screenBuffer = QPixmap (m_pixelsWidth, m_pixelsHeight) ;
+// Double hi-res mono pixmaps
+
+    m_dblHiResBlack = new QPixmap (1,2) ;
+    m_dblHiResBlack->fill (black) ;
+    m_dblHiResWhite = new QPixmap (1,2) ;
+    m_dblHiResBlack->fill (white) ;
+
+    for (int i=0; i<16; i++) {
+        int mask ;
+        m_dblHiResMonoPixels[i] = new QPixmap (4,2) ;
+        m_dblHiResMonoPixels[i]->fill (black) ;
+        QPainter* painter = new QPainter (m_dblHiResMonoPixels[i]) ;
+        painter->setPen (white) ;
+        mask = 1 ;
+        for (int pix=0; pix<4; pix++) {
+            if (i & mask) {
+//printf ("X") ;
+                painter->drawPoint (pix, 0) ;
+                painter->drawPoint (pix, 1) ;
+            }
+//            else printf ("_") ;
+            mask <<= 1 ;
+        }
+//printf ("\n") ;
+        delete painter ;
+
+    }
+
+    m_screenBuffer = QPixmap (PIXELSWIDTH, PIXELSHEIGHT) ;
     m_screenBuffer.fill (Qt::black) ;
 
     m_flashCounter = FLASHDELAY ;
@@ -371,7 +399,6 @@ void Screen::drawLine_80 (int x, int y, quint8 *main, quint8 *aux)
 }
 
 
-
 //   Refresh 80-column text-only screen
 
 void Screen::draw80Column (int firstLine)
@@ -391,7 +418,6 @@ void Screen::draw80Column (int firstLine)
         drawLine_80 (x, y, mainScreen+off, auxScreen+off) ;
     }
 }
-
 
 
 //   Refresh a low-resolution screen (or upper area of a mixed lores-&-RdTEXT screen)
@@ -421,7 +447,6 @@ void Screen::drawLoRes (int nLines, quint8 *screen)
     }
 
 }
-
 
 
 inline void Screen::put_7_bits (QPainter& painter, quint8* screenData, int x, int y, int col, int off)
@@ -497,7 +522,7 @@ void Screen::drawHiRes (quint8 *screenData)
 // |   b0   |   b1   |   b2   |   b3   | ...  bytes
 // |-BBBAAAA|-DDCCCCB|-FEEEEDD|-GGGGFFF| ...  color #s
 
-inline void Screen::doubleHiRes4bytes (quint8* main, quint8* aux, int rowOffset, int row, int column)
+inline void Screen::doubleColorHiRes4bytes (quint8* main, quint8* aux, int rowOffset, int row, int column)
 {
     main += rowOffset + column*2 ;
     aux  += rowOffset + column*2 ;
@@ -530,9 +555,9 @@ inline void Screen::doubleHiRes4bytes (quint8* main, quint8* aux, int rowOffset,
 }
 
 
-//    Write an entire double-hires screen
+//    Write an entire double-hires colour screen
 
-void Screen::writeDoubleHiRes (quint8 page2)
+void Screen::drawColorDoubleHiRes (quint8 page2)
 {
     int screenBase = 0x2000 ;
     if (page2) screenBase = 0x4000 ;
@@ -542,10 +567,89 @@ void Screen::writeDoubleHiRes (quint8 page2)
     for (int row=0; row<194; row++) {
         int rowOffset = ((row<<10) & 0x1c00) | ((row<<4) & 0x0380) | ((row/64)*0x28) ;
         for (int column=0; column<40; column++) {
-            doubleHiRes4bytes (main, aux, rowOffset, row, column) ;
+            doubleColorHiRes4bytes (main, aux, rowOffset, row, column) ;
         }
     }
 }
+
+
+// |   b0   |   b1   |   b2   |   b3   | ...  bytes   (4 bytes to a "group")
+// |-BBBAAAA|-DDCCCCB|-FEEEEDD|-GGGGFFF| ...  pixel bits
+
+void Screen::doubleMonoHiRes4bytes (quint8* main, quint8* aux, int rowOffset, int row, int group)
+{
+                                // a "group" is 4 bytes...
+    quint8* mPtr = main + rowOffset + 2*group ;
+    quint8* aPtr = aux  + rowOffset + 2*group ;
+
+    int b0 = *aPtr++ ;          // b0...b3 are the 4 bytes in this group; each contains 7 pixels.
+    int b1 = *mPtr++ ;
+    int b2 = *aPtr ;
+    int b3 = *mPtr ;
+
+    int iA = b0 & 0x0f ;        // iA...iG : each contains 4 bits of pixel data
+    int iB = ((b0 & 0x70)>>4) | ((b1 & 1)<<3) ;
+    int iC = (b1 & 0x1e)>>1 ;
+    int iD = ((b1 & 0x60)>>5) | ((b2 & 0x03)<<2);
+    int iE = (b2 & 0x3c)>>2 ;
+    int iF = ((b2 & 0x40)>>6) | ((b3 & 0x07)<<1) ;
+    int iG = (b3 & 0x78)>>3 ;
+//printf ("%1x %1x %1x %1x %1x %1x %1x \n", iA, iB, iC, iD, iE, iF, iG) ;
+    QPainter painter (&m_screenBuffer) ;
+
+    int x = 28*group ;
+    int y = 2*row ;
+/**
+    painter.drawPixmap (0, 0, *m_dblHiResMonoPixels[0]) ;
+    painter.drawPixmap (0, 2, *m_dblHiResMonoPixels[1]) ;
+    painter.drawPixmap (0, 4, *m_dblHiResMonoPixels[2]) ;
+    painter.drawPixmap (0, 6, *m_dblHiResMonoPixels[3]) ;
+    painter.drawPixmap (0, 8, *m_dblHiResMonoPixels[4]) ;
+    painter.drawPixmap (0, 10, *m_dblHiResMonoPixels[5]) ;
+    painter.drawPixmap (0, 12, *m_dblHiResMonoPixels[6]) ;
+    painter.drawPixmap (0, 14, *m_dblHiResMonoPixels[7]) ;
+    painter.drawPixmap (0, 16, *m_dblHiResMonoPixels[8]) ;
+    painter.drawPixmap (0, 18, *m_dblHiResMonoPixels[9]) ;
+    painter.drawPixmap (0, 20, *m_dblHiResMonoPixels[10]) ;
+    painter.drawPixmap (0, 22, *m_dblHiResMonoPixels[11]) ;
+    painter.drawPixmap (0, 24, *m_dblHiResMonoPixels[12]) ;
+    painter.drawPixmap (0, 26, *m_dblHiResMonoPixels[13]) ;
+    painter.drawPixmap (0, 28, *m_dblHiResMonoPixels[14]) ;
+    painter.drawPixmap (0, 30, *m_dblHiResMonoPixels[15]) ;
+return ;
+**/
+
+    painter.drawPixmap (x,    y, *m_dblHiResMonoPixels[iA]) ;
+    painter.drawPixmap (x+4,  y, *m_dblHiResMonoPixels[iB]) ;
+    painter.drawPixmap (x+8,  y, *m_dblHiResMonoPixels[iC]) ;
+    painter.drawPixmap (x+12, y, *m_dblHiResMonoPixels[iD]) ;
+    painter.drawPixmap (x+16, y, *m_dblHiResMonoPixels[iE]) ;
+    painter.drawPixmap (x+20, y, *m_dblHiResMonoPixels[iF]) ;
+    painter.drawPixmap (x+24, y, *m_dblHiResMonoPixels[iG]) ;
+
+}
+
+
+//    Write an entire double-hires monochrome screen
+
+void Screen::drawMonoDoubleHiRes (quint8 page2)
+{
+    int screenBase ;
+    if (page2) screenBase = 0x4000 ;
+    else       screenBase = 0x2000 ;
+
+    quint8* main = MAC->m_ram + screenBase ;
+    quint8* aux  = MAC->m_aux + screenBase ;
+
+    for (int row=0; row<192; row++) {
+        int rowOffset = ((row<<10) & 0x1c00) | ((row<<4) & 0x0380) | ((row/64)*0x28) ;
+        for (int group=0; group<27; group++) {
+            doubleMonoHiRes4bytes (main, aux, rowOffset, row, group) ;
+        }
+    }
+
+}
+
 
 //--------------------- End double-hires -----------------------------
 
@@ -580,7 +684,7 @@ void Screen::paintEvent (QPaintEvent* e)
         } ;
 
            T = RdTEXT     H = HIRES    E = Rd80COL
-           M = MIXED    P = PAGE2
+           M = MIXED      P = PAGE2
 
                   Graphics   |     RdTEXT
                    T = 0     |     T = 1
@@ -589,7 +693,7 @@ void Screen::paintEvent (QPaintEvent* e)
             PE \ 00 01 11 10 |  00 01 11 10 /  PE
              00  c  e  j  g  |  a  a  a  a  00
              01  c  e  j  g  |  x  x  x  x  01
-             11  d  f  k  h  |  x  x  x  x  11
+             11  d  f  k  h  |  x  x  x  x  11//
              10  d  f  k  h  |  b  b  b  b  10
 
 ***************************************************/
@@ -605,6 +709,7 @@ void Screen::refreshScreen (void)
     quint8 rdHiRes    = MAC->m_ss[0x01d] ;
     quint8 RdAltChar  = MAC->m_ss[0x01e] ;
     quint8 rd80Col    = MAC->m_ss[0x01f] ;
+//    quint8 newVideo   = MAC->m_ss[0x029] ;
     quint8 rdDblHiRes = MAC->m_ss[0x07f] ;
 
     if (RdAltChar) {
@@ -632,7 +737,10 @@ void Screen::refreshScreen (void)
 #ifdef Q_PROCESSOR_ARM
         m_refreshTimer.setInterval (SLOW) ;           // Give Raspberry Pi CPUs a break on refresh speed
 #endif
-        writeDoubleHiRes (page2) ;
+  //      if (newVideo & 0x20)  drawMonoDoubleHiRes (page2) ;
+//if (page2) putchar('P'); else putchar('.') ; fflush(stdout) ;
+        if (true)  drawMonoDoubleHiRes (page2) ;     // XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+        else                  drawColorDoubleHiRes (page2) ;
         QWidget::update (this->rect()) ;
         return ;                                      // <--- Note the return here on dbl hires ...
     }

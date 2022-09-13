@@ -61,12 +61,14 @@ private:
     inline void put_7_bits (QPainter& painter, quint8* screenData, int x, int y, int col, int off) ;
     void drawLoRes (int nLines, quint8 *screen) ;
     void drawHiRes (quint8 *screen) ;
-    void doubleHiRes4bytes (quint8* main, quint8* aux, int rowOffset, int row, int column) ;
-    void writeDoubleHiRes (quint8 page2) ;
+    void doubleColorHiRes4bytes (quint8* main, quint8* aux, int rowOffset, int row, int column) ;
+    void drawColorDoubleHiRes (quint8 page2) ;
+    void doubleMonoHiRes4bytes (quint8* main, quint8* aux, int rowOffset, int row, int column) ;
+    void drawMonoDoubleHiRes (quint8 page2) ;
     void paintEvent (QPaintEvent *) ;
 
-    const int m_pixelsWidth  = 560 ;
-    const int m_pixelsHeight = 384 ;
+    const int PIXELSWIDTH  = 560 ;
+    const int PIXELSHEIGHT = 384 ;
     
     QTimer  m_refreshTimer ;
     const int SLOW = 200 ;   // mSec delay for slow timer (for double hi-res)
@@ -87,6 +89,10 @@ private:
     QPixmap   m_pixmap_empty_hires_line ;
     QPixmap*  m_loResBlocks[16] ;
     QPixmap*  m_dblHiResBlock[16] ;
+    QPixmap*  m_dblHiResBlack ;
+    QPixmap*  m_dblHiResWhite ;
+    QPixmap*  m_dblHiResMonoPixels[16] ;
+
 
 } ;
 
