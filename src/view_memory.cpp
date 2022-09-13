@@ -28,6 +28,7 @@
 
 
 #include <stdio.h>
+#include <QPen>
 #include <QDialog>
 #include <QRadioButton>
 #include <QPaintEvent>
@@ -382,6 +383,10 @@ void Panel::onTimer (void)
     painter.setFont (m_font) ;
     m_nLines = this->height() / m_lineHeight ;
 
+  //  QPen yellowPen (QColor(0xf8,0xf8,0), 10) ;
+    QPen yellowPen (QColor(0xff,0xf8,0), 10) ;
+    QPen blackPen  (QColor(0,0,0)) ;
+
     quint8* p ;
     bool ssPage ;
     int start = m_startAddr ;
@@ -421,6 +426,18 @@ void Panel::onTimer (void)
             buffer[n+bix++] = c ;
         }
         buffer[n+bix] = 0 ;
+
+        if (ssPage) {
+            painter.setPen (yellowPen) ;
+            for (int i=0; i<16; i++) {
+                if (p[ix+i]) {
+                    int x = 66 + i*27 + (i/4)*10 ;
+                    int y = 14 + line*18 ;
+                    painter.drawLine (x,y, x+10,y) ;
+                }
+            }
+            painter.setPen (blackPen) ;
+        }
 
         painter.drawText (10,20+line*m_lineHeight, QString((const char*)buffer)) ;
 
