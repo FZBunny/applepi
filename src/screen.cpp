@@ -632,11 +632,11 @@ return ;
 
 //    Write an entire double-hires monochrome screen
 
-void Screen::drawMonoDoubleHiRes (quint8 page2)
+void Screen::drawMonoDoubleHiRes (quint8 usePage2)
 {
     int screenBase ;
-    if (page2) screenBase = 0x4000 ;
-    else       screenBase = 0x2000 ;
+    if (usePage2) screenBase = 0x4000 ;
+    else          screenBase = 0x2000 ;
 
     quint8* main = MAC->m_ram + screenBase ;
     quint8* aux  = MAC->m_aux + screenBase ;
@@ -703,6 +703,7 @@ void Screen::refreshScreen (void)
 {
     quint8  *loresData, *hiresData ;
 
+    quint8 rd80store  = MAC->m_ss[0x018] ;
     quint8 rdText     = MAC->m_ss[0x01a] ;
     quint8 rdMixed    = MAC->m_ss[0x01b] ;
     quint8 page2      = MAC->m_ss[0x01c] ;
@@ -721,14 +722,6 @@ void Screen::refreshScreen (void)
         }
     }
 
-    if (page2) {
-        loresData = MAC->m_ram+0x800 ;
-        hiresData = MAC->m_ram+0x4000 ;
-    } else {
-        loresData = MAC->m_ram+0x400 ;
-        hiresData = MAC->m_ram+0x2000 ;
-    }
-
     if  (rdDblHiRes                   // Double hi-res
          && rdHiRes
          && rdText == OFF
@@ -737,12 +730,21 @@ void Screen::refreshScreen (void)
 #ifdef Q_PROCESSOR_ARM
         m_refreshTimer.setInterval (SLOW) ;           // Give Raspberry Pi CPUs a break on refresh speed
 #endif
-  //      if (newVideo & 0x20)  drawMonoDoubleHiRes (page2) ;
-//if (page2) putchar('P'); else putchar('.') ; fflush(stdout) ;
-        if (true)  drawMonoDoubleHiRes (page2) ;     // XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-        else                  drawColorDoubleHiRes (page2) ;
+
+        quint8 usePage2 = page2 && (rd80store==0) ;
+
+        if (true)             drawMonoDoubleHiRes (usePage2) ;     // XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+        else                  drawColorDoubleHiRes (usePage2) ;
         QWidget::update (this->rect()) ;
         return ;                                      // <--- Note the return here on dbl hires ...
+    }
+
+    if (page2) {
+        loresData = MAC->m_ram+0x800 ;
+        hiresData = MAC->m_ram+0x4000 ;
+    } else {
+        loresData = MAC->m_ram+0x400 ;
+        hiresData = MAC->m_ram+0x2000 ;
     }
 
     if (m_refreshTimer.interval() == SLOW) {
