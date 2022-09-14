@@ -121,6 +121,7 @@ void Machine::initialize (bool power)
     m_previousCycles = 0 ;
     m_romSlot = 0 ;
     m_slotRomPointer = NULL ;
+    m_monoDblHiResState = 0 ;
     m_highRamWrite = true ;   // See "Understanding the Apple IIe" p. 5-23
     m_highWritePreset = false ;
 
@@ -461,6 +462,21 @@ void Machine::closeSlot1In (void)
     }
 }
 *****/
+
+
+// Return 'true' if CLR80VID, DHIRESON, DHIRESOFF, and SET80VID
+// have been accessed in the proper sequence, resulting in
+// 'm_monoDblHiResState' having been incremented to 6.
+// This sequence is expected by certain (most?) colour video
+// cards to persuade them to display monochrome.
+// Strange, but true.
+
+bool Machine::displayMonoDblHiRes (void)
+{
+    if (m_monoDblHiResState == 6) return true ;
+    else                          return false ;
+}
+
 
 void Machine::setX (quint8 x)
 {

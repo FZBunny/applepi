@@ -133,6 +133,7 @@ typedef struct HistoryEntry {
 #define RdALTCHAR   m_ss[0x01e]
 #define Rd80COL     m_ss[0x01f]
 #define TAPEOUT     m_ss[0x020]
+#define NEWVIDEO    m_ss[0x029]
 #define TAPEIN      m_ss[0x060]
 #define SW3IN       m_ss[0x060]
 #define SW0IN       m_ss[0x061]
@@ -366,7 +367,7 @@ typedef struct HistoryEntry {
 #define RESET 0xfffc
 #define IRQ   0xfffe
 
-#define ON  0xff
+#define ON  0x80
 #define OFF 0
 
 #define FAKE_BRK 0xff
@@ -460,6 +461,8 @@ public:
     quint8* lower48k (quint16 p, bool write) ;
     quint8* store_highMem (quint16 p) ;
 
+    bool displayMonoDblHiRes (void) ;
+
     quint8  m_rom[0x10000] ;    // Our motherboard ROM
     quint8  m_ram[0x10000] ;    // Main RAM
     quint8  m_aux[0x10000] ;    // Auxiliary RAM
@@ -520,6 +523,7 @@ private:
     int   m_mouseButton[3] ;
 
     bool  m_monochrome ;
+    int   m_monoDblHiResState ;
 
     bool    m_echoToTerminal ;
     QFile*  m_echoToFile ;

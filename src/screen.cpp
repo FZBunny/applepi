@@ -733,8 +733,8 @@ void Screen::refreshScreen (void)
 
         quint8 usePage2 = page2 && (rd80store==0) ;
 
-        if (true)             drawMonoDoubleHiRes (usePage2) ;     // XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-        else                  drawColorDoubleHiRes (usePage2) ;
+        if (MAC->displayMonoDblHiRes()) drawMonoDoubleHiRes (usePage2) ;
+        else                            drawColorDoubleHiRes(usePage2) ;
         QWidget::update (this->rect()) ;
         return ;                                      // <--- Note the return here on dbl hires ...
     }

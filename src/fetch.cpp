@@ -330,9 +330,13 @@ quint8 Machine::fetch_sspage (quint16 p)
                     break ;
                 case 0xe:
                     RdDBLHIRES = ON ;
+                    if ((m_monoDblHiResState==0) || (m_monoDblHiResState==2) || (m_monoDblHiResState==5)) m_monoDblHiResState++ ;
+                    else                                                                                  m_monoDblHiResState = 0 ;
                     break ;
                 case 0xf:
                     RdDBLHIRES = OFF ;
+                    if ((m_monoDblHiResState==1) || (m_monoDblHiResState==3)) m_monoDblHiResState++ ;
+                    else                                                      m_monoDblHiResState = 0 ;
                     break ;
             }
             break ;
@@ -399,8 +403,11 @@ quint8 Machine::fetch_sspage (quint16 p)
         case 7:                                // C070 .. C07F  Misc...
             if (loNibble==0) {    // Reset Analog inputs (gamepad)
                 m_parent->m_gamepad->reset() ;
+            } else if (loNibble==0x0f) {
+                c = RdHIRES ;     // C07F also returns 'RdHIRES'... why? *shrugs*
+            } else {
+                c = 0 ;
             }
-            c = 0 ;
             break ;
        case 8:                                 // C080 .. C08F  Bank Switching
             fetchFromBankSwitches(p) ;

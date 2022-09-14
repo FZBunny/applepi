@@ -255,9 +255,12 @@ void Machine::store_sspage (quint8 c, quint16 p)
                     break ;
                 case 0xc:                      // C00C  Rd80COL off   (40 column display)
                     Rd80COL = OFF ;
+                    m_monoDblHiResState = 0 ;
                     break ;
                 case 0xd:                      // C00D  Rd80COL on    (80 column display)
                     Rd80COL = ON ;
+                    if (m_monoDblHiResState == 4) m_monoDblHiResState++ ;
+                    else                          m_monoDblHiResState = 0 ;
                     break ;
                 case 0xe:                      // C00E  RdALTCHAR off (primary character set)
                     RdALTCHAR = OFF ;
@@ -321,9 +324,13 @@ void Machine::store_sspage (quint8 c, quint16 p)
                     break ;
                 case 0xe:
                     RdDBLHIRES = ON ;
+                    if ((m_monoDblHiResState==0) || (m_monoDblHiResState==2) || (m_monoDblHiResState==5)) m_monoDblHiResState++ ;
+                    else                                                                                  m_monoDblHiResState = 0 ;
                     break ;
                 case 0xf:
                     RdDBLHIRES = OFF ;
+                    if ((m_monoDblHiResState==1) || (m_monoDblHiResState==3)) m_monoDblHiResState++ ;
+                    else                                                      m_monoDblHiResState = 0 ;
                     break ;
             }
             break ;
