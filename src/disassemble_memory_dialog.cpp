@@ -279,8 +279,6 @@ void DisassembleMemory::onDoItButtonClicked (void)
 {
 //    QRect rect = m_doItButton->geometry() ;
 
-
-printf ("onDoItButtonClicked\n") ;
     quint8* mem ;
 
     if      (m_mainButton->isChecked()) mem = MAC->m_ram ;

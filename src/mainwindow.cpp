@@ -398,7 +398,6 @@ bool MainWindow::powerIsOn (void)
 
 void MainWindow::toggleScale (void)
 {
-//printf ("MainWindow::toggleScale entered.\n") ;
     if (m_scale == 1) {
         m_scale = 2 ;
         this->setMaximumSize (m_maxSize) ;
@@ -576,30 +575,6 @@ void MainWindow::setFloppyLabel (uint drive)
         }
     }
 
-/***
-        if (m_mac->m_floppy->OSType(drive) == DOS3) {     // --- DOS disk
-        int n = m_mac->m_floppy->readSector (buffer, drive, 17, 0) ;    // (DOS VTOC is on track 17, sector 0)
-        if (n == SECTORSIZE) {
-            int releaseNumber = buffer[3] ;
-            int volumeNumber  = buffer[6] ;
-            QTextStream (&slashLabel) << "DOS" << releaseNumber << " Vol." << volumeNumber ;
-        } else {
-            slashLabel = " *** I/O Error *** " ;
-        }
-    } else {                                                 //--- ProDOS disk
-        int n = m_mac->m_floppy->readSector (buffer, drive, 0, 11) ;    // Track 0, Sector 11 contains beginning 
-        if (n == SECTORSIZE) {                                          // of volume dir on a 5.25" ProDos floppy
-            int nameLen = buffer[4] & 0x0f ;  // (volume name starts at 6th byte of block 2)
-            buffer[nameLen+5] = 0 ;
-            quint8 tmp[16] ;
-            strcpy ((char*)tmp, (char*)buffer+5) ;
-            label = QString ((const char*)tmp) ;
-            slashLabel = "/" ;
-            slashLabel += label ;
-        } else {
-            slashLabel = " *** I/O Error *** " ;
-        }
-***/
     setFloppyLabel (drive, slashLabel) ;
 
 }
@@ -710,7 +685,6 @@ void MainWindow::keyPressEvent (QKeyEvent *e)
 
     }
 
-//printf ("mods=%8.8x  cSave= %8.8x  c=%8.8x\n", mods, cSave, c) ;
     MAC->m_ss[0] =  (c & 0x7f) | 0x80 ;
 }
 
@@ -786,7 +760,6 @@ void MainWindow::setProdosDateTime (void)
         p[0xbf90] = byte ;
         p[0xbf93] = timeOfDay.hour() ;
         p[0xbf92] = timeOfDay.minute() ;
-//printf ("%2.2x %2.2x   %2.2x %2.2x\n", p[0xbf90], p[0xbf91], p[0xbf92], p[0xbf93]) ;
     }
 
 }
@@ -814,7 +787,6 @@ void MainWindow::onPlaySoundTimer (void)
 
 void MainWindow::onScreenScale (void)
 {
-// fprintf ("MainWindow::onScreenScale\n") ;
     toggleScale() ;
 }
 
@@ -920,7 +892,6 @@ void MainWindow::onPowerButton (void)
 
 void MainWindow::onScaleButton (void)
 {
-//printf ("MainWindow::onScaleButton entered.\n") ;
     this->toggleScale() ;
 }
 
@@ -966,7 +937,6 @@ void MainWindow::onHd2Button (void)
 
 void MainWindow::onResetButton (void)
 {
-//printf ("onResetButton\n") ;
     if (m_mac->powerIsOn()) {
         m_floppyMotorCountDown[0] = DISK_CHECK_INTERVAL ;
         m_floppyMotorCountDown[1] = DISK_CHECK_INTERVAL ;

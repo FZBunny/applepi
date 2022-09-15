@@ -152,9 +152,15 @@ quint8 Machine::fetch_ioSpace (quint16 p)     //  Addresses c000 - cfff
                 }
                 break ;
               case 4:                                                           // Slot 4 $C4xx   (mouse)
-                c = mouse_rom_3420270C[loByte] ;
+/***
+                c = mouse_rom_3420270C[loByte] ;   // Mouse code not written yet.  2022-09-14   Soon.
                 m_slotRomPointer = NULL ;
                 m_romSlot = 4 ;
+***/                                                                       // Slot 4 $C4xx
+                c = EMPTY_SLOT ;
+                m_slotRomPointer = NULL ;
+                m_romSlot = 0 ;
+
                 break ;
               case 5:                                                           // Slot 5 $C5xx                                                          // Slot 4 $C4xx
                 c = EMPTY_SLOT ;
