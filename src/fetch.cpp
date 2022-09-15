@@ -113,16 +113,13 @@ quint8 Machine::fetch_ioSpace (quint16 p)     //  Addresses c000 - cfff
 
 //     ------------------------------------------------
 
-    if (p > 0xc7ff) {
+    if (p > 0xc7ff) {              // Executing upper ($C8xx) part of peripheral card ROM
         if (m_slotRomPointer) {
-            if (m_slotRomPointer) {
-                if (m_romSlot == 3) c = m_slotRomPointer[p-0xc700] ;
-            }
-            else                  c = m_rom[p] ; 
+            c = m_slotRomPointer[p-0xc700] ;
         } else {
             c = m_rom[p] ;
         }
-    } else {
+    } else {                       // Executing lower ($Cnxx)  part of peripheral card ROM
         if (RdCXROM) {
             c = m_rom[p] ;
         } else {
@@ -148,15 +145,16 @@ quint8 Machine::fetch_ioSpace (quint16 p)     //  Addresses c000 - cfff
                     m_slotRomPointer = NULL ;    // Use main ROM for C300+ on those models.
                     m_romSlot = 0 ;
                 } else {                         // Original apple II & II+: use Card in slot 3.
-//                    c = AE_Viewmaster80[loByte] ;        ** NOT IMPLEMENTD as of 2022-03-03 **
+                    c  = 0 ;
+//                    c = AE_Viewmaster80[loByte] ;        ** NOT IMPLEMENTD as of 2022-03-03; - maybe later -? **
 //                    m_romSlot = 3 ;
 //                    m_slotRomPointer = AE_Viewmaster80 ;
                 }
                 break ;
-              case 4:                                                           // Slot 4 $C4xx
-                c = EMPTY_SLOT ;
+              case 4:                                                           // Slot 4 $C4xx   (mouse)
+                c = mouse_rom_3420270C[loByte] ;
                 m_slotRomPointer = NULL ;
-                m_romSlot = 0 ;
+                m_romSlot = 4 ;
                 break ;
               case 5:                                                           // Slot 5 $C5xx                                                          // Slot 4 $C4xx
                 c = EMPTY_SLOT ;
