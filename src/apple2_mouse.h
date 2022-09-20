@@ -46,8 +46,8 @@ public:
 private:
     int m_slot ;
     int m_romStartAddr ;
-    int m_pressed_X ;
-    int m_pressed_Y ;
+    int m_X, m_Y ;
+    int m_pressed_X, m_pressed_Y ;
     quint16 m_pc ;
 
     void setMouse (void) ;

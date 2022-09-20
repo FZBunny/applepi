@@ -113,14 +113,13 @@ quint8 Machine::fetch_ioSpace (quint16 p)     //  Addresses c000 - cfff
 
 //     ------------------------------------------------
 
-    if (p > 0xc7ff) {              // Executing upper ($C8xx) part of peripheral card ROM
+    if (p > 0xc7ff) {              // Executing upper ($C800-CFFE) part of peripheral card ROM
         if (m_slotRomPointer == mouse_rom_3420270C) {
             c = m_parent->screen()->mouse()->mouseROMReferenced (p) ; // was: c = m_slotRomPointer[p-0xc700] ;
-printf ("Over $CFFF; p=%4.4X\n", p) ;
         } else {
             c = m_rom[p] ;
         }
-    } else {                       // Executing lower ($C100-$C7FF) part of ROM   XXXXXXXXXX  RdCXROM test should be ABOVE the ">c7ff" test! FIXME! XXXXXXX
+    } else {                       // Executing lower ($C100-$C0FF) part of ROM   XXXXXXXXXX  RdCXROM test should be ABOVE the ">c7ff" test! FIXME! XXXXXXX-
         if (RdCXROM) {             // Is it motherboard ROM?
             c = m_rom[p] ;         // Yes.
         } else {                   // Nope - must be peripheral card ROM
@@ -147,7 +146,7 @@ printf ("Over $CFFF; p=%4.4X\n", p) ;
                     m_romSlot = 0 ;
                 } else {                         // Original apple II & II+: use Card in slot 3.
                     c  = 0 ;
-//                    c = AE_Viewmaster80[loByte] ;        ** NOT IMPLEMENTD as of 2022-03-03; - maybe later -? **
+//                    c = AE_Viewmaster80[loByte] ;        ** NOT IMPLEMENTD as of 2022-03-03; - maybe later ? **
 //                    m_romSlot = 3 ;
 //                    m_slotRomPointer = AE_Viewmaster80 ;
                 }

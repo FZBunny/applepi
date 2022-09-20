@@ -51,24 +51,16 @@ Apple2Mouse::Apple2Mouse (int slot)
 }
 
 
-// Called by 'Screen::mouseMoveEvent'
-
-void Apple2Mouse::mouseMoved (QMouseEvent *e)
+void Apple2Mouse::mouseMoved (QMouseEvent *e)         // Called by 'Screen::mouseMoveEvent'
 {
     QPoint p = e->pos() ;
-    int x = p.x()/2 ;
-    int y = p.y()/2 ;
-    MAC->m_ram[0x0478+m_slot] = x & 0xff ;
-    MAC->m_ram[0x0578+m_slot] = x >> 8 ;
-    MAC->m_ram[0x04f8+m_slot] = y & 0xff ;
-    MAC->m_ram[0x05f8+m_slot] = y >> 8 ;
+    m_X = p.x()/2 ;
+    m_Y = p.y()/2 ;
 //printf ("mouse move event x=%4.4i y=%4.4i\n", p.x(), p.y()) ;  fflush(stdout) ;
 }
 
 
-// Called by 'Screen::mousePressEvent'
-
-void Apple2Mouse::mousePressed (QMouseEvent *e)
+void Apple2Mouse::mousePressed (QMouseEvent *e)       // Called by 'Screen::mousePressEvent'
 {
     QPoint p = e->pos() ;
     m_pressed_X = p.x() ;
@@ -78,76 +70,86 @@ void Apple2Mouse::mousePressed (QMouseEvent *e)
 }
 
 
-// Called by 'Screen::mouseReleaseEvent'
-
-void Apple2Mouse::mouseReleased (QMouseEvent*)
+void Apple2Mouse::mouseReleased (QMouseEvent*)        // Called by 'Screen::mouseReleaseEvent'
 {
      MAC->m_ram[0x0778+m_slot] = 0x00 ;
 // printf ("mouseReleased\n") ;
 }
 
 
-//void Apple2Mouse::PIA_store (quint8 )
+/*******
+void Apple2Mouse::PIA_store (quint8)
+{
+
+}
+*******/
 
 
-// Called by 'Machine::fetch_ioSpace' (In fetch.cpp)
-
-quint8 Apple2Mouse::mouseROMReferenced (quint16 ptr)
+quint8 Apple2Mouse::mouseROMReferenced (quint16 ptr)  // Called by 'Machine::fetch_ioSpace' (In fetch.cpp)
 {
     static int RTS = 0x60 ;
-    m_pc = MAC->savedPC() ;
-    int  loByte = ptr & 0xff ;
+
     quint8  c ;
+    m_pc = MAC->savedPC() ;
+    bool aJSR = false ;
+    if (m_pc == ptr) aJSR = true ;
+    int  loByte = ptr & 0xff ;
 
-    if (m_pc == ptr) {              // This is a JSR call 
+    if (ptr < (m_romStartAddr+0x100)) {
 
-        clearCarry() ;   // Clear carry bit; functions may set it to indicate errors
+        if (aJSR) {                        // This is a JSR call 
 
-        switch (loByte) {
-            case 0xb3:
-                setMouse() ;
-                c = RTS ;
-                break ;
-            case 0xc4:
-                serveMouse() ;
-                c = RTS ;
-                break ;
-            case 0x9b:
-                readMouse() ;
-                c = RTS ;
-                break ;
-            case 0xa4:
-                clearMouse() ;
-                c = RTS ;
-                break;
-            case 0xc0:
-                posMouse() ;
-                c = RTS ;
-                break ;
-            case 0x8a:
-                clampMouse() ;
-                c = RTS ;
-                break ;
-            case 0xdd:
-                homeMouse() ;
-                c = RTS ;
-                break ;
-            case 0xbc:
-                initMouse() ;
-                c = RTS ;
-                break ;
-            default:
-                c = mouse_rom_3420270C [loByte] ;
-                break ;
+            clearCarry() ;   // (Clear carry bit; functions may set it to indicate errors)
+
+            switch (loByte) {
+                case 0xb3:
+                    setMouse() ;
+                    c = RTS ;
+                    break ;
+                case 0xc4:
+                    serveMouse() ;
+                    c = RTS ;
+                    break ;
+                case 0x9b:
+                    readMouse() ;
+                    c = RTS ;
+                    break ;
+                case 0xa4:
+                    clearMouse() ;
+                    c = RTS ;
+                    break;
+                case 0xc0:
+                    posMouse() ;
+                    c = RTS ;
+                    break ;
+                case 0x8a:
+                    clampMouse() ;
+                    c = RTS ;
+                    break ;
+                case 0xdd:
+                    homeMouse() ;
+                    c = RTS ;
+                    break ;
+                case 0xbc:
+                    initMouse() ;
+                    c = RTS ;
+                    break ;
+                default:
+                    c = mouse_rom_3420270C [loByte] ;
+                    break ;
+            }
+        } else {
+            c = mouse_rom_3420270C [loByte] ;
         }
 
-    } else {                          // Must be just a fetch from ROM.
-        c = mouse_rom_3420270C [loByte] ;
-//printf ("Mouse fetch from %4.4X=%2.2X; savedPC=%4.4X\n", ptr, c, pc) ; fflush(stdout) ;
+    } else {                               // Must be a fetch address >= C800
+        if (ptr > 0xc800) ptr -= 0xc700 ;  // Fold addrs above C4ff to C800-CFFF part of ROM
+        c = mouse_rom_3420270C [ptr] ;
     }
 
     return c ;
 }
+//printf ("Mouse fetched %2.2X from %4.4X; savedPC=%4.4X\n", c, ptr, m_pc) ; fflush(stdout) ;
 
 
 void Apple2Mouse::setCarry (void)
@@ -181,7 +183,11 @@ printf ("serveMouse:  savedPc = %4.4X\n", m_pc) ;
 
 void Apple2Mouse::readMouse (void)
 {
-printf ("readMouse:   savedPc = %4.4X\n", m_pc) ;
+    MAC->m_ram[0x0478+m_slot] = m_X & 0xff ;
+    MAC->m_ram[0x0578+m_slot] = m_X >> 8 ;
+    MAC->m_ram[0x04f8+m_slot] = m_Y & 0xff ;
+    MAC->m_ram[0x05f8+m_slot] = m_Y >> 8 ;
+//printf ("readMouse:   savedPc = %4.4X\n", m_pc) ;
     return ;
 }
 
@@ -200,9 +206,12 @@ printf ("posMouse:    savedPc = %4.4X\n", m_pc) ;
 }
 
 
-void Apple2Mouse::clampMouse (void)
+void Apple2Mouse::clampMouse (void)   //  What to do about thr received limits?   XXXXX FIXME XXXXX
 {
-printf ("clampMouse:  savedPc = %4.4X\n", m_pc) ;
+int AReg = MAC->processorState()->Areg ;
+printf ("clampMouse  A=%2.2X  LO:%2.2X.%2.2X  HI:%2.2X.%2.2X\n",
+AReg, MAC->m_ram[0x0578], MAC->m_ram[0x0778], MAC->m_ram[0x05f8], MAC->m_ram[0x04f8]) ;
+
     return ;
 }
 
