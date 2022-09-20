@@ -32,6 +32,7 @@
 #define SCREENFRAME_H  1
 
 
+#include <QCursor>
 #include <QPaintDevice> 
 #include <QPixmap> 
 #include <QFrame> 
@@ -39,6 +40,7 @@
 #include <QMainWindow> 
 
 #include "mainwindow.h"
+#include "apple2_mouse.h"
 
 
 
@@ -50,6 +52,7 @@ public:
     void initialize (void) ;
     void setScale (uint scale) ;
     void splashScreen (void) ;
+    Apple2Mouse* mouse (void) ;
 
 private:
 
@@ -66,6 +69,13 @@ private:
     void doubleMonoHiRes4bytes (quint8* main, quint8* aux, int rowOffset, int row, int column) ;
     void drawMonoDoubleHiRes (quint8 page2) ;
     void paintEvent (QPaintEvent *) ;
+    void mouseMoveEvent   (QMouseEvent* e) ;
+    void mousePressEvent  (QMouseEvent* e) ;
+    void mouseReleaseEvent(QMouseEvent* e) ;
+    void enterEvent(QEvent *e) ;
+    void leaveEvent(QEvent *e) ;
+
+    Apple2Mouse* m_mouse ;  //  (Mouse is in slot 4.)
 
     const int PIXELSWIDTH  = 560 ;
     const int PIXELSHEIGHT = 384 ;
@@ -93,7 +103,7 @@ private:
     QPixmap*  m_dblHiResWhite ;
     QPixmap*  m_dblHiResMonoPixels[16] ;
 
-
+    QCursor*  m_blankCursor ;
 } ;
 
 #endif // SCREENFRAME_H

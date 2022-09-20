@@ -609,6 +609,12 @@ Speaker* MainWindow::speaker (void)
 }
 
 
+Screen* MainWindow::screen (void)
+{
+    return m_screen ;
+}
+
+
 // ----------------------------------------------------------------------------
 // -                                                                          -
 // -                           Events & Signals                               -

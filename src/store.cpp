@@ -191,7 +191,7 @@ void Machine::store_ioSpace (quint8 c, quint16 p)
             m_romSlot = 0 ;
             RdCXROM = OFF ;
         } else {
-            printf ("*** ILLEGAL store at PC=%4.4X: tried to store c=%2.2X to ROM at %4.4X\n", PC, c, p) ;
+            printf ("*** ILLEGAL store at PC=%4.4X: tried to store c=%2.2X to ROM at %4.4X\n", m_savedPC, c, p) ;
         }
     }
 }
@@ -409,6 +409,7 @@ void Machine::store_sspage (quint8 c, quint16 p)
         case 0xb:                      // Slot 3      C0B0 - C0BF
             break ;
         case 0xc:                      // Slot 4      C0C0 - C0CF
+printf ("Store slot4  %4.4X, m_savedPC=%4.4X\n", p, m_savedPC) ;
             break ;
         case 0xd:                      // Slot 5      C0D0 - C0DF
             break ;

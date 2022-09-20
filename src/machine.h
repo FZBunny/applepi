@@ -421,6 +421,8 @@ public:
     void runFree    (void) ;
     void halt       (void) ;
 
+    void performIRQ (void) ;
+    
     bool traceIsOn (void) ;
     void enableTrace (bool on) ;
     void setTraceStart (quint16 loAddress) ;

@@ -90,6 +90,7 @@ public:
     void watchAddrIsStopping (void) ;
 
     Speaker* speaker (void) ;
+    Screen* screen (void) ;
 
     void onPowerButton   (void) ;
     void onScaleButton   (void) ;

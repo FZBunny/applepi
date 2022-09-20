@@ -1,10 +1,10 @@
 
 
-#ifndef DEVICE_ROMS_H
-#define DEVICE_ROMS_H
 
 #include <QtGlobal>
 
+
+//  5-1/4" floppy code copyright (C) Apple Computer Inc.
 
 quint8 floppy_5_25Inch_ROM[] =     //      This code is for 16-sector (140 KiB) disks; card is in slot 6.
 {
@@ -44,6 +44,8 @@ quint8 floppy_5_25Inch_ROM[] =     //      This code is for 16-sector (140 KiB) 
 } ;
 
 
+
+//  AppleMouse II ROM copyright (C) Apple Computer Inc.
 
 quint8 mouse_rom_3420270C[] =      //     The mouse card is in slot 4.
 {
@@ -740,4 +742,3 @@ quint8 epson_ROM[] =
     0xfb, 0x8e, 0x90, 0xc0, 0x10, 0xeb, 0x60, 0x00, 0x00, 0xff, 0x22, 0x20, 0x22, 0x3b, 0x49, 0x31
 } ;
 
-#endif // DEVICE_ROMS_H

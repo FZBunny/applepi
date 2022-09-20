@@ -121,6 +121,12 @@ FloppyDiskController::~FloppyDiskController(void)
 }
 
 
+void FloppyDiskController::forgetTrackNumbers (void)
+{
+    for (int i=0; i<2; i++) m_trackTimes2[i] = 34*2 ;
+}
+
+
 int FloppyDiskController::diskInDrive (unsigned int drive)
 {
     if (drive > 1) drive = 1 ;

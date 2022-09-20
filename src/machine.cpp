@@ -257,9 +257,29 @@ void Machine::shutDown(void)
     m_powerIsOn = false ;
     m_floppy->close(0) ;
     m_floppy->close(1) ;
+    m_floppy->forgetTrackNumbers() ;
+} 
 //    m_tape->close() ;
 //    closeCapture() ;
+
+
+void Machine::performIRQ (void)
+{
+    PC++ ;
+    S &= 0xff ;
+    store (PCHI, 0x100|S--) ;
+    S &= 0xff ;
+    store (PCLO, 0x100|S--) ;
+    S &= 0xff ;
+    store (P, 0x100|S--) ;
+    S &= 0xff ;
+    PCLO = fetch(IRQ) ;
+    PCHI = fetch(IRQ+1) ;
+printf ("PCHI,PCLO = %2.2X%2.2X\n", PCHI, PCLO) ;
+    P |= (UN | I) ;
+    cycles(7) ;      // NMOS 6502 does not do this.
 }
+
 
 
 bool Machine::toggleEchoToTerminal (void)

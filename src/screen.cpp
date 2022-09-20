@@ -38,7 +38,9 @@
 #include <QEvent>
 #include <QPaintDevice>
 #include <QPainter>
+#include <QEvent>
 #include <QPaintEvent>
+#include <QMouseEvent>
 
 #include <QImage>
 #include <QClipboard>
@@ -79,9 +81,12 @@ static quint16 screen_RdTEXT_offsets[24] = {
 Screen::Screen (QWidget *parent) : QWidget (parent)
 {
     m_parent = parent ;
+    m_mouse = new Apple2Mouse (4) ;  // Mouse is in slot 4
+    this->setMouseTracking (true) ;
+    m_blankCursor = new QCursor (Qt::BlankCursor) ;
     initialize() ;
 }
-
+ 
 
 void Screen::initialize (void)
 {
@@ -699,6 +704,47 @@ void Screen::paintEvent (QPaintEvent* e)
 ***************************************************/
 
 
+Apple2Mouse* Screen::mouse (void)
+{
+    return m_mouse ;
+}
+
+
+void Screen::mouseMoveEvent (QMouseEvent *e)
+{
+    m_mouse->mouseMoved (e) ;
+}
+
+
+void Screen::mousePressEvent (QMouseEvent *e)
+{
+    m_mouse->mousePressed (e) ;
+}
+
+
+void Screen::mouseReleaseEvent (QMouseEvent *e)
+{
+    m_mouse->mouseReleased (e) ;
+}
+
+
+void Screen::enterEvent (QEvent*)
+{
+//printf ("enterEvent\n") ;
+    QApplication::setOverrideCursor (Qt::BlankCursor) ;
+}
+
+
+void Screen::leaveEvent(QEvent*)
+{
+//printf ("leaveEvent\n") ;
+    QApplication::restoreOverrideCursor() ;
+}
+
+
+
+
+
 void Screen::refreshScreen (void)
 {
     quint8  *loresData, *hiresData ;
@@ -714,7 +760,7 @@ void Screen::refreshScreen (void)
     quint8 rdDblHiRes = MAC->m_ss[0x07f] ;
 
     if (RdAltChar) {
-         m_flash = false ;               // (Nothing in alt.char set flashes.)
+         m_flash = false ;            // (Nothing in alt.char set flashes.)
     } else {
         if (--m_flashCounter < 0) {
              m_flashCounter = FLASHDELAY ;

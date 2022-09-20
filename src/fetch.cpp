@@ -114,15 +114,16 @@ quint8 Machine::fetch_ioSpace (quint16 p)     //  Addresses c000 - cfff
 //     ------------------------------------------------
 
     if (p > 0xc7ff) {              // Executing upper ($C8xx) part of peripheral card ROM
-        if (m_slotRomPointer) {
-            c = m_slotRomPointer[p-0xc700] ;
+        if (m_slotRomPointer == mouse_rom_3420270C) {
+            c = m_parent->screen()->mouse()->mouseROMReferenced (p) ; // was: c = m_slotRomPointer[p-0xc700] ;
+printf ("Over $CFFF; p=%4.4X\n", p) ;
         } else {
             c = m_rom[p] ;
         }
-    } else {                       // Executing lower ($Cnxx)  part of peripheral card ROM
-        if (RdCXROM) {
-            c = m_rom[p] ;
-        } else {
+    } else {                       // Executing lower ($C100-$C7FF) part of ROM   XXXXXXXXXX  RdCXROM test should be ABOVE the ">c7ff" test! FIXME! XXXXXXX
+        if (RdCXROM) {             // Is it motherboard ROM?
+            c = m_rom[p] ;         // Yes.
+        } else {                   // Nope - must be peripheral card ROM
             int loByte = p & 0xff ;
             int slotNumber = (p >> 8 ) & 0x000f ;
             switch (slotNumber) {
@@ -152,17 +153,11 @@ quint8 Machine::fetch_ioSpace (quint16 p)     //  Addresses c000 - cfff
                 }
                 break ;
               case 4:                                                           // Slot 4 $C4xx   (mouse)
-/***
-                c = mouse_rom_3420270C[loByte] ;   // Mouse code not written yet.  2022-09-14   Soon.
-                m_slotRomPointer = NULL ;
+                m_slotRomPointer = mouse_rom_3420270C ;
                 m_romSlot = 4 ;
-***/                                                                       // Slot 4 $C4xx
-                c = EMPTY_SLOT ;
-                m_slotRomPointer = NULL ;
-                m_romSlot = 0 ;
-
+                c = m_parent->screen()->mouse()->mouseROMReferenced (p) ;
                 break ;
-              case 5:                                                           // Slot 5 $C5xx                                                          // Slot 4 $C4xx
+              case 5:                                                           // Slot 5 $C5xx
                 c = EMPTY_SLOT ;
                 m_slotRomPointer = NULL ;
                 m_romSlot = 0 ;
@@ -185,7 +180,15 @@ quint8 Machine::fetch_ioSpace (quint16 p)     //  Addresses c000 - cfff
 
     return c ;
 }
-
+/*****
+                if (loByte == 0x0c) {         // mouse ID
+                    c = 0x20 ;
+                } else if (loByte == 0xfb) {  // mouse ID
+                    c = 0xd6 ;
+                } else if ((loByte>0x11) && (loByte<0x20)) {
+                    m_parent->screen()->mouse()->mouseROMReferenced (loByte) ;
+                }
+*****/
 
 // Address is in range $D000 - $FFFF
 // Return a pointer to main or auxiliary RAM, or to ROM.
@@ -328,7 +331,8 @@ quint8 Machine::fetch_sspage (quint16 p)
                     break ;
                 case 0xb:
                     break ;
-                case 0xc:
+                case 0xc: ;
+printf ("Fetch slot4  %4.4X, m_savedPC=%4.4X\n", p, m_savedPC) ;
                     break ;
                 case 0xd:
                     break ;
@@ -428,6 +432,8 @@ printf ("Fetch %2.2x from slot 1, p=%4.4x\n", c, p) ;
             m_romSlot = 3 ;
             break ;
         case 0xc:                 //  slot 4      C0C0 - C0CF
+       //     c = 
+printf ("*** Fetch from slot4 %4.4X\n", p) ;
             m_romSlot = 4 ;
             break ;
         case 0xd:                 //  slot 5      C0D0 - C0DF

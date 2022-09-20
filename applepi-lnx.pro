@@ -28,6 +28,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 # Input
 HEADERS += src/about.h \
+           src/apple2_mouse.h \
            src/applepi_button.h \
            src/bootblock.h \
            src/config.h \
@@ -65,12 +66,14 @@ HEADERS += src/about.h \
            src/xpm_images.h
 
 SOURCES += src/about.cpp \
+           src/apple2_mouse.cpp \
            src/applepi_button.cpp \
            src/bootblock.cpp \
            src/config.cpp \
            src/debugging_dumps.cpp \
            src/defs.h \
            src/defs.cpp \
+           src/device_roms.cpp \
            src/disassembler.cpp \
            src/disassemble_memory_dialog.cpp \
            src/fetch.cpp \

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
-    File: "AppleIIMouse.cpp"
+    File: "apple2_mouse.h"
 
     Copyright (C) 2022, Bruce Ward
 
@@ -25,3 +25,42 @@
 
 *****************************************************************************/
 
+#ifndef APPLE2MOUSE_H
+#define APPLE2MOUSE_H
+
+#include  <QMouseEvent>
+
+
+class Apple2Mouse
+{
+public:
+    Apple2Mouse (int slot) ;
+    ~Apple2Mouse() {} ;
+
+    void mouseMoved    (QMouseEvent *e) ;
+    void mousePressed  (QMouseEvent *e) ;
+    void mouseReleased (QMouseEvent *e) ;
+
+    quint8 mouseROMReferenced (quint16 pc) ;
+
+private:
+    int m_slot ;
+    int m_romStartAddr ;
+    int m_pressed_X ;
+    int m_pressed_Y ;
+    quint16 m_pc ;
+
+    void setMouse (void) ;
+    void serveMouse( void) ;
+    void readMouse (void) ;
+    void clearMouse (void) ;
+    void posMouse (void) ;
+    void clampMouse (void) ;
+    void homeMouse (void) ;
+    void initMouse (void) ;
+
+    void setCarry (void) ;
+    void clearCarry (void) ;
+} ;
+
+#endif

@@ -62,6 +62,7 @@ public:
     bool writeProtected (unsigned int drive) ;
     void setWriteProtect (unsigned int drive, int flag) ;
 
+    void forgetTrackNumbers (void) ;
 //    QString *file (unsigned int drive) ; XXXXXXXXXXXXXXXXXXX FIX
     int diskInDrive (unsigned int drive) ;
     int OSType (int driveNumber) ;
