@@ -431,9 +431,8 @@ printf ("Fetch %2.2x from slot 1, p=%4.4x\n", c, p) ;
             m_romSlot = 3 ;
             break ;
         case 0xc:                 //  slot 4      C0C0 - C0CF
-       //     c = 
-printf ("*** Fetch from slot4 %4.4X\n", p) ;
             m_romSlot = 4 ;
+            c = m_parent->screen()->mouse()->PIA_fetch (p) ;
             break ;
         case 0xd:                 //  slot 5      C0D0 - C0DF
             m_romSlot = 5 ;

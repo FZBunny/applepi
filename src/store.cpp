@@ -409,7 +409,8 @@ void Machine::store_sspage (quint8 c, quint16 p)
         case 0xb:                      // Slot 3      C0B0 - C0BF
             break ;
         case 0xc:                      // Slot 4      C0C0 - C0CF
-printf ("Store slot4  %4.4X, m_savedPC=%4.4X\n", p, m_savedPC) ;
+            m_parent->screen()->mouse()->PIA_store (p, c) ;
+//printf ("Store slot4  %4.4X, m_savedPC=%4.4X\n", p, m_savedPC) ;
             break ;
         case 0xd:                      // Slot 5      C0D0 - C0DF
             break ;
