@@ -82,8 +82,6 @@ Screen::Screen (QWidget *parent) : QWidget (parent)
 {
     m_parent = parent ;
     m_mouse = new Apple2Mouse (4) ;  // Mouse is in slot 4
-    this->setMouseTracking (true) ;
-    m_blankCursor = new QCursor (Qt::BlankCursor) ;
     initialize() ;
 }
  
@@ -92,6 +90,9 @@ void Screen::initialize (void)
 {
     int m_romNumber = ((MainWindow*)m_parent)->romNumber() ;
 
+    this->setMouseTracking (true) ;
+    m_blankCursor = new QCursor (Qt::BlankCursor) ;
+    
     switch (m_romNumber) {
         case APPLE2:
         case APPLE2PLUS:
@@ -604,26 +605,6 @@ void Screen::doubleMonoHiRes4bytes (quint8* main, quint8* aux, int rowOffset, in
 
     int x = 28*group ;
     int y = 2*row ;
-/**
-    painter.drawPixmap (0, 0, *m_dblHiResMonoPixels[0]) ;
-    painter.drawPixmap (0, 2, *m_dblHiResMonoPixels[1]) ;
-    painter.drawPixmap (0, 4, *m_dblHiResMonoPixels[2]) ;
-    painter.drawPixmap (0, 6, *m_dblHiResMonoPixels[3]) ;
-    painter.drawPixmap (0, 8, *m_dblHiResMonoPixels[4]) ;
-    painter.drawPixmap (0, 10, *m_dblHiResMonoPixels[5]) ;
-    painter.drawPixmap (0, 12, *m_dblHiResMonoPixels[6]) ;
-    painter.drawPixmap (0, 14, *m_dblHiResMonoPixels[7]) ;
-    painter.drawPixmap (0, 16, *m_dblHiResMonoPixels[8]) ;
-    painter.drawPixmap (0, 18, *m_dblHiResMonoPixels[9]) ;
-    painter.drawPixmap (0, 20, *m_dblHiResMonoPixels[10]) ;
-    painter.drawPixmap (0, 22, *m_dblHiResMonoPixels[11]) ;
-    painter.drawPixmap (0, 24, *m_dblHiResMonoPixels[12]) ;
-    painter.drawPixmap (0, 26, *m_dblHiResMonoPixels[13]) ;
-    painter.drawPixmap (0, 28, *m_dblHiResMonoPixels[14]) ;
-    painter.drawPixmap (0, 30, *m_dblHiResMonoPixels[15]) ;
-return ;
-**/
-
     painter.drawPixmap (x,    y, *m_dblHiResMonoPixels[iA]) ;
     painter.drawPixmap (x+4,  y, *m_dblHiResMonoPixels[iB]) ;
     painter.drawPixmap (x+8,  y, *m_dblHiResMonoPixels[iC]) ;
