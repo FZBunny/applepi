@@ -42,14 +42,27 @@ public:
     void mouseReleased (QMouseEvent *e) ;
 
     quint8 mouseROMReferenced (quint16 pc) ;
+    quint8 PIA_fetch (quint16 ptr) ;
+    void   PIA_store (quint16 ptr, quint8 c) ;
 
 private:
     int m_slot ;
     int m_romStartAddr ;
+    int m_IOSlotStartAddr ;
     int m_X, m_Y ;
     int m_pressed_X, m_pressed_Y ;
     quint16 m_pc ;
 
+    // 6520 PIA registers:
+    quint8 CRA,  CRB ;  // control registers
+    quint8 DDRA, DDRB ; // data-direction registers
+    quint8 IORA, IORB ; // input/output registers
+} ;
+
+#endif
+
+
+/***
     void setMouse (void) ;
     void serveMouse( void) ;
     void readMouse (void) ;
@@ -61,6 +74,4 @@ private:
 
     void setCarry (void) ;
     void clearCarry (void) ;
-} ;
-
-#endif
+***/
