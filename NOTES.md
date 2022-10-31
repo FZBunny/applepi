@@ -11,18 +11,19 @@ For Debian-derived distributions, you will need to install these libraries:
 
 #### A warning when building from source  
 ApplePi uses the Qt5 library.
-You will have to do a 'qmake -makefile' to create a makefile, but:    
--don't- use "qmake -project" to recreate the .pro file.  
-But, if you must, add the following lines to the new applepi.pro :  
+You will have to do a 'qmake -makefile applepi-lnx.pro' to create a makefile.
+.......................................................
+-DO NOT- use "qmake -project" to recreate the .pro file.  
+However, if you must, add the following lines to the new applepi.pro :  
 
 `QMAKE_CXXFLAGS += -Wno-implicit-fallthrough -Wno-deprecated-declarations`   
 `LIBS += -L/usr/lib/x86_64-linux-gnu/alsa-lib -lasound -no-pie`   
 `QT += widgets   printsupport   gamepad  multimedia`  
 `OBJECTS_DIR=obj`  
 `DESTDIR=bin`   
-  
+
 You will also have to remove tape.cpp, tape\_dialog.cpp, tape.h, and tape_dialog.h from the source and header lists of the new applepi.pro .  (All 'tape' code is old, using wxWidgets.  It may be converted to Qt some time in future)
-   
+.......................................................
   
 #### Shortcomings and known bugs
 
