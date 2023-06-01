@@ -30,7 +30,10 @@
 #ifndef MACHINE_H
 #define MACHINE_H
 
-#include <sys/time.h>
+
+#ifndef Q_OS_WINDOWS
+#   include <sys/time.h>
+#endif
 
 #include <QThread>
 #include <QFile>
@@ -443,7 +446,6 @@ public:
     quint16 getPC (void) ;
 
     bool toggleEchoToTerminal (void) ;
-//    bool toggleEchoToFile    (void) ;
     bool isEchoingToFile (void) ;
     void echoToFile (QFile* f) ;
     void closeEchoFile (void) ;
@@ -499,14 +501,14 @@ private:
     void    ss_store_snoop (quint8, quint16 p) ;
     void    printInstruction (quint8 opcode, quint8 c1, quint8 c2) ;
     void    sprint_6502_registers (ProcessorState& State, char* buffer) ;
-    void    intitializeRAM (void) ;
+    void    initializeRAM (void) ;
 
     Disassembler*  m_disassembler ;
     quint16       m_savedPC ;
 
     bool     m_waitForCPUTimer ;
     bool     m_powerIsOn ;
-    int      m_highRamWrite ;       // "high RAM" ($C000-$FFFF) write enabled when m_highRamWrite is true    (or is it $D000-$FFFF ? )
+    bool     m_highRamWrite ;       // "high RAM" ($C000-$FFFF) write enabled when m_highRamWrite is true    (or is it $D000-$FFFF ? )
     bool     m_highWritePreset ;    // m_highWritePreset must be true before m_highRamWrite can be set 'true'
     quint64  m_nCycles ;
     quint64  m_previousCycles ;
@@ -518,34 +520,35 @@ private:
     bool     m_snoopSSFetches ;
     bool     m_snoopSSStores ;
 
-    quint64  m_debugFlags ;
+//    quint64  m_debugFlags ;
 
     int   m_mouseX, m_mouseMaxX ;
     int   m_mouseY, m_mouseMaxY ;
     int   m_mouseButton[3] ;
 
-    bool  m_monochrome ;
+//    bool  m_monochrome ;
     int   m_monoDblHiResState ;
 
     bool    m_echoToTerminal ;
-    QFile*  m_echoToFile ;
+    bool    m_echoingToFile ;
+    QFile*  m_textEchoFile ;
 
     quint64  m_previousUsecs ;
 
     bool      m_haltedOnTrap ;
-    bool      m_paused ;
+//    bool      m_paused ;
     bool      m_WAI_executed ;    // Set to true if "WAI" (wait for interrupt) instruction is executed
     bool      m_STP_executed ;    // Set to true if "STP" (wait for reset) instruction is executed
     quint16   m_trapPointAddr[4] ;
     bool      m_trapPointSet[4] ;
     quint16   m_watchAddr[4] ;
-    quint16   m_watchAddrSet[4] ;
+    bool      m_watchAddrSet[4] ;
     bool      m_dumpHistory ;
     int       m_halted ;
     int       m_singleStepPhase ;
 
     TrapTrace  *m_trapTraceDialogPointer ;
-    WatchAddr   *m_watchAddrDialogPointer ;
+    WatchAddr  *m_watchAddrDialogPointer ;
 
     ProcessorState  m_registers ;
 

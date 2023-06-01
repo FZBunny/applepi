@@ -43,7 +43,7 @@
 #include "help.h"
 
 #include "traptrace.h"
-#include "watchaddr.h"
+//#include "watchaddr.h"
 
 #include "gamepad_dialog.h"
 #include "rom_dialog.h"
@@ -117,6 +117,7 @@ void MainWindow::createMenus (void)
 
     m_echoToFile = new QAction (tr("Echo Screen Text to File..."), this) ;
     m_preferencesMenu->addAction (m_echoToFile) ;
+    m_echoToFile->setEnabled (false) ;
     connect (m_echoToFile, &QAction::triggered, this, &MainWindow::onEchoToFile) ;
 
 // "Debug" menu  ------------------------------------
@@ -148,6 +149,12 @@ void MainWindow::createMenus (void)
     connect (m_about, &QAction::triggered, this, &MainWindow::onAbout) ;
 
     m_trapTraceIsRunning = false ;
+}
+
+
+void MainWindow::clearMenus (void)
+{
+    
 }
 
 
@@ -350,10 +357,11 @@ void MainWindow::onEchoToFile (void)
 {
     if (MAC->isEchoingToFile() == false) {
 
-        CFG->Get ("text_echo_path", &m_textEchoPath) ;
+        QString echoPath ;
+        CFG->Get ("text_echo_path", &echoPath) ;
         QString fileTypes ("Text files (*.TXT, *.txt)||Any (*.*)|*.*") ;
-        QFileDialog dialog  (this, tr("Create a new capture file"), m_textEchoPath, fileTypes) ;
-        QString dir = QFileInfo (m_textEchoPath).absolutePath() ;
+        QFileDialog dialog  (this, tr("Create a new capture file"), echoPath, fileTypes) ;
+        QString dir = QFileInfo (echoPath).absolutePath() ;
         dialog.setDirectory (dir) ;
         dialog.setModal(true) ;
         dialog.exec() ;
@@ -363,7 +371,7 @@ void MainWindow::onEchoToFile (void)
             if (QString::compare(check,".txt",Qt::CaseInsensitive) != 0) {
                 path.append (".txt") ;
             }
-            m_textEchoFile = new QFile (path, this) ;
+            m_textEchoFile = new QFile (path) ;
             bool ok = m_textEchoFile->open (QIODevice::WriteOnly) ;
             if (ok) {
                 MAC->echoToFile (m_textEchoFile) ;

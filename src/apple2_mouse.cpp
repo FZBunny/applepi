@@ -28,6 +28,12 @@
 
 /*------------------------------------------------------------------------------------------------
 
+    XXXXX Note that this code DOES NOT YET FUNCTION PROPERLY in many cases.
+    XXXXX It exists only for use when running in double-hires mono mode.
+    XXXXX Visit https://www.a2desktop.com/ for the Apple II desktop program,
+    XXXXX which uses double-hires mono, but does not yet run properly on ApplePi.
+    XXXXX JBW, 2023-06-01
+
     Information for this class taken from: "AppleMouse // User's Manual", currently
     available at (as of Sept.2022) :
     https://github.com/freitz85/AppleIIMouse/blob/master/AppleMouse%20II%20User's%20Manual.pdf

@@ -70,19 +70,17 @@ Machine::Machine (MainWindow* parent)
     m_powerIsOn = false ;
     m_trace = false ;
 
-    m_debugFlags = 0x00000000 ;
-
     for (int i=0; i<4; i++) {
         m_trapPointAddr[i] = 0 ;
         m_trapPointSet[i] = false ;
     }
 
+    initialize (false) ;
 }
 
 
 void Machine::initialize (bool power)
 {
-//printf ("AE_Viewmaster80 = %16.16llx\n", (quint64)AE_Viewmaster80) ;
     m_powerIsOn = power ;
 
     if ( ! power) return ;  // Don't clear anything if power has been turned off;
@@ -112,7 +110,7 @@ void Machine::initialize (bool power)
     S = 0xfc ;
     P = 0xff ;
     memset (m_ss,  0, 0x0100) ;
-    intitializeRAM() ;
+    initializeRAM() ;
 
     RdMIXED = OFF ;
     RdHIRES = OFF ;
@@ -122,8 +120,25 @@ void Machine::initialize (bool power)
     m_romSlot = 0 ;
     m_slotRomPointer = NULL ;
     m_monoDblHiResState = 0 ;
-    m_highRamWrite = true ;   // See "Understanding the Apple IIe" p. 5-23
+    m_highRamWrite = true ;        // See "Understanding the Apple IIe" p. 5-23
     m_highWritePreset = false ;
+    m_waitForCPUTimer = false ;
+    m_waitForCPUTimer = false;
+    m_highRamWrite = false;
+    m_highWritePreset = false;
+    m_trace = false;
+    m_snoopSSFetches = false;
+    m_snoopSSStores = false;
+    m_echoToTerminal = false;
+    m_echoingToFile = false ;
+    m_WAI_executed = false;
+    m_STP_executed = false;
+    m_dumpHistory = false;
+    for (int i = 0; i < 4; i++) {
+        m_trapPointSet[i] = false;
+        m_watchAddr[i] = false;
+
+    }
 
     closeEchoFile() ;
 
@@ -131,25 +146,24 @@ void Machine::initialize (bool power)
 
 
 
-// Generate a slightly randomized pattern on screen after power-up.
-// A kind'a lame attempt to mimic dynamic RAM behaviour.
-
 #ifdef Q_OS_WINDOWS  // ------------------------------------
 
-void Machine::intitializeRAM (void)  // XXXXXXXXXXXXXXXXXXXXXXXXXX  FIXME  XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+void Machine::initializeRAM (void)
 {
-
+    memset(m_ram, 0, 0x10000);
+    memset(m_aux, 0, 0x10000);
 }
 
 #else  // -------------------------------------------------
 
-void Machine::intitializeRAM (void)
-{
-    
-memset (m_ram, 0, 0x10000) ;
-memset (m_aux, 0, 0x10000) ;
+// Generate a slightly randomized pattern on screen after power-up.
+// A kind'a lame attempt to mimic dynamic RAM behaviour.
 
-/***
+void Machine::initializeRAM (void)
+{
+    memset (m_ram, 0, 0x10000) ;
+    memset (m_aux, 0, 0x10000) ;
+/****
 //    int seed = QTime::msecsSinceStartOfDay() ;   // Kinda lame, but good enough.
     time_t n = time(NULL) ;
     srandom(n) ;
@@ -290,21 +304,24 @@ bool Machine::toggleEchoToTerminal (void)
 
 bool Machine::isEchoingToFile (void)
 {
-    if (m_echoToFile) return true ;
-    else            return false ;
+    return m_echoingToFile ;
 }
 
 
 void Machine::echoToFile (QFile* f)
 {
-    m_echoToFile = f ;
+    m_textEchoFile = f ;
+    m_echoingToFile = true ;
 }
 
 
 void Machine::closeEchoFile (void)
 {
-    if (m_echoToFile) m_echoToFile->close() ;
-    m_echoToFile = NULL ;
+    if (m_echoingToFile) {
+        m_textEchoFile->close() ;
+        delete (m_textEchoFile) ;
+    }
+    m_echoingToFile = false ;
 }
 
 
@@ -734,6 +751,7 @@ void Machine::run (void)
         // (Note that storing microseconds as 64 bits is good for 500,000+ years)
 
         quint64 deltaCycles = m_nCycles - m_previousCycles ;
+
 #ifdef Q_OS_WINDOWS
         if (deltaCycles > SLICECYCLES) {
             m_previousCycles = m_nCycles ;
@@ -796,9 +814,9 @@ void Machine::run (void)
 
         // If the CPU is not running, sit in a wait loop.
 
-        while (   (m_powerIsOn == false)
-               ||  m_halted
-               || (m_singleStepPhase == ACK))
+        while ((m_powerIsOn == false)
+            ||  m_halted
+            || (m_singleStepPhase == ACK))
         {
             usleep (50000) ;
             m_previousUsecs = microseconds() ;
@@ -812,19 +830,19 @@ void Machine::run (void)
         else         echo = (PC == 0xfdf0) ;
 
         if (echo) {
-            quint8 c = A & 0x7f ;
-            static const quint8 CR  = 0x0d ;
-            static const quint8 LF  = 0x0a ;
+            const char c = A & 0x7f ;
+            static const char CR  = 0x0d ;
+            static const char LF  = 0x0a ;
             if (m_echoToTerminal) {     //   Echo screen character to terminal?
                     printf ("%c", c) ;
                     if (c == CR) printf ("%c", LF) ;
                     fflush (stdout) ;
             }
 
-            if (m_echoToFile) {        //   Echo screen character to a file?
-//                m_echoToFile->write (&c, 1) ;
- //               if (c == CR) m_echoToFile->write (&LF, 1) ;
-//                m_echoToFile->Flush() ;
+            if (m_echoingToFile) {        //   Echo screen character to a file?
+                m_textEchoFile->write (&c, 1) ;
+                if (c == CR) m_textEchoFile->write (&LF, 1) ;
+                m_textEchoFile->flush() ;
             }
         }
 

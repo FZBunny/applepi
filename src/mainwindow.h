@@ -213,9 +213,10 @@ private:
     QString  m_romPath ;
     QString  m_hdPath ;
 
-    QString  m_textEchoPath ;
+// ---------------------
+
     QFile*   m_textEchoFile ;
-//    QSlider* m_volumeSlider ;
+
     VolumeDial* m_dial ;
 
     QSize    m_buttonSize ;
@@ -229,6 +230,7 @@ private:
     bool m_watchAddrIsRunning ;
 
     void createMenus (void) ;
+    void clearMenus (void) ;
     void setCPuTimer (void) ;
 
     void onDiskDriveCheckTimer (void) ;
@@ -247,6 +249,7 @@ private:
     void onCopyScreen    (void) ;
     void pasteToKeyboard (void) ;
 
+    bool isDesktopBigEnough (void) ;
     void toggleScale     (void) ;
     void onScreenScale   (void) ;
 

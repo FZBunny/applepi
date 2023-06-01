@@ -88,4 +88,9 @@ enum romNumber {
 } ;
 
 
+#ifdef Q_OS_WINDOWS
+    void usleep(unsigned int usec);
+#endif
+
+
 #endif // MISC_DEFS_H

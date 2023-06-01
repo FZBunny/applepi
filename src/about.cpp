@@ -26,14 +26,12 @@
 *****************************************************************************/
 
 
-
 #include <QDesktopServices>
 #include <QFontComboBox>
 #include <QUrl>
 
 #include "about.h"
 #include "version.h"
-
 
 
 About::About (QWindow*)

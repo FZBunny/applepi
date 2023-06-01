@@ -25,11 +25,10 @@
 
 *****************************************************************************/
 
-/*
+
 #ifdef Q_OS_WINDOWS
   void usleep(unsigned int usec) ;
 #endif
-*/
 
 quint64 microseconds (void) ;
 void quickSleep (quint64 uSecs) ;

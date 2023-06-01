@@ -325,7 +325,11 @@ Panel::Panel (ViewMemory* parent)
     int bufferLen = 77 ;
     int requiredPanelWidth ;
     do {                                      // Find the largest font that will fit.
-        m_font = QFont ("DejaVu Sans Mono", fontSize--) ;
+#ifdef Q_OS_WINDOWS
+        m_font = QFont("Courier", fontSize--);
+#else
+        m_font = QFont("DejaVu Sans Mono", fontSize--);
+#endif
         QFontMetrics fm (m_font) ;
         m_lineHeight = fm.height() ;
         int charWidth = fm.horizontalAdvance('0') ;

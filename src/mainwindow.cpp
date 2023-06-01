@@ -31,6 +31,7 @@ using namespace std ;
 #include <iostream>
 
 #include <QApplication>
+#include <QDesktopWidget>
 #include <QIcon>
 #include <QThread>
 #include <QLabel>
@@ -182,6 +183,17 @@ MainWindow::MainWindow (void)
         m_scaleButton->setFont (sbFont) ;
     }
 
+    if (isDesktopBigEnough() == false) {
+        m_scale = 1;
+        m_screenSize = QSize(564, 388);
+        this->setMinimumSize(m_minSize);
+        this->setMaximumSize(m_minSize);
+        this->resize(m_minSize);
+        m_cfg->Set("window_scale", &m_scale);
+        m_scaleButton->setText("Big Screen");
+        m_scaleButton->setEnabled(false);
+    }
+
     connect (m_powerButton,        &ApplepiButton::clicked, this, &MainWindow::onPowerButton) ;
     connect (m_floppy1Button,      &ApplepiButton::clicked, this, &MainWindow::onFloppy1Button) ;
     connect (m_floppy2Button,      &ApplepiButton::clicked, this, &MainWindow::onFloppy2Button) ;
@@ -198,8 +210,12 @@ MainWindow::MainWindow (void)
     this->setFocus() ;
 
     m_volText  = new QLabel ("Volume", this) ;
-       
-    QFont font2 ("courier", 8) ;
+
+#ifdef Q_OS_WINDOWS
+        QFont font2 ("Lucida Sans Typewriter", 8);
+#else
+        QFont font2("courier", 8);
+#endif
     font2.setBold (false) ;
 
     m_floppy1Label = new QLabel ("", this) ;
@@ -391,6 +407,21 @@ bool MainWindow::readRomFile (QString path)
 bool MainWindow::powerIsOn (void)
 {
     return m_powerButtonState ;
+}
+
+
+bool MainWindow::isDesktopBigEnough (void)
+{
+    QDesktopWidget deskTop ;
+    QRect r = deskTop.screenGeometry() ;
+    int screenWidth  = r.width() ;
+    int screenHeight = r.height() ;
+    
+    bool ok = true ;
+
+
+    if ((MAX_MAINWINDOW_WIDTH > screenWidth) || (MAX_MAINWINDOW_HEIGHT > screenHeight)) ok = false ; 
+    return ok ;
 }
 
 
@@ -880,6 +911,8 @@ void MainWindow::onPowerButton (void)
         m_mac->initialize (true) ;
         m_selectRomFile->setEnabled (false) ;
         m_powerButton->setIcon (m_led_bright_green) ;
+        m_echoToFile->setEnabled (true) ;
+        m_echoToFile->setText ("Echo Screen Text to File") ;
     } else {
         m_mac->initialize (false) ;
         m_selectRomFile->setEnabled (true) ;
@@ -890,6 +923,8 @@ void MainWindow::onPowerButton (void)
         m_hd2Button->setIcon (m_led_dim_red) ;
         m_tapeButton->setIcon (m_led_dim_red) ;
         m_screen->initialize() ;
+        m_echoToFile->setEnabled (false) ;
+        m_echoToFile->setText ("Echo Screen Text to File") ;
         m_motorSound.stop() ;
     }
 

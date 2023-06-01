@@ -45,7 +45,9 @@
 #include <QImage>
 #include <QClipboard>
 
-#include <unistd.h>
+#ifndef Q_OS_WINDOWS
+#   include <unistd.h>
+#endif
 
 #include "mainwindow.h"
 #include "machine.h"
@@ -341,7 +343,7 @@ void Screen::splashScreen (void)
 }
 
 
-//   Draw a single 40-column line on the screen
+//   Draw a single 40-column line of text on the screen
 
 void Screen::drawLine_40 (uchar *characters, int dstX, int dstY)
 {
@@ -378,7 +380,7 @@ void Screen::draw40Column (int firstLine, quint8 *loresData)
 }
 
 
-//   Draw a single 80-column line on the screen
+//   Draw a single 80-column line of text on the screen
 
 void Screen::drawLine_80 (int x, int y, quint8 *main, quint8 *aux)
 {
@@ -712,7 +714,7 @@ void Screen::mouseReleaseEvent (QMouseEvent *e)
 void Screen::enterEvent (QEvent*)
 {
 //printf ("enterEvent\n") ;
-    QApplication::setOverrideCursor (Qt::BlankCursor) ;
+    if (MAC->displayMonoDblHiRes()) QApplication::setOverrideCursor (Qt::BlankCursor) ;
 }
 
 
@@ -750,9 +752,9 @@ void Screen::refreshScreen (void)
     }
 
     if  (rdDblHiRes                   // Double hi-res
-         && rdHiRes
-         && rdText == OFF
-         && rd80Col)
+      && rdHiRes
+      && rdText == OFF
+      && rd80Col)
     {
 #ifdef Q_PROCESSOR_ARM
         m_refreshTimer.setInterval (SLOW) ;           // Give Raspberry Pi CPUs a break on refresh speed
@@ -763,7 +765,7 @@ void Screen::refreshScreen (void)
         if (MAC->displayMonoDblHiRes()) drawMonoDoubleHiRes (usePage2) ;
         else                            drawColorDoubleHiRes(usePage2) ;
         QWidget::update (this->rect()) ;
-        return ;                                      // <--- Note the return here on dbl hires ...
+        return ;                                      // <--- Note that we return here on dbl hires ...
     }
 
     if (page2) {
