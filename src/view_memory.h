@@ -152,6 +152,7 @@ private:
     int         m_height ;
     int         m_nLines ;
     int         m_lineHeight ;
+    int         m_charWidth ;
 
 } ;
 

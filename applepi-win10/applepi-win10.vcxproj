@@ -101,6 +101,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\qrc_resources.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="..\src\apple2_mouse.cpp" />
     <ClCompile Include="..\src\applepi_button.cpp" />
     <ClCompile Include="..\src\bootblock.cpp" />
@@ -192,6 +196,9 @@
     <ClInclude Include="..\src\wav_step1.h" />
     <ClInclude Include="..\src\win-speaker.h" />
     <ClInclude Include="..\src\xpm_images.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <QtRcc Include="..\resources.qrc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">

@@ -75,6 +75,7 @@ MainWindow* main_window ;
 
 MainWindow::MainWindow (void)
 {
+//printf("Entering MainWindow::MainWindow\n") ;
     main_window = this ;
 
     m_cfg = new Config() ;
@@ -810,10 +811,13 @@ void MainWindow::play (int n)    // Currently (as of v0.2.3) called only by 'Flo
 
 void MainWindow::onPlaySoundTimer (void)
 {
+    int n ;
+
     switch (m_soundNumber) {
         case 1:
-            m_soundEffect.setSource(QUrl::fromLocalFile(":/sounds/step1.wav")) ;
-            m_soundEffect.play();
+            m_soundEffect.setSource(QUrl::fromLocalFile (":/sounds/step1.wav")) ;
+            n = m_soundEffect.status();
+            m_soundEffect.play() ;
             break ;
         default:
             break ;

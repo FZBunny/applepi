@@ -326,16 +326,16 @@ Panel::Panel (ViewMemory* parent)
     int requiredPanelWidth ;
     do {                                      // Find the largest font that will fit.
 #ifdef Q_OS_WINDOWS
-        m_font = QFont("Courier", fontSize--);
+        m_font = QFont ("Consolas", fontSize--) ; 
 #else
-        m_font = QFont("DejaVu Sans Mono", fontSize--);
+        m_font = QFont ("DejaVu Sans Mono", fontSize--) ;
 #endif
         QFontMetrics fm (m_font) ;
         m_lineHeight = fm.height() ;
-        int charWidth = fm.horizontalAdvance('0') ;
-        requiredPanelWidth = bufferLen * charWidth ;
+        m_charWidth = fm.horizontalAdvance('0') ;
+        requiredPanelWidth = bufferLen * m_charWidth ;
     } while (requiredPanelWidth > m_width) ;
-
+//printf ("fontSize=%d  m_lineHeight=%d  m_charWidth=%d\n", fontSize, m_lineHeight, m_charWidth) ;
     this->show() ;
 }
 
@@ -431,12 +431,12 @@ void Panel::onTimer (void)
         }
         buffer[n+bix] = 0 ;
 
-        if (ssPage) {
+        if (ssPage) {                                     // If displaying soft switches, hilight non-zero ("set") switches
             painter.setPen (yellowPen) ;
             for (int i=0; i<16; i++) {
                 if (p[ix+i]) {
-                    int x = 66 + i*27 + (i/4)*10 ;
-                    int y = 14 + line*18 ;
+                    int x = 66 + i*m_charWidth*3 + (i/4)*10 ;
+                    int y = 14 + line*m_lineHeight ;
                     painter.drawLine (x,y, x+10,y) ;
                 }
             }
