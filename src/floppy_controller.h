@@ -92,6 +92,8 @@ public:
 
 private:
 
+    Machine* m_parent;
+
     void embarassingKludge(void) ;
 
     bool    checkDiskType (int driveIndex) ;
@@ -100,8 +102,6 @@ private:
     quint8  addressData (quint8 xx, quint8 yy) ;
     quint8  read (void) ;
     void    write (void) ;
-
-    quint64 m_lastAccess[2] ;
 
     int  m_currentDrive ;
     int  m_trackTimes2[2] ;
@@ -115,7 +115,7 @@ private:
     int  m_stepperState[2] ;   // on(1) or off(0)
     int  m_motorState[2] ;     // on(1) or off(0)
 
-    bool m_pole[2][4] ;        // state of pole 'n'; on or off
+    bool m_pole[2][4] ;        // state of head stepper pole 'n'; on or off
                                // part of an embarassing hack for ProDOS...
 
     bool m_writeProtectFlag[2] ;
@@ -127,7 +127,7 @@ private:
     QFile   m_file[2] ;
     QString m_filePath[2] ;
 
-    quint8  m_image[2][143360] ;
+    quint8  m_image[2][143360] ; // Holds contents of both floppy disks
 
     int     m_bufferIndex[2] ;
     quint8  m_buffer[2][256] ;
@@ -137,7 +137,6 @@ private:
     bool m_writingData ;
     int  m_diskAddressCounter ;
     int  m_dataPrologCounter ;
-    int  m_epilogCounter ;
     
     const quint8 m_addressProlog[3] = {0xd5, 0xaa, 0x96} ;
     const quint8 m_dataProlog[3]    = {0xd5, 0xaa, 0xad} ;
@@ -147,7 +146,6 @@ private:
     int m_delayInterSector ;
     int m_delayPostAddress ;
 
-    Machine* m_parent ;
 
 } ;
 

@@ -291,7 +291,6 @@ void MainWindow::onCopyScreen (void)
 
     QClipboard *clipboard = QGuiApplication::clipboard() ;
     int lineBase ;
-
     if (rd80Col) {
         for (int line=0; line<24; line++) {
             lineBase = screenBase + textBufferOffsets[line] ;
@@ -319,9 +318,9 @@ void MainWindow::onCopyScreen (void)
             string.append ((const char*)buffer) ;
             string.append (newLine) ;
         }
-
-        clipboard->setText (string) ;
     }
+    
+    clipboard->setText (string) ;
 }
 
 

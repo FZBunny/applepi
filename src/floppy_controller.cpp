@@ -71,22 +71,26 @@ static const unsigned int DISK_II_SIZE = 143360 ;   // In bytes
 
 FloppyDiskController::FloppyDiskController (Machine* parent)
 {
- //   m_sectorSkew[0] = DOS3 ;         // Default to DOS3 interleaving of sectors
- //   m_sectorSkew[1] = DOS3 ;
-
     m_parent = parent ;
+
+    m_delayByte = 0;
+    m_delayInterSector = 0;
+    m_delayPostAddress = 0;
+    m_currentDrive = 0;
 
     for (int i=0; i<2; i++) {
 
         m_diskInDriveFlag[i] = false ;
         m_volume[i] = 0 ;
         m_trackTimes2[i] = 34*2 ;
-        m_sector[0] = 0 ;
-        m_motorState[0] = 0 ;
+        m_sector[i] = 0 ;
+        m_motorState[i] = 0 ;
         m_writeProtectFlag[i] = 0 ;
+        m_dataLatchedForOutput[i] = 0;
         m_bufferIndex[i] = -18 ;
         memset (&m_buffer[i], 0, SECTORSIZE*2) ;
         memset (m_encodedBuffer[i], 0, 344) ;
+        for (int p = 0; p < 4; p++) m_pole[i][p] = false;
 
         QString key ;
         QTextStream (&key) << "floppy" << i+1 << "_path" ;
@@ -106,11 +110,6 @@ FloppyDiskController::FloppyDiskController (Machine* parent)
 // qStdOut() << "FloppyDiskController::FloppyDiskController    m_filePath[" << i << "]=" << m_filePath[i]  << endl ;
 // qStdOut() << "FloppyDiskController::FloppyDiskController    m_diskInDriveFlag[" << i << "]=" << m_diskInDriveFlag[i] << endl  << endl ;
     }
-
-    m_delayByte = 0 ;
-    m_delayInterSector  = 0 ;
-    m_delayPostAddress = 0 ;
-    m_currentDrive = 0 ;
 }
 
 
@@ -202,7 +201,7 @@ bool FloppyDiskController::open (unsigned int driveIndex, QString &path, bool wr
 
     m_dataPrologCounter = 0 ;
     m_diskAddressCounter = 0 ;
-    m_epilogCounter = 0 ;
+//    m_epilogCounter = 0 ;
     m_writingData = false ;
 //printf ("m_sectorSkew[%i]=%i\n", driveIndex, m_sectorSkew[driveIndex]) ;
     return true ;
@@ -292,7 +291,7 @@ int FloppyDiskController::readSector (quint8* buffer, int driveNumber, int track
 static int TRKMAX = 34*2 ;
 
 
-//  This function allows us to boot later verions of ProDOS.
+//  This function allows us to boot later versions of ProDOS.
 //  Apparently, the "phaseX_on/off functions below do not
 //  model the floppy drives properly.  I'll figure it out
 //  later.  Maybe.
@@ -987,6 +986,7 @@ DBUG(0x1000) ("Q6L  writing;  bix = %4d;  c=%2.2X\n", bix, c) ;
             case 8:
                 yy = c ;
                 m_sector[m_currentDrive] = addressData (xx,yy) ;
+ if (m_currentDrive == 1) printf("xx=%d, yy=%d   m_sector[m_currentDrive]=%d\n", xx, yy, m_sector[m_currentDrive]);
                 m_diskAddressCounter++ ;
                 return ;
                 break ;
@@ -1080,7 +1080,7 @@ DBUG(0x1000) ("Q6L  writing;  bix = %4d;  c=%2.2X\n", bix, c) ;
 
 unsigned char FloppyDiskController::Q6L (void)
 {
-    m_lastAccess[m_currentDrive] = (qint64)time(NULL) ;
+//    m_lastAccess[m_currentDrive] = (qint64)time(NULL) ;
     if (m_diskInDriveFlag[m_currentDrive] == false) return 0xff ;
 
     if (m_bufferIndex[m_currentDrive]<-18 || m_bufferIndex[m_currentDrive]>345) {

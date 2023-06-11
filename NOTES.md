@@ -31,8 +31,9 @@ You will also have to remove tape.cpp, tape\_dialog.cpp, tape.h, and tape_dialog
 - There is some confusion about which ROM is the IIe and which is the enhanced IIe ROM. Selecting the IIe model may really select the enhanced IIe. Or not... 
 - ApplePi cannot read 13-sector floppy disks; that is, DOS versions before 3.3; this will probably not change.
 - There is a bug when double-buffering double-hires graphics. To be fixed soon(ish)
+- The Edit->"Copy Screen Text to Clipboard" menu selection fails to copy 80-column text.  Fixed in source code, but not in release code yet. (As of 2023-06-11)
 - Only later versions of the ProDOS uitlities can be used to format disk II floppies. They will warn that the drive is too fast, but will succeed. The earliest ProDOS utility will immediately claim the drive is too fast, and abandon the operation.
-- ApplePi emulates a 65C02 (not the original 6502) processor, whether or not the IIe enhanced model is selected. This saves code, and few will care.  
+- ApplePi emulates a 65C02 (not the original 6502) processor, whether or not the IIe enhanced model is selected. This saves code, and few will care.
 - Cassette tape I/O is temporarily disabled. A workaround for the format differences between monitor and BASIC formats will eventually be devised.
 - There is no serial I/O emulation. Coming soon. (This can be partially mitigated by echoing screen text to the console or a file on the host O/S.)
 
