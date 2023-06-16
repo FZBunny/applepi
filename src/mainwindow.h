@@ -139,6 +139,10 @@ private:
     bool    m_firstTimerEvent ;
     int     m_scaleButtonKludge ;
     int     m_soundNumber ;
+    bool    m_playMotorSound ;   // If TRUE, allow sounds of DiskII motor-on and/or head seeks to be played
+    bool    m_playHeadsounds ;   // For the time being, one or both are set to FALSE when running under 
+                                 // MS Windows operating systems to avoid mysterious GUI freezes.
+                                 // To be fixed as soon as possible. JBW, 2023-06-15
 
     QSoundEffect  m_soundEffect;
     QSoundEffect  m_motorSound ;

@@ -283,7 +283,14 @@ MainWindow::MainWindow (void)
 
     resizeWindow() ;
 
-    // this->setMouseTracking(true) ;  WTF was this for ?
+#ifdef Q_OS_WINDOWS
+    m_playMotorSound = false ; // This will be removed as soon as possible.  JBW, 2023-06-15
+    m_playHeadsounds = true ;  // See comments in 'mainwindow.h'.
+#else
+    m_playMotorSound = true ;
+    m_playHeadsounds = true ;
+#endif
+
 }
 
 
@@ -468,7 +475,7 @@ void MainWindow::floppyMotorHasStarted (int driveIndex)
     if (driveIndex) m_floppy2Button->setIcon (m_led_bright_red) ;
     else            m_floppy1Button->setIcon (m_led_bright_red) ;
 
-    m_motorSound.play() ;
+    if (m_playMotorSound) m_motorSound.play() ;
     m_floppyMotorIsOn[driveIndex] = true ;
 
     // The following is a kludge to set the motor off delay only if 
@@ -567,8 +574,9 @@ void MainWindow::setFloppyLabel (uint drive)
             case DOS3:
                 n = m_mac->m_floppy->readSector (buffer, drive, 17, 0) ;    // (DOS VTOC is on track 17, sector 0)
                 if (n == SECTORSIZE) {
-                    int volumeNumber  = buffer[6] ;
-                    QTextStream (&slashLabel) << "DOS" << "3.3" << " Vol." << volumeNumber ;
+                    int volumeNumber = buffer[6] ;
+                    int dosReleaseNumber = buffer[3] ;
+                    QTextStream (&slashLabel) << "DOS" << "3." << dosReleaseNumber << " Vol." << volumeNumber ;
                 } else {
                     slashLabel = " *** I/O Error *** " ;
                 }
@@ -803,7 +811,7 @@ void MainWindow::setProdosDateTime (void)
 }
 
 
-void MainWindow::play (int n)    // Currently (as of v0.2.3) called only by 'FloppyDiskController::phase1_on'
+void MainWindow::play (int n)    // Currently (as of v0.2.3) called only by 'FloppyDiskController::turnStepperPoleOn'
 {
     m_soundNumber = n ;
 }
@@ -811,16 +819,16 @@ void MainWindow::play (int n)    // Currently (as of v0.2.3) called only by 'Flo
 
 void MainWindow::onPlaySoundTimer (void)
 {
-    int n ;
-
-    switch (m_soundNumber) {
+    if (m_playHeadsounds) {
+        switch (m_soundNumber) {
         case 1:
-            m_soundEffect.setSource(QUrl::fromLocalFile (":/sounds/step1.wav")) ;
-            n = m_soundEffect.status();
-            m_soundEffect.play() ;
-            break ;
+            m_soundEffect.setSource(QUrl::fromLocalFile(":/sounds/step1.wav"));
+            m_soundEffect.play();
+            m_soundEffect.status(); // This helps keep MS Windows from freezing GUI. No idea why.
+            break;
         default:
-            break ;
+            break;
+        }
     }
     m_soundNumber = 0 ;
 }
