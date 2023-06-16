@@ -67,9 +67,6 @@ public:
     int diskInDrive (unsigned int drive) ;
     int OSType (int driveNumber) ;
 
-    void  onTimer0 (QTimerEvent&) ;
-    void  onTimer1 (QTimerEvent&) ;
-
     void phase0_off (void) ;    // stepper motor phases
     void phase0_on  (void) ;
     void phase1_off (void) ;
@@ -100,6 +97,8 @@ private:
     uint    logicalSector (void) ;
     uint    getFileOffset (void) ;
     quint8  addressData (quint8 xx, quint8 yy) ;
+    void    turnStepperPoleOn (int phase);
+    void    turnStepperPoleOff (int phase);
     quint8  read (void) ;
     void    write (void) ;
 

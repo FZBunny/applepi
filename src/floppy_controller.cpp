@@ -88,7 +88,7 @@ FloppyDiskController::FloppyDiskController (Machine* parent)
         m_writeProtectFlag[i] = 0 ;
         m_dataLatchedForOutput[i] = 0;
         m_bufferIndex[i] = -18 ;
-        memset (&m_buffer[i], 0, SECTORSIZE*2) ;
+        memset (&m_buffer[i], 0, SECTORSIZE) ;
         memset (m_encodedBuffer[i], 0, 344) ;
         for (int p = 0; p < 4; p++) m_pole[i][p] = false;
 
@@ -208,7 +208,8 @@ bool FloppyDiskController::open (unsigned int driveIndex, QString &path, bool wr
 }
 
 
-//     Create & open a new disk-image file
+//     Create & open a new 143360 byte DiskII disk-image file,
+//     and initalize it to all zero bytes.
 
 QString FloppyDiskController::create  (unsigned int driveIndex, QString &path)
 {
@@ -279,7 +280,7 @@ int FloppyDiskController::readSector (quint8* buffer, int driveNumber, int track
     int fileOffset = (track * 4096) + (sector * SECTORSIZE) ;
     m_file[index].seek (fileOffset) ;
     int n = m_file[index].read ((char*)buffer, SECTORSIZE) ;
-
+//printf ("boot fileOffset = %5d (%5.5x)\n", fileOffset, fileOffset) ;
     return n ;
 }
 
@@ -295,145 +296,118 @@ static int TRKMAX = 34*2 ;
 //  Apparently, the "phaseX_on/off functions below do not
 //  model the floppy drives properly.  I'll figure it out
 //  later.  Maybe.
+//
+//void FloppyDiskController::embarassingKludge(void)
+//{
+//    if (m_OS[m_currentDrive] == PRODOS) {
+//        int i;
+//        for (i = 0; i < 4; i++) {
+//            if (m_pole[m_currentDrive][i]) break;
+//        }
+//
+//        if (i == 3) m_trackTimes2[m_currentDrive] = 0;
+//    }
+//}
 
-void FloppyDiskController::embarassingKludge(void)
+
+
+void FloppyDiskController::turnStepperPoleOn (int phase)
 {
-//    bool allPolesAreOff = false ;
+    if (phase < 0) phase = 0 ;
+    if (phase > 3) phase = 3 ;
 
-    if (m_OS[m_currentDrive] == PRODOS) {
-        int i ;
-        for (i=0; i<4; i++) {
-            if (m_pole[m_currentDrive][i]) break ;
-        }
+    int nextPhase = phase + 1 ;
+    if (nextPhase > 3) nextPhase = 0 ;
+    
+    int prevPhase = phase - 1 ;
+    if (prevPhase < 0) prevPhase = 3;
 
-        if (i == 3) m_trackTimes2[m_currentDrive] = 0 ;
-    }
-
-}
-
-
-// phase 0
-
-void FloppyDiskController::phase0_off (void)
-{
-    m_pole[m_currentDrive][0] = false ;
-
-    embarassingKludge() ;
-
-    m_stepperState[m_currentDrive] = 0 ;
-DBUG(0x0001) ("phase0_off m_trackTimes2[%i] = %2i\n", m_currentDrive, m_trackTimes2[m_currentDrive]) ;
-}
-
-void FloppyDiskController::phase0_on  (void)
-{
-    m_pole[m_currentDrive][0] = true ;
-    if (m_stepperPhase[m_currentDrive] == 1) {
+    m_pole[m_currentDrive][phase] = true;
+    if (m_stepperPhase[m_currentDrive] == nextPhase) {
         m_trackTimes2[m_currentDrive] -= 1 ;
-        if (m_trackTimes2[m_currentDrive] < 0) m_trackTimes2[m_currentDrive] = 0 ;
+        if (m_trackTimes2[m_currentDrive] < 0) m_trackTimes2[m_currentDrive] = 0;
     }
 
-    if (m_stepperPhase[m_currentDrive] == 3) {
+    if (m_stepperPhase[m_currentDrive] == prevPhase) {
         m_trackTimes2[m_currentDrive] += 1 ;
-        if (m_trackTimes2[m_currentDrive] > TRKMAX) m_trackTimes2[m_currentDrive] = TRKMAX ;
+        if (m_trackTimes2[m_currentDrive] > TRKMAX) m_trackTimes2[m_currentDrive] = TRKMAX;
     }
 
-    m_stepperPhase[m_currentDrive] = 0 ;
+    m_stepperPhase[m_currentDrive] = phase ;
     m_stepperState[m_currentDrive] = 1 ;
 
-DBUG(0x0002) ("phase0_on  m_trackTimes2[%i] = %2i\n", m_currentDrive, m_trackTimes2[m_currentDrive]) ;
+ //   if (phase & 1)  main_window->play(1);           // Play a 'head step' .wav sound
+    if (phase == 1)  main_window->play(1);           // Play a 'head step' .wav sound
+
 }
 
 
-// phase 1
-
-void FloppyDiskController::phase1_off (void)
+void FloppyDiskController::turnStepperPoleOff (int phase)
 {
-    m_pole[m_currentDrive][1] = false ;
-    if (m_trackTimes2[m_currentDrive] == 0) {
-//        m_parent->setFloppySound() ;
-    } else {
-//        m_parent->setFloppySound() ;
-    }
+    m_pole[m_currentDrive][phase] = false ;
     m_stepperState[m_currentDrive] = 0 ;
-
-DBUG(0x0004) ("phase1_off m_trackTimes2[%i] = %2i\n", m_currentDrive, m_trackTimes2[m_currentDrive]) ;
-}
-
-void FloppyDiskController::phase1_on  (void)
-{
-    m_pole[m_currentDrive][1] = true ;
-
-    main_window->play (1) ;           // Play a 'head step' .wav sound
-
-    if (m_stepperPhase[m_currentDrive] == 2) {
-        m_trackTimes2[m_currentDrive] -= 1 ;
-        if (m_trackTimes2[m_currentDrive] < 0) m_trackTimes2[m_currentDrive] = 0 ;
-    }
-
-    if (m_stepperPhase[m_currentDrive] == 0) {
-        m_trackTimes2[m_currentDrive] += 1 ;
-        if (m_trackTimes2[m_currentDrive] > TRKMAX) m_trackTimes2[m_currentDrive] = TRKMAX ;
-    }
-
-    m_stepperPhase[m_currentDrive] = 1 ;
-    m_stepperState[m_currentDrive] = 1 ;
-DBUG(0x0008) ("phase1_on  m_trackTimes2[%i] = %2i\n", m_currentDrive, m_trackTimes2[m_currentDrive]) ;
 }
 
 
-// phase 2
+// -------- phases OFF --------- 
 
-void FloppyDiskController::phase2_off (void)
+
+void FloppyDiskController::phase0_off(void)
 {
-    m_pole[m_currentDrive][2] = false ;
-    m_stepperState[m_currentDrive] = 0 ;
-DBUG(0x0010) ("phase2_off m_trackTimes2[%i] = %2i\n", m_currentDrive, m_trackTimes2[m_currentDrive]) ;
-}
-
-void FloppyDiskController::phase2_on  (void)
-{
-    m_pole[m_currentDrive][2] = true ;
-    if (m_stepperPhase[m_currentDrive] == 3) {
-        m_trackTimes2[m_currentDrive] -= 1 ;
-        if (m_trackTimes2[m_currentDrive] < 0) m_trackTimes2[m_currentDrive] = 0 ;
-    }
-
-    if (m_stepperPhase[m_currentDrive] == 1) {
-        m_trackTimes2[m_currentDrive] += 1 ;
-        if (m_trackTimes2[m_currentDrive] > TRKMAX) m_trackTimes2[m_currentDrive] = TRKMAX ;
-    }
-
-    m_stepperPhase[m_currentDrive] = 2 ;
-    m_stepperState[m_currentDrive] = 1 ;
-DBUG(0x0020) ("phase2_on  m_trackTimes2[%i] = %2i\n", m_currentDrive, m_trackTimes2[m_currentDrive]) ;
+    turnStepperPoleOff(0);
+DBUG(0x0001) ("phase0_off m_trackTimes2[%i] = %2i\n", m_currentDrive, m_trackTimes2[m_currentDrive]);
 }
 
 
-// phase 3
-
-void FloppyDiskController::phase3_off (void)
+void FloppyDiskController::phase1_off(void)
 {
-    m_pole[m_currentDrive][3] = false ;
-    m_stepperState[m_currentDrive] = 0 ;
-DBUG(0x0040) ("phase3_off m_trackTimes2[%i] = %2i\n", m_currentDrive, m_trackTimes2[m_currentDrive]) ;
+    turnStepperPoleOff(1);
+DBUG(0x0002) ("phase1_off m_trackTimes2[%i] = %2i\n", m_currentDrive, m_trackTimes2[m_currentDrive]);
 }
 
-void FloppyDiskController::phase3_on  (void)
+
+void FloppyDiskController::phase2_off(void)
 {
-    m_pole[m_currentDrive][3] = true ;
-    if (m_stepperPhase[m_currentDrive] == 0) {
-        m_trackTimes2[m_currentDrive] -= 1 ;
-        if (m_trackTimes2[m_currentDrive] < 0) m_trackTimes2[m_currentDrive] = 0 ;
-    }
+    turnStepperPoleOff(2);
+DBUG(0x0004) ("phase2_off m_trackTimes2[%i] = %2i\n", m_currentDrive, m_trackTimes2[m_currentDrive]);
+}
 
-    if (m_stepperPhase[m_currentDrive] == 2) {
-        m_trackTimes2[m_currentDrive] += 1 ;
-        if (m_trackTimes2[m_currentDrive] > TRKMAX) m_trackTimes2[m_currentDrive] = TRKMAX ;
-    }
 
-    m_stepperPhase[m_currentDrive] = 3 ;
-    m_stepperState[m_currentDrive] = 1 ;
-DBUG(0x0080) ("phase3_on  m_trackTimes2[%i] = %2i\n", m_currentDrive, m_trackTimes2[m_currentDrive]) ;
+void FloppyDiskController::phase3_off(void)
+{
+    turnStepperPoleOff(3);
+DBUG(0x0008) ("phase3_off m_trackTimes2[%i] = %2i\n", m_currentDrive, m_trackTimes2[m_currentDrive]);
+}
+
+
+// -------- phases ON ---------
+
+
+void FloppyDiskController::phase0_on(void)
+{
+    turnStepperPoleOn(0);
+DBUG(0x0010) ("phase0_on  m_trackTimes2[%i] = %2i\n", m_currentDrive, m_trackTimes2[m_currentDrive]);
+}
+
+
+void FloppyDiskController::phase1_on(void)
+{
+    turnStepperPoleOn(1);
+DBUG(0x0020) ("phase1_on  m_trackTimes2[%i] = %2i\n", m_currentDrive, m_trackTimes2[m_currentDrive]);
+}
+
+
+void FloppyDiskController::phase2_on(void)
+{
+    turnStepperPoleOn(2);
+DBUG(0x0040) ("phase2_on  m_trackTimes2[%i] = %2i\n", m_currentDrive, m_trackTimes2[m_currentDrive]);
+}
+
+
+void FloppyDiskController::phase3_on(void)
+{
+    turnStepperPoleOn(3);
+DBUG(0x0080) ("phase3_on  m_trackTimes2[%i] = %2i\n", m_currentDrive, m_trackTimes2[m_currentDrive]);
 }
 
 
@@ -443,7 +417,7 @@ DBUG(0x0080) ("phase3_on  m_trackTimes2[%i] = %2i\n", m_currentDrive, m_trackTim
 
 // This function seem backwards (the floppy tells the main frame that is has started a motor,
 // so that the frame can start a motor timer to control it's LEDs).   But this way prevents 
-// complaints that timers should be started only in the main thread.
+// complaints by Qt that timers should be started only in the main thread.
 
 void FloppyDiskController::motorOn  (void)
 {
@@ -772,19 +746,10 @@ quint8 FloppyDiskController::read (void)
 //printf ("bix=%i\n", bix) ; fflush(stdout) ;
     static quint8  addrCsum0, addrCsum1 ;
 
-//    if (++m_delayByte < 2) {
-//        m_bufferIndex[m_currentDrive]-- ;
-//        return 0xff ;
-//    }
     m_delayByte = 0 ;
 
     switch (bix) {
         case -17:
-//            if (++m_delayInterSector < 20) {
-//                m_bufferIndex[m_currentDrive]-- ;
-//                return 0 ;
-//            }
-//            m_delayInterSector = 0 ;
             c = 0xd5 ;                                 // address field prologue
             break ;
         case -16:
@@ -857,6 +822,7 @@ quint8 FloppyDiskController::read (void)
                 quint8* b = m_buffer[m_currentDrive] ;           // 'b' for Buffer
                 quint8* e = m_encodedBuffer[m_currentDrive] ;    // 'e' for Encoded buffer
                 int fileOffset = getFileOffset() ;
+//printf ("fileOffset = %5d (%6.6x)\n", fileOffset, fileOffset) ;
                 m_file[m_currentDrive].seek (fileOffset) ;
                 m_file[m_currentDrive].read ((char*)b, SECTORSIZE) ;
 
@@ -986,7 +952,7 @@ DBUG(0x1000) ("Q6L  writing;  bix = %4d;  c=%2.2X\n", bix, c) ;
             case 8:
                 yy = c ;
                 m_sector[m_currentDrive] = addressData (xx,yy) ;
- if (m_currentDrive == 1) printf("xx=%d, yy=%d   m_sector[m_currentDrive]=%d\n", xx, yy, m_sector[m_currentDrive]);
+ // if (m_currentDrive == 1) printf("xx=%d, yy=%d   m_sector[m_currentDrive]=%d\n", xx, yy, m_sector[m_currentDrive]);
                 m_diskAddressCounter++ ;
                 return ;
                 break ;
