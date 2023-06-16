@@ -30,8 +30,8 @@
 #include <QPushButton>
 #include <QKeyEvent>
 
-
 #include "applepi_button.h"
+
 
 ApplepiButton::ApplepiButton (const QIcon &icon, const QString &text, QWidget *parent)
              : QPushButton   (icon, text, parent)
@@ -45,6 +45,7 @@ ApplepiButton::ApplepiButton (const QString &text, QWidget *parent)
 {
     this->setFocusPolicy (Qt::NoFocus) ;
 }
+
 
 void ApplepiButton::keyPressEvent(QKeyEvent *e)
 {

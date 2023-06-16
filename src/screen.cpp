@@ -726,8 +726,6 @@ void Screen::leaveEvent(QEvent*)
 
 
 
-
-
 void Screen::refreshScreen (void)
 {
     quint8  *loresData, *hiresData ;
