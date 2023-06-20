@@ -236,6 +236,7 @@ void RomDialog::onDone (void)
         CFG->Set ("internal_rom_number", m_internalRomNumber) ;
     }
     m_parent->installRom() ;
+    m_parent->screen()->initialize() ;
 
     this->accept() ;
 }
