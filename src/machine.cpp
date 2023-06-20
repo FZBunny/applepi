@@ -27,6 +27,8 @@
 
 
 #include <stdlib.h>
+#include <QTime>
+#include <QRandomGenerator>
 
 #include "machine.h"
 #include "usleep.h"
@@ -47,6 +49,7 @@
 //  byte totals over 1,000 lines, both "fetch" and
 //  "store" functions are given their own source files,
 //  "fetch.cpp" and "store.cpp".
+//  Otherwise, this file is too large to be comfortable.
 #include "fetch.cpp"
 #include "store.cpp"
 // *****************************************************
@@ -145,45 +148,32 @@ void Machine::initialize (bool power)
 }
 
 
-
-#ifdef Q_OS_WINDOWS  // ------------------------------------
-
-void Machine::initializeRAM (void)
-{
-    memset(m_ram, 0, 0x10000);
-    memset(m_aux, 0, 0x10000);
-}
-
-#else  // -------------------------------------------------
-
 // Generate a slightly randomized pattern on screen after power-up.
 // A kind'a lame attempt to mimic dynamic RAM behaviour.
 
 void Machine::initializeRAM (void)
 {
-    memset (m_ram, 0, 0x10000) ;
-    memset (m_aux, 0, 0x10000) ;
-/****
-//    int seed = QTime::msecsSinceStartOfDay() ;   // Kinda lame, but good enough.
-    time_t n = time(NULL) ;
-    srandom(n) ;
+    QTime time =  QTime::currentTime();
+    quint32 seed = time.msecsSinceStartOfDay() ;   // Good enough seed.
+//printf ("seed = %8.8x\n", seed) ;
+    QRandomGenerator random (seed) ;
 
     for (int i=0; i<0x010000; i+=4) {
         m_ram[i]   = m_ram[i+1] = 0xdf ;
         m_ram[i+2] = m_ram[i+3] = 0x00 ;
         m_aux[i]   = m_aux[i+1] = 0xdf ;
         m_aux[i+2] = m_aux[i+3] = 0x00 ;
-        long int n1 = random() % 960 ;       // (960 is the number of characters on a 40-col. screen)
-        if (n1 < 10) {
-            long int n2 = random() ;
-            m_ram[i] = n2 ;                  // (No one will notice that the random crap is)
-            m_aux[i] = n2 ;                  // (identical in main & aux RAM.  Or care.)
+        int n1 = random.generate() % 1000 ;
+        if (n1 < 10) {                       // Every so often, put some random crap in...
+            long int n2 = random.generate() ;
+            long int n3 = random.generate() ;
+            m_ram[i]   = n2 ;
+            m_ram[i+1] = n3 ;
+            m_aux[i]   = n2 ;                // (No one will notice that the random crap )
+            m_aux[i+1] = n3 ;                // (is identical in main & aux RAM. Or care.)
         }
     }
-***/
 }
-
-#endif  // ------------------------------------------------
 
 
 //   This is a helper for functions "fetch" & "store".
@@ -207,15 +197,14 @@ quint8* Machine::lower48k (quint16 p, bool store)   // (Not really 48K; doesn't 
     if ((ramRW==ON) && (Rd80STORE==OFF))                   return m_aux + p ;
     if ((ramRW==ON) && (RdPAGE2==ON) && (Rd80STORE==ON))   return m_aux + p ;
 
-    if (Rd80STORE==OFF) return m_ram + p ;           // This may or may not be correct...
-
+    if (Rd80STORE==OFF)                                    return m_ram + p ;        // This may or may not be correct...
 
     int switches = 0 ;
     if (RdPAGE2==ON) switches |= 1 ;
     if (RdHIRES==ON) switches |= 2 ;
     if (ramRW==ON)   switches |= 4 ;
 
-    quint8* memory = m_ram ;                        // default to 'm_ram' (main memory)
+    quint8* memory = m_ram ;           // default to 'm_ram' (main memory)
     switch (switches) {
        case 1:                         // Only PAGE2 is on :                         //   ... Use Aux memory if ...
           if (p>=0x0400 && p<0x0800) memory = m_aux ;                                // If p in range $0400-$07ff
