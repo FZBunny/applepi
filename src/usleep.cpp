@@ -40,30 +40,25 @@
 
 quint64 microseconds (void)
 {
-    LARGE_INTEGER performanceCount ;
-    QueryPerformanceCounter (&performanceCount) ;
-    return performanceCount.QuadPart ;
-}
-
-//  This usleep stolen from "latsa", https://gist.github.com/ngryman/6482577
-
-void usleep(unsigned int usec)
-{
-	HANDLE timer;
-	LARGE_INTEGER ft;
-
-	ft.QuadPart = -(10 * (__int64)usec);
-
-	timer = CreateWaitableTimer(NULL, TRUE, NULL);
-	SetWaitableTimer(timer, &ft, 0, NULL, NULL, 0);
-	WaitForSingleObject(timer, INFINITE);
-	CloseHandle(timer);
+    LARGE_INTEGER ticks ;
+    QueryPerformanceCounter (&ticks) ;
+    return ticks.QuadPart / 10 ;
 }
 
 
-void quickSleep (quint64 uSecs)
+void usleep (unsigned int usec)
 {
-// printf ("*** quickSleep not implemented for Windows yet ***\n") ;
+	HANDLE timer ;
+	LARGE_INTEGER delay ;
+
+    delay.QuadPart = 10 * (unsigned long)usec ;
+
+	timer = CreateWaitableTimer (NULL, TRUE, NULL) ;
+    if (timer) {
+        SetWaitableTimer (timer, &delay, 0, NULL, NULL, 0) ;
+        WaitForSingleObject (timer, INFINITE) ;
+        CloseHandle (timer) ;
+    }
 }
 
 
