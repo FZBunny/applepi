@@ -56,14 +56,14 @@ public:
     void toggleSpeaker (void) ;   // Called in Machine::fetch_sspage upon fetch from $C030
     void setVolume (float volume) ;
 
-    void playRecal (void) ;
-    void playStep  (void) ;
+//    void playRecal (void) ;
+//    void playStep  (void) ;
 
 private:
 
     void run (void) ;
     void initialize_ALSA (void) ;
-    int  writeQueue (int len) ;
+//    int  writeQueue (int len) ;
 
     static const int SND_QUEUE_SIZE    = 10000 ;        // Sound queue size, bytes
     static const int RATE              = 10000 ;        // Max. samples/second
@@ -76,8 +76,8 @@ private:
     uint  m_hi ;
 
     snd_pcm_t  *m_soundHandle ;
-    int         m_nDescriptors ;
-    int         m_nFilledDescriptors ;
+//    int         m_nDescriptors ;
+//    int         m_nFilledDescriptors ;
 
     qint32   m_pcmLen ;
     quint8*  m_pcmSound ;

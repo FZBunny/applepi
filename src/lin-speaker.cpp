@@ -205,9 +205,11 @@ void Speaker::setVolume (float value)
 }
 
 
-
-// ---  Entry point to the speaker thread  ---
+//--------------------------------------------------------------------------------
+//               ---  Entry point to the speaker thread  ---
 // This thread reads from the head of the sound queue, and writes to the speaker.
+// Run by MainWindow::MainWindow
+//--------------------------------------------------------------------------------
 
 void Speaker::run (void)
 {
@@ -242,8 +244,8 @@ void Speaker::run (void)
             memset (dummyBuffer, m_previousValue, sizeof(dummyBuffer)) ;
             snd_pcm_writei (m_soundHandle, dummyBuffer, sizeof(dummyBuffer)) ;
         }
-                        // ( About the sleep-&-repeat hackery... poll calls refuse to work,)
-        usleep (20) ;   // ( and ALSA callbacks are not implemented on some Linux distros. )
+                          // ( About the sleep-&-repeat hackery... poll calls refuse to work,)
+        usleep (1000) ;   // ( and ALSA callbacks are not implemented on some Linux distros. )
 
     }
 }
