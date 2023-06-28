@@ -259,7 +259,7 @@ MainWindow::MainWindow (void)
 
     m_soundEffect.setLoopCount (1) ;
 
-    m_motorSound.setSource(QUrl::fromLocalFile(":/sounds/floppy-motor.wav")) ;
+    m_motorSound.setSource (QUrl::fromLocalFile(":/sounds/floppy-motor.wav")) ;
     m_motorSound.setLoopCount (QSoundEffect::Infinite) ;
     m_floppyMotorSoundIsPlaying = false ;
 
@@ -824,7 +824,7 @@ void MainWindow::onPlaySoundTimer (void)
         case 1:
             m_soundEffect.setSource(QUrl::fromLocalFile(":/sounds/step1.wav"));
             m_soundEffect.play();
-            m_soundEffect.status(); // This helps keep MS Windows from freezing GUI. No idea why.
+            m_soundEffect.status(); // This helps keep Windows OS from freezing GUI. No idea why. XXXXX not true?  FIXME XXXXX
             break;
         default:
             break;
