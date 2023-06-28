@@ -525,9 +525,11 @@ private:
     int   m_mouseX, m_mouseMaxX ;
     int   m_mouseY, m_mouseMaxY ;
     int   m_mouseButton[3] ;
+#ifdef Q_OS_WINDOWS
+    HANDLE  m_syncTimerHandle;
+#endif
 
-//    bool  m_monochrome ;
-    int   m_monoDblHiResState ;
+    int     m_monoDblHiResState ;
 
     bool    m_echoToTerminal ;
     bool    m_echoingToFile ;

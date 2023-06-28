@@ -36,23 +36,21 @@
 #include "device_roms.h"
 #include "floppy_controller.h"
 #include "traptrace.h"
+#ifdef Q_OS_WINDOWS
+#   include "windows.h"
+#endif
 
 //#include "tape.h"
 //#include "disassembler.h"
 //#include "debugging_dumps.h"
 
 
-// *****************************************************
+// ***********************************************************************************************
 //  A NOTE about source files for the "Machine" class :
-//
-//  Since the code to both fetch and store a single
-//  byte totals over 1,000 lines, both "fetch" and
-//  "store" functions are given their own source files,
-//  "fetch.cpp" and "store.cpp".
-//  Otherwise, this file is too large to be comfortable.
-#include "fetch.cpp"
-#include "store.cpp"
-// *****************************************************
+//  Since the code to both fetch and store a single byte totals over 1,000 lines, both "fetch" and
+//  "store" functions are given their own source files, "fetch.cpp" and "store.cpp".
+//  Otherwise, this file would be too large to be comfortable.
+// ***********************************************************************************************
 
 
 #define MARK_UNIMPLEMENTED true
@@ -78,6 +76,7 @@ Machine::Machine (MainWindow* parent)
         m_trapPointSet[i] = false ;
     }
 
+    m_nCycles = 0 ;
     initialize (false) ;
 }
 
@@ -129,7 +128,6 @@ void Machine::initialize (bool power)
     m_waitForCPUTimer = false;
     m_highRamWrite = false;
     m_highWritePreset = false;
-    m_trace = false;
     m_snoopSSFetches = false;
     m_snoopSSStores = false;
     m_echoToTerminal = false;
@@ -159,9 +157,9 @@ void Machine::initializeRAM (void)
     QRandomGenerator random (seed) ;
 
     for (int i=0; i<0x010000; i+=4) {
-        m_ram[i]   = m_ram[i+1] = 0xdf ;
+        m_ram[i]   = m_ram[i+1] = 0xff ;
         m_ram[i+2] = m_ram[i+3] = 0x00 ;
-        m_aux[i]   = m_aux[i+1] = 0xdf ;
+        m_aux[i]   = m_aux[i+1] = 0xff ;
         m_aux[i+2] = m_aux[i+3] = 0x00 ;
         int n1 = random.generate() % 1000 ;
         if (n1 < 10) {                       // Every so often, put some random crap in...
@@ -197,7 +195,7 @@ quint8* Machine::lower48k (quint16 p, bool store)   // (Not really 48K; doesn't 
     if ((ramRW==ON) && (Rd80STORE==OFF))                   return m_aux + p ;
     if ((ramRW==ON) && (RdPAGE2==ON) && (Rd80STORE==ON))   return m_aux + p ;
 
-    if (Rd80STORE==OFF)                                    return m_ram + p ;        // This may or may not be correct...
+    if (Rd80STORE==OFF)                                    return m_ram + p ; // XXXXX This may not be correct! FIXME?
 
     int switches = 0 ;
     if (RdPAGE2==ON) switches |= 1 ;
@@ -217,7 +215,7 @@ quint8* Machine::lower48k (quint16 p, bool store)   // (Not really 48K; doesn't 
           break ;                                                                    // $0800 and up
        case 6:                         // HIRES is ON & ramRW is ON :
           if ((p<0x0400) || (p>=0x4000) || (p>=0x0800 && p<0x2000)) memory = m_aux ; // If p is under $400 or in range 
-          break ;                                                                    // $0800-$1fff, or is $4000 and up.
+          break ;                                                                    // $0800-$1fff, or is $4000 and up
     }
 
     return memory + p ;
@@ -409,8 +407,6 @@ void Machine::addmem (quint16 p)
         }
     }
 }
-
-
 
 
 void Machine::submem (quint16 p)
@@ -710,7 +706,20 @@ void Machine::run (void)
     m_previousUsecs = microseconds() ;
     m_waitForCPUTimer = false ;
 
-//  #define TIME_TEST 1
+#ifdef Q_OS_WINDOWS                  // This bit may or may not be necessary...
+    if (SetPriorityClass (GetCurrentProcess(), REALTIME_PRIORITY_CLASS)) {
+        bool ret = SetThreadPriority (GetCurrentThread(), THREAD_PRIORITY_TIME_CRITICAL) ;
+        int priority = GetThreadPriority(GetCurrentThread());
+    }
+
+    m_syncTimerHandle = CreateWaitableTimer (NULL, false, NULL) ;  // We must use a timer in Windows,
+    LARGE_INTEGER firstTime = { 0,0 } ;                            // as sleep functions are too coarse
+    bool ret = SetWaitableTimer (m_syncTimerHandle, &firstTime, 1, NULL, NULL, false) ;
+#endif
+
+
+//  define "TIME_TEST" to allow inspection of the instruction-loop timing; times written to stdout.
+// #define TIME_TEST
 
 #ifdef TIME_TEST
     quint64 testPreviousTime = microseconds() ;
@@ -719,11 +728,16 @@ void Machine::run (void)
     quint64 testK = 1e6 ;
 #endif
 
+#ifdef Q_OS_WINDOWS
+    const quint64 SLICECYCLES = 1030;
+#else
+    const quint64 SLICECYCLES = 1000 ;
+#endif
+
+
 //  -------------------------------------------------------------------------------------
 //     Main loop to execute one 65C02 instruction each time through; repeats forever...
 //  -------------------------------------------------------------------------------------
-
-    const quint64 SLICECYCLES = 500 ;
 
     for (;;) {
 
@@ -732,7 +746,10 @@ void Machine::run (void)
         testTime = microseconds() ;
         testDeltaTime = testTime - testPreviousTime ;
         testPreviousTime = testTime ;
-        if (testDeltaTime > 100) printf ("testDeltaTime = %lli\n", testDeltaTime) ;
+        if (testDeltaTime > 100) {
+            printf("testDeltaTime = %lli\n", testDeltaTime) ;
+            fflush (stdout) ;
+        }
     }
 #endif
 
@@ -744,24 +761,16 @@ void Machine::run (void)
 #ifdef Q_OS_WINDOWS
         if (deltaCycles > SLICECYCLES) {
             m_previousCycles = m_nCycles ;
-            LARGE_INTEGER ticks ;            // (One 'tick' = 100 nSec; ticks count from boot of Windows system)
-            QueryPerformanceCounter (&ticks) ;
-            quint64 uSecs = ticks.QuadPart / 10 ;
-            qint64 nextSlice = uSecs + SLICECYCLES - (uSecs % SLICECYCLES) ;
-            bool keepLooping = true ;
-            while (keepLooping) {            // This being Windows, we must just sit in a CPU-wasting
-                LARGE_INTEGER test ;         // loop until it's time to execute some more 6502 code.
-                QueryPerformanceCounter (&test) ;
-                if (test.QuadPart/10 >= nextSlice) keepLooping = false ;
-            }
+            WaitForSingleObject (m_syncTimerHandle, INFINITE) ;
+        }
 #else
         if (deltaCycles > SLICECYCLES) {
-            m_previousCycles = m_nCycles ;         
+            m_previousCycles = m_nCycles ;
             quint64 now = microseconds() ;
             quint64 nextSlice = now + SLICECYCLES - (now % SLICECYCLES) ;
-            while (microseconds() < nextSlice) usleep (5) ; // Keep sleeping until it's time to
-#endif                                                      // execute some more 6502 code, as all
-        }                                                   // civilized OS's are accustomed to do.
+            while (microseconds() < nextSlice) usleep(5) ; // Keep sleeping until it's time to execute some more 6502 code
+        }
+#endif
 
         // See if we hit a trap.
 
