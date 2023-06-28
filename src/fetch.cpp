@@ -331,7 +331,7 @@ quint8 Machine::fetch_sspage (quint16 p)
                 case 0xb:
                     break ;
                 case 0xc: ;
-printf ("Fetch slot4  %4.4X, m_savedPC=%4.4X\n", p, m_savedPC) ;
+//printf ("Fetch slot4  %4.4X, m_savedPC=%4.4X\n", p, m_savedPC) ;
                     break ;
                 case 0xd:
                     break ;
