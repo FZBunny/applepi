@@ -114,6 +114,7 @@
     <ClCompile Include="..\src\device_roms.cpp" />
     <ClCompile Include="..\src\disassembler.cpp" />
     <ClCompile Include="..\src\disassemble_memory_dialog.cpp" />
+    <ClCompile Include="..\src\fetch.cpp" />
     <ClCompile Include="..\src\floppy_controller.cpp" />
     <ClCompile Include="..\src\floppy_dialog.cpp" />
     <ClCompile Include="..\src\gamepad.cpp" />
@@ -127,6 +128,7 @@
     <ClCompile Include="..\src\printer.cpp" />
     <ClCompile Include="..\src\rom_dialog.cpp" />
     <ClCompile Include="..\src\screen.cpp" />
+    <ClCompile Include="..\src\store.cpp" />
     <ClCompile Include="..\src\traptrace.cpp" />
     <ClCompile Include="..\src\usleep.cpp" />
     <ClCompile Include="..\src\view_memory.cpp" />
