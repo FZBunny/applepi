@@ -31,7 +31,8 @@
 #define WIN_SPEAKER_H
 
 
-#include "defs.h"
+#include "xaudio2.h"
+
 #include "mainwindow.h"
 
 class MainWindow ;
@@ -48,13 +49,24 @@ public:
 
 private:
 
-    virtual void *Entry (void) ;
+    void run(void) ;
 
     MainWindow*  m_parent ;
-    
-    static const int MID = 0x80 ;
+
+    static const int RATE = 10000;                  // Max. samples/second
+    static const quint64 SAMPLE_DELTA = 1E6 / RATE; // No. of 6502 cycles between samples
+    static const int MID = 0x80;                    // Middle value of unsigned 8-bit variable
+    static const int BUFFER_LEN = 1000 ;            // length of PCM buffer
+
     uint  m_lo ;
     uint  m_hi ;
+
+    uint     m_previousValue ;
+    quint64  m_previousCycles ;
+
+    QMutex   m_bufferLock ;
+    uint     m_bufferPtr ;
+    quint8   m_tmpBuffer[BUFFER_LEN] ;   // Written by 'toggleSpeaker', read by 'run'
 
 } ;
 
