@@ -56,7 +56,7 @@ private:
     static const int RATE = 10000;                  // Max. samples/second
     static const quint64 SAMPLE_DELTA = 1E6 / RATE; // No. of 6502 cycles between samples
     static const int MID = 0x80;                    // Middle value of unsigned 8-bit variable
-    static const int BUFFER_LEN = 1000 ;            // length of PCM buffer
+    static const int BUFFER_LEN = 500 ;             // length of PCM buffer
 
     uint  m_lo ;
     uint  m_hi ;

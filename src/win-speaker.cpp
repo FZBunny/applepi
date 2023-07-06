@@ -104,14 +104,14 @@ void Speaker::setVolume (float value)
 
 void Speaker::run (void)
 {
+    const int SLEEP = 1 ;     // sleep time im milliseconds
+
     HRESULT hr ;
     IXAudio2*               xAudio2 ;
     IXAudio2MasteringVoice* masterVoice ;
     IXAudio2SourceVoice*    sourceVoice ;
-//    char dummyBuffer[16] ;
 
-
-// waveFmt holds a WAVE header in our fictitious RIFF file
+    // waveFmt holds a WAVE header in our fictitious RIFF file
     WAVEFORMATEX waveFmt;              // #1: These two variables must be kept together in this
     quint8       pcmData[BUFFER_LEN];  // #2: order. (i.e, wave structure followed by PCM data.)
 
@@ -123,10 +123,9 @@ void Speaker::run (void)
     waveFmt.wBitsPerSample = 8;
     waveFmt.cbSize = 0;
     
-
     XAUDIO2_BUFFER  xAudio2Buffer;
     xAudio2Buffer.Flags = 0;
-    //    xAudio2Buffer.Flags = XAUDIO2_END_OF_STREAM;
+//    xAudio2Buffer.Flags = XAUDIO2_END_OF_STREAM;
     xAudio2Buffer.pAudioData = (const BYTE*)&waveFmt;
     xAudio2Buffer.AudioBytes = 0;
     xAudio2Buffer.PlayBegin = 0;
@@ -162,7 +161,6 @@ void Speaker::run (void)
         if (m_bufferPtr) {
             m_bufferLock.lock() ;
             memmove (pcmData, m_tmpBuffer, m_bufferPtr) ;
-int len = m_bufferPtr;
             xAudio2Buffer.AudioBytes = m_bufferPtr ;
             xAudio2Buffer.PlayLength = m_bufferPtr ;
             m_bufferPtr = 0 ;
@@ -170,9 +168,20 @@ int len = m_bufferPtr;
 //xdump (pcmData, len, 0) ;
             hr = sourceVoice->SubmitSourceBuffer(&xAudio2Buffer, nullptr) ;
             if (FAILED(hr)) printf ("SubmitSourceBuffer returned err code 0x%8.8x\n", hr) ;
+        } 
+/**
+        else {
+            m_bufferLock.lock() ;
+            int nBytes = RATE / (SLEEP * 1000) ;
+            memset (pcmData, m_previousValue, nBytes) ;
+            xAudio2Buffer.AudioBytes = nBytes;
+            xAudio2Buffer.PlayLength = nBytes;
+            hr = sourceVoice->SubmitSourceBuffer(&xAudio2Buffer, nullptr) ;
+            m_bufferLock.unlock() ;
+            if (FAILED(hr)) printf("SubmitSourceBuffer returned err code 0x%8.8x\n", hr) ;
         }
-
-        Sleep (100) ;
+**/
+        Sleep (SLEEP) ;
     }
 
 error1:
