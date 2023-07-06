@@ -7,21 +7,21 @@ const char* xpm_40ColChars_IIPlus[] =
     "- c #000000",
 
     "XXXXXXXXXXXXXXXX",    // 00
-    "XXXXXXXXXXXXXXXX",
+    "----------------",
     "XXXX------XXXXXX",
-    "XXXXXXXXXXXXXXXX",
+    "----------------",
     "XX--XXXXXX--XXXX",
-    "XXXXXXXXXXXXXXXX",
+    "----------------",
     "XX--XX--XX--XXXX",
-    "XXXXXXXXXXXXXXXX",
+    "----------------",
     "XX--XX------XXXX",
-    "XXXXXXXXXXXXXXXX",
+    "----------------",
     "XX--XX----XXXXXX",
-    "XXXXXXXXXXXXXXXX",
+    "----------------",
     "XX--XXXXXXXXXXXX",
-    "XXXXXXXXXXXXXXXX",
+    "----------------",
     "XXXX--------XXXX",
-    "XXXXXXXXXXXXXXXX",
+    "----------------",
 
 
     "XXXXXXXXXXXXXXXX",    // 01
@@ -1733,7 +1733,7 @@ const char* xpm_40ColChars_IIPlus[] =
     "XX----------XXXX",
     "XXXXXXXXXXXXXXXX",
 
-
+/*****
     "XXXXXXXXXXXXXXXX",    // 60
     "XXXXXXXXXXXXXXXX",
     "XXXXXXXXXXXXXXXX",
@@ -1750,8 +1750,25 @@ const char* xpm_40ColChars_IIPlus[] =
     "XXXXXXXXXXXXXXXX",
     "XXXXXXXXXXXXXXXX",
     "XXXXXXXXXXXXXXXX",
+****/
 
-
+    "XXXXXXXXXXXXXXXX",    // 60
+    "----------------",
+    "XXXXXXXXXXXXXXXX",
+    "----------------",
+    "XXXXXXXXXXXXXXXX",
+    "----------------",
+    "XXXXXXXXXXXXXXXX",
+    "----------------",
+    "XXXXXXXXXXXXXXXX",
+    "----------------",
+    "XXXXXXXXXXXXXXXX",
+    "----------------",
+    "XXXXXXXXXXXXXXXX",
+    "----------------",
+    "XXXXXXXXXXXXXXXX",
+    "----------------",
+    
     "XXXXXXXXXXXXXXXX",    // 61
     "XXXXXXXXXXXXXXXX",
     "XXXXXX--XXXXXXXX",
