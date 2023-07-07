@@ -87,7 +87,7 @@ quint8 HdController::fetch_HD_ROM (int slotNumber, quint8 p)
                 if (isOpen(0)) {                             // Disk in drive?
                     offsetKludge() ;                         // Yes. Read the first block on the hard drive
                     readBlock (m_mac->m_ram+0x0800, 0, 0) ;  // into $0800 - 0x9ff...
-                    ps->Xreg  = slotNumber << 4 ;            // Then jump to $0801
+                    ps->Xregister  = slotNumber << 4 ;       // Then jump to $0801
                     ps->pc.pc_16 = 0x0801 ;                  // (The code on the 1st block takes care of the rest.)
                     c  = NOP ;
                 } else {                                     // No disk in drive; tell ROM to try slot 6.
@@ -113,8 +113,8 @@ quint8 HdController::fetch_HD_ROM (int slotNumber, quint8 p)
             break ;      // ($3c seems to make some code happy.)
         case 0x10:
             if (m_mac->savedPC() == entryPoint) {          // ProDOS call
-                ps->Areg = IO() ;
-                if (ps->Areg) ps->Pstat |= C ;
+                ps->Aregister = IO() ;
+                if (ps->Aregister) ps->Pstat |= C ;
                 else          ps->Pstat &= C ^ 0xff ;
                 return RTS ;
             } else {

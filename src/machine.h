@@ -64,9 +64,9 @@ typedef struct ProcessorState {
         quint16  pc_16 ;
     } pc ;
     quint8  opcode ;        // Not a register, but included for coding convenience
-    quint16 Areg ;
-    quint16 Xreg ;
-    quint16 Yreg ;
+    quint16 Aregister ;
+    quint16 Xregister ;
+    quint16 Yregister ;
     quint16 Sptr ;
     quint16 Pstat ;
 } ProcessorState ;
@@ -80,39 +80,26 @@ typedef struct HistoryEntry {
 
 
 //       6502 processor status bits (in register "P")
-/*
-#ifdef Q_OS_WINDOWS
-#   define N  0x80  // Negative
-#   define V  0x40  // oVerflow
-#   define UN 0x20  // ... bit 5 is UNused
-#   define B  0x10  // Break
-#   define D  0x08  // Decimal mode
-#   define I  0x04  // Interrupt disable
-#   define Z  0x02  // Zero result
-#   define C  0x01  // Carry
-#else
-*/
-    static const quint8 N  = 0x80 ;  // Negative
-    static const quint8 V  = 0x40 ;  // oVerflow
-    static const quint8 UN = 0x20 ;  // ... bit 5 is UNused, and always set to '1'.
-    static const quint8 B  = 0x10 ;  // Break
-    static const quint8 D  = 0x08 ;  // Decimal mode
-    static const quint8 I  = 0x04 ;  // Interrupt disable
-    static const quint8 Z  = 0x02 ;  // Zero result
-    static const quint8 C  = 0x01 ;  // Carry
-//#endif
 
+static const quint8 N  = 0x80 ;  // Negative
+static const quint8 V  = 0x40 ;  // oVerflow
+static const quint8 UN = 0x20 ;  // ... bit 5 is UNused, and always set to '1'.
+static const quint8 B  = 0x10 ;  // Break
+static const quint8 D  = 0x08 ;  // Decimal mode
+static const quint8 I  = 0x04 ;  // Interrupt disable
+static const quint8 Z  = 0x02 ;  // Zero result
+static const quint8 C  = 0x01 ;  // Carry
 
 #define PC   m_registers.pc.pc_16
 #define PCLO m_registers.pc.pc_8[0]
 #define PCHI m_registers.pc.pc_8[1]
 
-#define A m_registers.Areg
-#define X m_registers.Xreg
-#define Y m_registers.Yreg
+#define Areg m_registers.Aregister
+#define Xreg m_registers.Xregister
+#define Yreg m_registers.Yregister
 
-#define S m_registers.Sptr
-#define P m_registers.Pstat
+#define Sreg m_registers.Sptr
+#define Preg m_registers.Pstat
 
 #define W80STOROFF  m_ss[0x000]
 #define W80STORON   m_ss[0x001]
@@ -154,19 +141,19 @@ typedef struct HistoryEntry {
 #define IDBYTE      m_rom[0xfbb3]
 
 
-#define STATNZ(m) P &= (N | Z) ^ 0xff ;\
-                  if (m & N) P |= N ;\
-                  if (m == 0) P |= Z ;
+#define STATNZ(m) Preg &= (N | Z) ^ 0xff ;\
+                  if (m & N) Preg |= N ;\
+                  if (m == 0) Preg |= Z ;
 
-#define STATNZC(m) P &= (N | Z | C) ^ 0xff ;\
-                   if (m & 0x100) P |= C ;\
-                   if ((m & 0xff)==0) P |= Z ;\
-                   if (m & N) P |= N ;
+#define STATNZC(m) Preg &= (N | Z | C) ^ 0xff ;\
+                   if (m & 0x100) Preg |= C ;\
+                   if ((m & 0xff)==0) Preg |= Z ;\
+                   if (m & N) Preg |= N ;
 
-#define STATNZV(m) P &= (N | Z | V) ^ 0xff ;\
-                   if (m & 0x40) P |= V ;\
-                   if ((m & 0xff)==0) P |= Z ;\
-                   if (m & 0x80) P |= N ;
+#define STATNZV(m) Preg &= (N | Z | V) ^ 0xff ;\
+                   if (m & 0x40) Preg |= V ;\
+                   if ((m & 0xff)==0) Preg |= Z ;\
+                   if (m & 0x80) Preg |= N ;
 
 #define BRADDR(p) p = fetch(PC) ;\
                   if (p & 0x80) {\
@@ -208,19 +195,19 @@ typedef struct HistoryEntry {
 
 #define TSB(p)\
                 s = fetch(p) ;\
-                c = A & s ;\
-                s |= A ;\
+                c = Areg & s ;\
+                s |= Areg ;\
                 store (s, p) ;\
-                if (c == 0) P = P | Z ;\
-                else        P = P & (Z ^ 0xff) ;
+                if (c == 0) Preg = Preg | Z ;\
+                else        Preg = Preg & (Z ^ 0xff) ;
 
 #define TRB(p)\
                 s = fetch(p) ;\
-                c = A & s ;\
-                s &= (A ^ 0xff) ;\
+                c = Areg & s ;\
+                s &= (Areg ^ 0xff) ;\
                 store (s, p) ;\
-                if (c == 0) P = P | Z ;\
-                else        P = P & (Z ^ 0xff) ;
+                if (c == 0) Preg = Preg | Z ;\
+                else        Preg = Preg & (Z ^ 0xff) ;
 
 
 #define SMB(mask) p = fetch(PC++) ;\
@@ -230,28 +217,28 @@ typedef struct HistoryEntry {
 
 #define ROLMEM(p) {\
                       quint16 m, oldC, newC ;\
-                      oldC = P & C ;\
-                      P &= C ^ 0xff ;\
+                      oldC = Preg & C ;\
+                      Preg &= C ^ 0xff ;\
                       m = fetch(p) ;\
                       newC = m & 0x80 ;\
                       m <<= 1 ;\
                       if (oldC) m |= 0x01 ;\
                       store(m,p) ;\
                       STATNZ(m) ;\
-                      if (newC) P |= C ;\
+                      if (newC) Preg |= C ;\
                   }
 
 #define RORMEM(p) {\
                       quint16 m, oldC, newC ;\
-                      oldC = P & C ;\
-                      P &= C ^ 0xff ;\
+                      oldC = Preg & C ;\
+                      Preg &= C ^ 0xff ;\
                       m = fetch(p) ;\
                       newC = m & 0x01 ;\
                       m >>= 1 ;\
                       if (oldC) m |= 0x80 ;\
                       store (m,p) ;\
                       STATNZ(m) ;\
-                      if (newC) P |= C ;\
+                      if (newC) Preg |= C ;\
                   }
 
 #define ASLMEM(p) {\
@@ -264,9 +251,9 @@ typedef struct HistoryEntry {
 
 #define LSRMEM(p) {\
                       quint16 s ;\
-                      P &= C ^ 0xff ;\
+                      Preg &= C ^ 0xff ;\
                       s = fetch(p) ;\
-                      if (s & 1) P |= C ;\
+                      if (s & 1) Preg |= C ;\
                       s >>= 1 ;\
                       store(s,p) ;\
                       STATNZ(s) ;\
@@ -293,33 +280,33 @@ typedef struct HistoryEntry {
 #define COMPARE(reg,p)  {\
                             quint16 s ;\
                             s = fetch(p) ;\
-                            P &=  (Z | N | C) ^ 0xff ;\
-                            if (reg == s)  P |= Z ;\
-                            if (s <= reg)  P |= C ;\
+                            Preg &=  (Z | N | C) ^ 0xff ;\
+                            if (reg == s)  Preg |= Z ;\
+                            if (s <= reg)  Preg |= C ;\
                             s = reg - s ;\
-                            if (s & 0x80) P |= N ;\
+                            if (s & 0x80) Preg |= N ;\
                         }
 
 #define BIT(p) s = fetch(p) ;\
-               P &= (N | V | Z) ^ 0xff ;\
-               P |= s & N ;\
-               P |= s & V ;\
-               if ((A & s) == 0) P |= Z ;
+               Preg &= (N | V | Z) ^ 0xff ;\
+               Preg |= s & N ;\
+               Preg |= s & V ;\
+               if ((Areg & s) == 0) Preg |= Z ;
 
 // ------------------------------------------------------
 
-#define ZEROPAGE(p)  p=fetch(PC++);
+#define ZEROPAGE(p) p=fetch(PC++);
 
-#define ABSOLUT(p) p = fetch(PC++) ;\
+#define ABSOLUT(p)  p = fetch(PC++) ;\
                     p |= fetch(PC++) << 8 ;
 
 #define ABSOLUTX(p) p = fetch(PC++) ;\
-                     p |= fetch(PC++) << 8 ;\
-                     p += X & 0xff ;
+                    p |= fetch(PC++) << 8 ;\
+                    p += Xreg & 0xff ;
 
 #define ABSOLUTY(p) p = fetch(PC++) ;\
                      p |= fetch(PC++) << 8 ;\
-                     p += Y & 0xff ;
+                     p += Yreg & 0xff ;
 
 #define INDIRECTZP(p) {\
                          quint16 s ;\
@@ -338,7 +325,7 @@ typedef struct HistoryEntry {
                          quint16 s ;\
                          s = fetch(PC++) ;\
                          s |= fetch(PC++) << 8 ;\
-                         s += X ;\
+                         s += Xreg ;\
                          p = fetch(s) ;\
                          p |= fetch(s+1) << 8 ;\
                        }
@@ -346,7 +333,7 @@ typedef struct HistoryEntry {
 #define INDIRECTX(p) {\
                          quint16 s ;\
                          s = fetch(PC++) ;\
-                         s = (s + X) & 0xff ;\
+                         s = (s + Xreg) & 0xff ;\
                          p = fetch(s) ;\
                          p |= fetch(s+1) << 8 ;\
                      }
@@ -356,14 +343,14 @@ typedef struct HistoryEntry {
                          s = fetch(PC++) ;\
                          p = fetch(s) ;\
                          p |= fetch(s+1) << 8;\
-                         p += Y ;\
+                         p += Yreg ;\
                      }
 
 #define ZEROPAGEX(p) p = fetch(PC++) ;\
-                     p = (p + X) & 0xff ;
+                     p = (p + Xreg) & 0xff ;
 
 #define ZEROPAGEY(p) p = fetch(PC++) ;\
-                     p = (p + Y) & 0xff ;
+                     p = (p + Yreg) & 0xff ;
 
 
 #define NMI   0xfffa
@@ -450,9 +437,6 @@ public:
     void echoToFile (QFile* f) ;
     void closeEchoFile (void) ;
 
-    void setFloppySound (quint8& sound, int  len) ;
-    bool getFloppySound (quint8* sound, int* len) ;
-
     ProcessorState *processorState (void) ;
     quint16 savedPC (void) ;
 
@@ -489,7 +473,6 @@ private:
     void dumpHistory (void) ;
 
     quint8  fetch_sspage (quint16 p) ;
-    quint8  fetch_lower48k (quint16 p) ;
     quint8  fetch_ioSpace (quint16 p) ;
     void    ss_fetch_snoop (quint16 p) ;
     quint8* fetch_highMem (quint16 p) ;

@@ -254,7 +254,11 @@ MainWindow::MainWindow (void)
 
     uint volume ;
     m_cfg->Get ("speaker_volume", &volume) ;
-    m_speaker = new Speaker (this) ;
+#ifdef Q_OS_WINDOWS
+    m_speaker = new Speaker() ;
+#else
+    m_speaker = new Speaker(this) ;
+#endif
     m_speaker->start() ;
 
     m_soundEffect.setLoopCount (1) ;

@@ -106,11 +106,11 @@ void Machine::initialize (bool power)
  //   Y = 0 ;
  //   S = 0xff ;
  //   P = 0x20 ;
-    A = 0xff ;
-    X = 0xff ;
-    Y = 0xff ;
-    S = 0xfc ;
-    P = 0xff ;
+    Areg = 0xff ;
+    Xreg = 0xff ;
+    Yreg = 0xff ;
+    Sreg = 0xfc ;
+    Preg = 0xff ;
     memset (m_ss,  0, 0x0100) ;
     initializeRAM() ;
 
@@ -267,17 +267,17 @@ void Machine::shutDown(void)
 void Machine::performIRQ (void)
 {
     PC++ ;
-    S &= 0xff ;
-    store (PCHI, 0x100|S--) ;
-    S &= 0xff ;
-    store (PCLO, 0x100|S--) ;
-    S &= 0xff ;
-    store (P, 0x100|S--) ;
-    S &= 0xff ;
+    Sreg &= 0xff ;
+    store (PCHI, 0x100|Sreg--) ;
+    Sreg &= 0xff ;
+    store (PCLO, 0x100|Sreg--) ;
+    Sreg &= 0xff ;
+    store (Preg, 0x100|Sreg--) ;
+    Sreg &= 0xff ;
     PCLO = fetch(IRQ) ;
     PCHI = fetch(IRQ+1) ;
 printf ("PCHI,PCLO = %2.2X%2.2X\n", PCHI, PCLO) ;
-    P |= (UN | I) ;
+    Preg |= (UN | I) ;
     cycles(7) ;      // NMOS 6502 does not do this.
 }
 
@@ -362,13 +362,13 @@ void Machine::addmem (quint16 p)
     quint8 c, alo, ahi, mlo, mhi ;
     quint16 s, m ;
 
-    if (P&D) {         // decimal addition. Ew...
-        c = P & C ;
-        P &= (N | Z | C) ^ 0xff ;
-        A &= 0xff ;
-        s = A ;
+    if (Preg & D) {         // decimal addition. Ew...
+        c = Preg & C ;
+        Preg &= (N | Z | C) ^ 0xff ;
+        Areg &= 0xff ;
+        s = Areg ;
         m = fetch(p) ;
-        alo = A & 0x0f ;
+        alo = Areg & 0x0f ;
         mlo = m & 0x0f ;
         alo = alo + mlo + c ;
         c = 0 ;
@@ -376,7 +376,7 @@ void Machine::addmem (quint16 p)
             c = 1 ;
             alo = (alo - 10) & 0x0f ;
         }
-        ahi = A >> 4 ;
+        ahi = Areg >> 4 ;
         mhi = m >> 4 ;
         ahi = ahi + mhi + c ;
         c = 0 ;
@@ -384,26 +384,26 @@ void Machine::addmem (quint16 p)
             c = 1 ;
             ahi = (ahi - 10) & 0x0f ;
         }
-        A = ((ahi<<4) & 0xf0) | (alo & 0x0f) ;
-        P |= c ;
+        Areg = ((ahi<<4) & 0xf0) | (alo & 0x0f) ;
+        Preg |= c ;
         if ((s & 0x80) == (m & 0x80)) {   // XXXXXX   V flag is sometimes wrong
-            if ((A & 0x80) != (s & 0x80)) P |= V ;
+            if ((Areg & 0x80) != (s & 0x80)) Preg |= V ;
         }
 //printf ("addmem: m_parent->romNumber() = %i\n", m_parent->romNumber()) ;
         if (m_parent->romNumber() != APPLE2E_ENHANCED) {
 //printf ("addmem: not APPLE2E_ENHANCED\n") ;
-            if (A == 0) P |= N ;     // only on 6502.  65C02 does not set N on decimal addition.
+            if (Areg == 0) Preg |= N ;     // only on 6502.  65C02 does not set N on decimal addition.
         }
 //printf ("PC=%4.4x  romNumber=%i  P=%2.2x\n", m_savedPC, m_parent->romNumber(), P) ;
     } else {           // binary addition.
-        s = A ;
+        s = Areg ;
         m = fetch(p) ;
-        A += m + (P&C) ;
-        STATNZC(A) ;
-        A &= 0xff ;
-        P &= V ^ 0xff ;
+        Areg += m + (Preg & C) ;
+        STATNZC(Areg) ;
+        Areg &= 0xff ;
+        Preg &= V ^ 0xff ;
         if ((s & 0x80) == (m & 0x80)) {
-            if ((A & 0x80) != (s & 0x80)) P |= V ;
+            if ((Areg & 0x80) != (s & 0x80)) Preg |= V ;
         }
     }
 }
@@ -414,11 +414,11 @@ void Machine::submem (quint16 p)
     quint16  c, alo, ahi, mlo, mhi ;
     quint16  s, m ;
 
-    if (P&D) {         // decimal subtraction. Likewise, ew.
-        c = P & C ;
-        P &= (N | Z | C | V) ^ 0xff ;
-        alo = A & 0x0f ;
-        ahi = (A >> 4) & 0x0f ;
+    if (Preg & D) {         // decimal subtraction. Likewise, ew.
+        c = Preg & C ;
+        Preg &= (N | Z | C | V) ^ 0xff ;
+        alo = Areg & 0x0f ;
+        ahi = (Areg >> 4) & 0x0f ;
         m = fetch(p) ;
         mlo = m & 0x0f ;
         mhi = (m >> 4) & 0x0f ;
@@ -436,23 +436,23 @@ void Machine::submem (quint16 p)
             ahi += 10 ;
             c = 0 ;
         }
-        P |= c ;
+        Preg |= c ;
 //
-        A = ((ahi << 4) & 0xf0) | (alo & 0x0f)  ;
-        if (A == 0) P |= Z ;
+        Areg = ((ahi << 4) & 0xf0) | (alo & 0x0f)  ;
+        if (Areg == 0) Preg |= Z ;
     } else {           // binary subtraction
 
-        s = A ;
+        s = Areg ;
         m = fetch(p) ^ 0xff ;
-        c = P & C ;
-        A += m + c ;
-        P &= (N | Z | C | V) ^ 0xff ;
-        if (A & 0x100) P |= C ;
-        A &= 0xff ;
-        if (A == 0) P |= Z ;
-        if (A & 0x80) P |= N ;
+        c = Preg & C ;
+        Areg += m + c ;
+        Preg &= (N | Z | C | V) ^ 0xff ;
+        if (Areg & 0x100) Preg |= C ;
+        Areg &= 0xff ;
+        if (Areg == 0) Preg |= Z ;
+        if (Areg & 0x80) Preg |= N ;
         if ((s & 0x80) == (m & 0x80)) {
-            if ((A & 0x80) != (s & 0x80)) P |= V ;
+            if ((Areg & 0x80) != (s & 0x80)) Preg |= V ;
         }
     }
 }
@@ -502,13 +502,13 @@ bool Machine::displayMonoDblHiRes (void)
 
 void Machine::setX (quint8 x)
 {
-    m_registers.Xreg = x ;
+    m_registers.Xregister = x ;
 }
 
 
 void Machine::setY (quint8 y)
 {
-    m_registers.Yreg = y ;
+    m_registers.Yregister = y ;
 }
 
 
@@ -629,7 +629,7 @@ void Machine::sprint_6502_registers (ProcessorState& regs, char* buffer)
     if (p & C) c = 'C' ;
 
     sprintf (buffer, "A=%2.2x X=%2.2x Y=%2.2x S=%2.2x   P=%2.2x %c%c.%c%c%c%c%c   ",
-                     regs.Areg, regs.Xreg, regs.Yreg, regs.Sptr,   regs.Pstat, n, v, b, d, i, z, c) ;
+                     regs.Aregister, regs.Xregister, regs.Yregister, regs.Sptr,   regs.Pstat, n, v, b, d, i, z, c) ;
     char* comment = processorComment[processorType[regs.opcode]] ;
     strcat (buffer, comment) ;
 
@@ -828,7 +828,7 @@ void Machine::run (void)
         else         echo = (PC == 0xfdf0) ;
 
         if (echo) {
-            const char c = A & 0x7f ;
+            const char c = Areg & 0x7f ;
             static const char CR  = 0x0d ;
             static const char LF  = 0x0a ;
             if (m_echoToTerminal) {     //   Echo screen character to terminal?
@@ -857,23 +857,23 @@ void Machine::run (void)
         switch (m_registers.opcode) {
             case 0x00:        // BRK
                 PC++ ;
-                S &= 0xff ;
-                store (PCHI, 0x100|S--) ;
-                S &= 0xff ;
-                store (PCLO, 0x100|S--) ;
-                S &= 0xff ;
-                store (P, 0x100|S--) ;
-                S &= 0xff ;
+                Sreg &= 0xff ;
+                store (PCHI, 0x100|Sreg--) ;
+                Sreg &= 0xff ;
+                store (PCLO, 0x100|Sreg--) ;
+                Sreg &= 0xff ;
+                store (Preg, 0x100|Sreg--) ;
+                Sreg &= 0xff ;
                 PCLO = fetch(IRQ) ;
                 PCHI = fetch(IRQ+1) ;
-                P |= (UN | B | I) ;
-                P &= (D ^ 0xff); // This is a 65c02 convention; the 'D' flag is cleared on BRK.
-                cycles(7) ;      // NMOS 6502 does not do this.
+                Preg |= (UN | B | I) ;
+                Preg &= (D ^ 0xff); // This is a 65c02 convention; the 'D' flag is cleared on BRK.
+                cycles(7) ;         // NMOS 6502 does not do this.
                 break ;
             case 0x01:        // ORA (zero page,X)
                 INDIRECTX(p) ;
-                A |= fetch(p) ;
-                STATNZ(A) ;
+                Areg |= fetch(p) ;
+                STATNZ(Areg) ;
                 cycles(6) ;
                 break ;
             case 0x02:        // Unimplemented opcode of 65C02.  See the following URL; the tests in that file
@@ -890,8 +890,8 @@ void Machine::run (void)
                 break ;
             case 0x05:        // ORA zero page
                 p = fetch(PC++) ;
-                A |= fetch(p) ;
-                STATNZ(A) ;
+                Areg |= fetch(p) ;
+                STATNZ(Areg) ;
                 cycles(3) ;
                 break ;
             case 0x06:        // ASL zero page
@@ -904,20 +904,20 @@ void Machine::run (void)
                 cycles(5) ;
                 break ;
             case 0x08:        // PHP
-                S &= 0xff ;
-                store (P|UN|B, 0x100|S--) ;
-                S &= 0xff ;
+                Sreg &= 0xff ;
+                store (Preg|UN|B, 0x100|Sreg--) ;
+                Sreg &= 0xff ;
                 cycles(3) ;
                 break ;
             case 0x09:        // ORA immediate
-                A |= fetch(PC++) ;
-                STATNZ(A) ;
+                Areg |= fetch(PC++) ;
+                STATNZ(Areg) ;
                 cycles(2) ;
                 break ;
             case 0x0a:        // ASL accumulator
-                A <<= 1 ;
-                STATNZC(A) ;
-                A &= 0xff ;
+                Areg <<= 1 ;
+                STATNZC(Areg) ;
+                Areg &= 0xff ;
                 cycles(2) ;
                 break ;
             case 0x0b:
@@ -929,8 +929,8 @@ void Machine::run (void)
                 break ;
             case 0x0d:        // ORA absolute
                 ABSOLUT(p) ;
-                A |= fetch(p) ;
-                STATNZ(A) ;
+                Areg |= fetch(p) ;
+                STATNZ(Areg) ;
                 cycles(4) ;
                 break ;
             case 0x0e:        // ASL absolute
@@ -946,18 +946,18 @@ void Machine::run (void)
 
             case 0x10:        // BPL
                 BRADDR(p) ;
-                BRANCH((P&N)==0) ;
+                BRANCH((Preg&N)==0) ;
                 break ;
             case 0x11:        // ORA (zero page),Y
                 INDIRECTY(p)
-                A |= fetch(p) ;
-                STATNZ(A) ;
+                Areg |= fetch(p) ;
+                STATNZ(Areg) ;
                 cycles(5) ;
                 break ;
             case 0x12:        // ORA (zero page)      * 65C02 *
                 INDIRECTZP(p)
-                A |= fetch(p) ;
-                STATNZ(A) ;
+                Areg |= fetch(p) ;
+                STATNZ(Areg) ;
                 cycles(5) ;
                 break ;
             case 0x13:        //  --- Unimplemented opcode 
@@ -971,8 +971,8 @@ void Machine::run (void)
                 break ;
             case 0x15:        // ORA zero page,X
                 ZEROPAGEX(p) ;
-                A |= fetch(p) ;
-                STATNZ(A) ;
+                Areg |= fetch(p) ;
+                STATNZ(Areg) ;
                 cycles(4) ;
                 break ;
             case 0x16:        // ASL zero page,X
@@ -985,19 +985,19 @@ void Machine::run (void)
                 cycles(5) ;
                 break ;
             case 0x18:        // CLC
-                P &= C ^ 0xff ;
+                Preg &= C ^ 0xff ;
                 cycles(2) ;
                 break ;
             case 0x19:        // ORA absolute,Y
                 ABSOLUTY(p) ;
-                A |= fetch(p) ;
-                STATNZ(A) ;
+                Areg |= fetch(p) ;
+                STATNZ(Areg) ;
                 cycles(4) ;
                 break ;
             case 0x1a:        // INC/INA/INC A        * 65C02 *
-                A++ ;
-                A &= 0xff ;
-                STATNZ(A) ;
+                Areg++ ;
+                Areg &= 0xff ;
+                STATNZ(Areg) ;
                 cycles(2) ;
                 break ;
             case 0x1b:
@@ -1009,8 +1009,8 @@ void Machine::run (void)
                 break ;
             case 0x1d:        // ORA absolute,X
                 ABSOLUTX(p) ;
-                A |= fetch(p) ;
-                STATNZ(A) ;
+                Areg |= fetch(p) ;
+                STATNZ(Areg) ;
                 cycles(4) ;
                 break ;
             case 0x1e:        // ASL absolute,X
@@ -1027,17 +1027,17 @@ void Machine::run (void)
             case 0x20:        // JSR
                 ABSOLUT(p) ;
                 PC -= 1 ;
-                store (PCHI, 0x100|S--) ;
-                S &= 0xff ;
-                store (PCLO, 0x100|S--) ;
-                S &= 0xff ;
+                store (PCHI, 0x100|Sreg--) ;
+                Sreg &= 0xff ;
+                store (PCLO, 0x100|Sreg--) ;
+                Sreg &= 0xff ;
                 PC = p ;
                 cycles(6) ;
                 break ;
             case 0x21:        // AND (zero page,X)
                 INDIRECTX(p) ;
-                A &= fetch(p) ;
-                STATNZ(A) ;
+                Areg &= fetch(p) ;
+                STATNZ(Areg) ;
                 cycles(6) ;
                 break ;
             case 0x22:        //  --- Unimplemented opcode  
@@ -1055,8 +1055,8 @@ void Machine::run (void)
                 break ;
             case 0x25:        // AND zero page
                 p = fetch(PC++) ;
-                A &= fetch(p) ;
-                STATNZ(A) ;
+                Areg &= fetch(p) ;
+                STATNZ(Areg) ;
                 cycles(3) ;
                 break ;
             case 0x26:        // ROL zero page
@@ -1069,21 +1069,21 @@ void Machine::run (void)
                 cycles(5) ;
                 break ;
             case 0x28:        // PLP
-                S += 1 ;
-                S &= 0xff ;
-                P = fetch(0x100|S) | UN ;
+                Sreg += 1 ;
+                Sreg &= 0xff ;
+                Preg = fetch(0x100|Sreg) | UN ;
                 cycles(4) ;
                 break ;
             case 0x29:        // AND immediate
-                A &= fetch(PC++) ;
-                STATNZ(A) ;
+                Areg &= fetch(PC++) ;
+                STATNZ(Areg) ;
                 cycles(2) ;
                 break ;
             case 0x2a:        // ROL accumulator
-                A <<= 1 ;
-                if (P & C) A |= 1 ;
-                STATNZC(A) ;
-                A &= 0xff ;
+                Areg <<= 1 ;
+                if (Preg & C) Areg |= 1 ;
+                STATNZC(Areg) ;
+                Areg &= 0xff ;
                 cycles(2) ;
                 break ;
             case 0x2b:
@@ -1095,8 +1095,8 @@ void Machine::run (void)
                 break ;
             case 0x2d:        // AND absolute
                 ABSOLUT(p) ;
-                A &= fetch(p) ;
-                STATNZ(A) ;
+                Areg &= fetch(p) ;
+                STATNZ(Areg) ;
                 cycles(4) ;
                 break ;
             case 0x2e:        // ROL absolute
@@ -1112,18 +1112,18 @@ void Machine::run (void)
 
             case 0x30:        // BMI
                 BRADDR(p) ;
-                BRANCH((P&N)) ;
+                BRANCH((Preg&N)) ;
                 break ;
             case 0x31:        // AND (zero page),Y
                 INDIRECTY(p)
-                A &= fetch(p) ;
-                STATNZ(A) ;
+                Areg &= fetch(p) ;
+                STATNZ(Areg) ;
                 cycles(5) ;
                 break ;
             case 0x32:        // AND (zero page)      * 65C02 *
                 INDIRECTZP(p) ;
-                A &= fetch(p) ;
-                STATNZ(A) ;
+                Areg &= fetch(p) ;
+                STATNZ(Areg) ;
                 cycles(6) ;
                 break ;
             case 0x33:
@@ -1135,8 +1135,8 @@ void Machine::run (void)
                 break ;
             case 0x35:        // AND zero page,X
                 ZEROPAGEX(p) ;
-                A &= fetch(p) ;
-                STATNZ(A) ;
+                Areg &= fetch(p) ;
+                STATNZ(Areg) ;
                 cycles(4) ;
                 break ;
             case 0x36:        // ROL zero page,X
@@ -1149,18 +1149,18 @@ void Machine::run (void)
                 cycles(5) ;
                 break ;
             case 0x38:        // SEC
-                P |= C ;
+               Preg|= C ;
                 break ;
             case 0x39:        // AND absolute,Y
                 ABSOLUTY(p) ;
-                A &= fetch(p) ;
-                STATNZ(A) ;
+                Areg &= fetch(p) ;
+                STATNZ(Areg) ;
                 cycles(4) ;
                 break ;
             case 0x3a:        // DEC/DEA/DEC A        * 65C02 *
-                A-- ;
-                A &= 0xff ;
-                STATNZ(A) ;
+                Areg-- ;
+                Areg &= 0xff ;
+                STATNZ(Areg) ;
                 cycles(2) ;
                 break ;
             case 0x3b:
@@ -1172,8 +1172,8 @@ void Machine::run (void)
                 break ;
             case 0x3d:        // AND absolute,X
                 ABSOLUTX(p) ;
-                A &= fetch(p) ;
-                STATNZ(A) ;
+                Areg &= fetch(p) ;
+                STATNZ(Areg) ;
                 cycles(4) ;
                 break ;
             case 0x3e:        // ROL absolute,X
@@ -1188,21 +1188,21 @@ void Machine::run (void)
 //   --------------------------------------------
 
             case 0x40:        // RTI
-                S += 1 ;
-                S &= 0xff ;
-                P = fetch(0x100|S) ;
-                S += 1 ;
-                S &= 0xff ;
-                PCLO = fetch(0x100|S) ;
-                S += 1 ;
-                S &= 0xff ;
-                PCHI = fetch(0x100|S) ;
+                Sreg += 1 ;
+                Sreg &= 0xff ;
+                Preg = fetch(0x100|Sreg) ;
+                Sreg += 1 ;
+                Sreg &= 0xff ;
+                PCLO = fetch(0x100|Sreg) ;
+                Sreg += 1 ;
+                Sreg &= 0xff ;
+                PCHI = fetch(0x100|Sreg) ;
                 cycles(6) ;
                 break ;
             case 0x41:        // EOR (zero page,X)
                 INDIRECTX(p) ;
-                A ^= fetch(p) ;
-                STATNZ(A) ;
+                Areg ^= fetch(p) ;
+                STATNZ(Areg) ;
                 cycles(6) ;
                 break ;
             case 0x42:        //  --- Unimplemented opcode, but the 65C02 skips the following byte.  I think. 
@@ -1219,8 +1219,8 @@ void Machine::run (void)
                 break ;
             case 0x45:        // EOR zero page
                 p = fetch(PC++) ;
-                A ^= fetch(p) ;
-                STATNZ(A) ;
+                Areg ^= fetch(p) ;
+                STATNZ(Areg) ;
                 cycles(3) ;
                 break ;
             case 0x46:        // LSR zero page
@@ -1233,20 +1233,20 @@ void Machine::run (void)
                 cycles(5) ;
                 break ;
             case 0x48:        // PHA
-                store (A, 0x100|S--) ;
-                S &= 0xff ;
+                store (Areg, 0x100|Sreg--) ;
+                Sreg &= 0xff ;
                 cycles(3) ;
                 break ;
             case 0x49:        // EOR immediate
-                A ^= fetch(PC++) ;
-                STATNZ(A) ;
+                Areg ^= fetch(PC++) ;
+                STATNZ(Areg) ;
                 cycles(2) ;
                 break ;
             case 0x4a:        // LSR accumulator
-                P &= C ^ 0xff ;
-                if (A & 1) P |= C ;
-                A >>= 1 ;
-                STATNZ(A) ;
+                Preg &= C ^ 0xff ;
+                if (Areg & 1) Preg |= C ;
+                Areg >>= 1 ;
+                STATNZ(Areg) ;
                 cycles(2) ;
                 break ;
             case 0x4b:
@@ -1258,8 +1258,8 @@ void Machine::run (void)
                 break ;
             case 0x4d:        // EOR absolute
                 ABSOLUT(p) ;
-                A ^= fetch(p) ;
-                STATNZ(A) ;
+                Areg ^= fetch(p) ;
+                STATNZ(Areg) ;
                 cycles(4) ;
                 break ;
             case 0x4e:        // LSR absolute
@@ -1275,18 +1275,18 @@ void Machine::run (void)
 
             case 0x50:        // BVC
                 BRADDR(p) ;
-                BRANCH((P&V)==0) ;
+                BRANCH((Preg&V)==0) ;
                 break ;
             case 0x51:        // EOR (zero page),Y
                 INDIRECTY(p)
-                A ^= fetch(p) ;
-                STATNZ(A) ;
+                Areg ^= fetch(p) ;
+                STATNZ(Areg) ;
                 cycles(5) ;
                 break ;
             case 0x52:        // EOR (zero page)      * 65C02 *
                 INDIRECTZP(p) ;
-                A ^= fetch(p) ;
-                STATNZ(A) ;
+                Areg ^= fetch(p) ;
+                STATNZ(Areg) ;
                 cycles(5) ;
                 break ;
             case 0x53:                          // XXXXXXXXXX  overlooked opcode; FIX ME
@@ -1298,8 +1298,8 @@ void Machine::run (void)
                 break ;
             case 0x55:        // EOR zero page,X
                 ZEROPAGEX(p) ;
-                A ^= fetch(p) ;
-                STATNZ(A) ;
+                Areg ^= fetch(p) ;
+                STATNZ(Areg) ;
                 cycles(4) ;
                 break ;
             case 0x56:        // LSR zero page,X
@@ -1312,18 +1312,18 @@ void Machine::run (void)
                 cycles(5) ;
                 break ;
             case 0x58:        // CLI
-                P &=  I ^ 0xff ;
+                Preg &=  I ^ 0xff ;
                 cycles(2) ;
                 break ;
             case 0x59:        // EOR absolute,Y
                 ABSOLUTY(p) ;
-                A ^= fetch(p) ;
-                STATNZ(A) ;
+                Areg ^= fetch(p) ;
+                STATNZ(Areg) ;
                 cycles(4) ;
                 break ;
             case 0x5a:        // PHY                  * 65C02 *
-                store (Y, 0x100|S--) ;
-                S &= 0xff ;
+                store (Yreg, 0x100|Sreg--) ;
+                Sreg &= 0xff ;
                 cycles(3) ;
                 break ;
             case 0x5b:
@@ -1335,8 +1335,8 @@ void Machine::run (void)
                 break ;
             case 0x5d:        // EOR absolute,X
                 ABSOLUTX(p) ;
-                A ^= fetch(p) ;
-                STATNZ(A) ;
+                Areg ^= fetch(p) ;
+                STATNZ(Areg) ;
                 cycles(4) ;
                 break ;
             case 0x5e:        // LSR absolute,X
@@ -1351,12 +1351,12 @@ void Machine::run (void)
 //   --------------------------------------------
 
             case 0x60:        // RTS
-                S += 1 ;
-                S &= 0xff ;
-                PCLO = fetch(0x100|S) ;
-                S += 1 ;
-                S &= 0xff ;
-                PCHI = fetch(0x100|S) ;
+                Sreg += 1 ;
+                Sreg &= 0xff ;
+                PCLO = fetch(0x100|Sreg) ;
+                Sreg += 1 ;
+                Sreg &= 0xff ;
+                PCHI = fetch(0x100|Sreg) ;
                 PC += 1 ;
                 cycles(6) ;
                 break ;
@@ -1392,11 +1392,11 @@ void Machine::run (void)
                 cycles(5) ;
                 break ;
             case 0x68:        // PLA
-                S += 1 ;
-                S &= 0xff ;
-                A = fetch(0x100|S) ;
-                S &= 0xff ;
-                STATNZ(A) ;
+                Sreg += 1 ;
+                Sreg &= 0xff ;
+                Areg = fetch(0x100|Sreg) ;
+                Sreg &= 0xff ;
+                STATNZ(Areg) ;
                 cycles(4) ;
                 break ;
             case 0x69:        // ADC immediate ;
@@ -1405,12 +1405,12 @@ void Machine::run (void)
                 cycles(2) ;
                 break ;
             case 0x6a:        // ROR accumulator
-                A &= 0xff ;
-                if (P & C) A |= 0x100 ;
-                P &= C ^ 0xff ;
-                if (A & 1) P |= C ;
-                A >>= 1 ;
-                STATNZ(A) ;
+                Areg &= 0xff ;
+                if (Preg & C) Areg |= 0x100 ;
+                Preg &= C ^ 0xff ;
+                if (Areg & 1) Preg |= C ;
+                Areg >>= 1 ;
+                STATNZ(Areg) ;
                 cycles(2) ;
                 break ;
             case 0x6b:
@@ -1439,7 +1439,7 @@ void Machine::run (void)
 
             case 0x70:        // BVS
                 BRADDR(p) ;
-                BRANCH(P&V) ;
+                BRANCH(Preg&V) ;
                 break ;
             case 0x71:        // ADC (zero page),Y
                 INDIRECTY(p) ;
@@ -1473,7 +1473,7 @@ void Machine::run (void)
                 cycles(5) ;
                 break ;
             case 0x78:        // SEI
-                P |= I ;
+                Preg |= I ;
                 break ;
             case 0x79:        // ADC absolute,Y
                 ABSOLUTY(p) ;
@@ -1481,11 +1481,11 @@ void Machine::run (void)
                 cycles(4) ;
                 break ;
             case 0x7a:        // PLY                  * 65C02 *
-                S += 1 ;
-                S &= 0xff ;
-                Y = fetch(0x100|S) ;
-                S &= 0xff ;
-                STATNZ(Y) ;
+                Sreg += 1 ;
+                Sreg &= 0xff ;
+                Yreg = fetch(0x100|Sreg) ;
+                Sreg &= 0xff ;
+                STATNZ(Yreg) ;
                 cycles(4) ;
                 break ;
             case 0x7b:
@@ -1518,7 +1518,7 @@ void Machine::run (void)
                 break ;
             case 0x81:        // STA (zero page,X)
                 INDIRECTX(p) ;
-                store (A, p) ;
+                store (Areg, p) ;
                 cycles(6) ;
                 break ;
             case 0x82:        //  --- Unimplemented opcode, but the 65C02 skips the following byte.  I think. 
@@ -1530,17 +1530,17 @@ void Machine::run (void)
                 break ;
             case 0x84:        // STY zero page
                 p = fetch(PC++) ;
-                store (Y,p) ;
+                store (Yreg,p) ;
                 cycles(3) ;
                 break ;
             case 0x85:        // STA zero page
                 p = fetch(PC++) ;
-                store (A,p) ;
+                store (Areg,p) ;
                 cycles(3) ;
                 break ;
             case 0x86:        // STX zero page
                 p = fetch(PC++) ;
-                store (X,p) ;
+                store (Xreg,p) ;
                 cycles(3) ;
                 break ;
             case 0x87:        // SMB0                 * 65C02 (Rockwell and WDC only) *
@@ -1548,37 +1548,37 @@ void Machine::run (void)
                 cycles(5) ;
                 break ;
             case 0x88:        // DEY
-                Y -= 1 ;
-                Y &= 0xff ;
-                STATNZ(Y) ;
+                Yreg -= 1 ;
+                Yreg &= 0xff ;
+                STATNZ(Yreg) ;
                 cycles(2) ;
                 break ;
             case 0x89:        // BIT immediate        * 65C02 *
                 s = PC++ ;
-                if (A & s) P |= Z ;          // Note: on a 65C02, immediate-mode BIT can
-                else       P &= (0xff ^ Z) ; // change the processor status Z bit, only.
+                if (Areg & s) Preg |= Z ;          // Note: on a 65C02, immediate-mode BIT can
+                else       Preg &= (0xff ^ Z) ; // change the processor status Z bit, only.
                 cycles(3) ;
                 break ;
             case 0x8a:        // TXA
-                A = X ;
-                STATNZ(A) ;
+                Areg = Xreg ;
+                STATNZ(Areg) ;
                 cycles(2) ;
                 break ;
             case 0x8b:
                 break ;
             case 0x8c:        // STY absolute
                 ABSOLUT(p) ;
-                store (Y, p) ;
+                store (Yreg, p) ;
                 cycles(4) ;
                 break ;
             case 0x8d:        // STA absolute
                 ABSOLUT(p) ;
-                store (A, p) ;
+                store (Areg, p) ;
                 cycles(4) ;
                 break ;
             case 0x8e:        // STX absolute
                 ABSOLUT(p) ;
-                store (X, p) ;
+                store (Xreg, p) ;
                 cycles(4) ;
                 break ;
             case 0x8f:        // BBS0                 * 65C02 (Rockwell and WDC only) *
@@ -1589,33 +1589,33 @@ void Machine::run (void)
 
             case 0x90:        // BCC
                 BRADDR(p) ;
-                BRANCH((P&C)==0) ;
+                BRANCH((Preg&C)==0) ;
                 break ;
             case 0x91:        // STA (zero page),Y
                 INDIRECTY(p) ;
-                store (A, p) ;
+                store (Areg, p) ;
                 cycles(6) ;
                 break ;
             case 0x92:        // STA (zero page)      * 65C02 *
                 INDIRECTZP(p) ;
-                store (A, p) ;
+                store (Areg, p) ;
                 cycles(5) ;
                 break ;
             case 0x93:
                 break ;
             case 0x94:        // STY zero page,X
                 ZEROPAGEX(p) ;
-                store (Y,p) ;
+                store (Yreg,p) ;
                 cycles(4) ;
                 break ;
             case 0x95:        // STA zero page,X
                 ZEROPAGEX(p) ;
-                store (A,p) ;
+                store (Areg,p) ;
                 cycles(4) ;
                 break ;
             case 0x96:        // STX zero page,Y
                 ZEROPAGEY(p) ;
-                store (X,p) ;
+                store (Xreg,p) ;
                 cycles(4) ;
                 break ;
             case 0x97:        // SMB1                 * 65C02 (Rockwell and WDC only) *
@@ -1623,17 +1623,17 @@ void Machine::run (void)
                 cycles(5) ;
                 break ;
             case 0x98:        // TYA
-                A = Y ;
-                STATNZ(A) ;
+                Areg = Yreg ;
+                STATNZ(Areg) ;
                 cycles(2) ;
                 break ;
             case 0x99:        // STA absolute,Y
                 ABSOLUTY(p) ;
-                store (A,p) ;
+                store (Areg,p) ;
                 cycles(5) ;
                 break ;
             case 0x9a:        // TXS
-                S = X ;
+                Sreg = Xreg ;
                 break ;
             case 0x9b:
                 break ;
@@ -1644,7 +1644,7 @@ void Machine::run (void)
                 break ;
             case 0x9d:        // STA absolute,X
                 ABSOLUTX(p) ;
-                store (A,p) ;
+                store (Areg,p) ;
                 cycles(5) ;
                 break ;
             case 0x9e:        // STZ absolute,X       * 65C02 *
@@ -1659,39 +1659,39 @@ void Machine::run (void)
 //   --------------------------------------------
 
             case 0xa0:        // LDY immediate
-                Y = fetch(PC++) ;
-                STATNZ(Y) ;
+                Yreg = fetch(PC++) ;
+                STATNZ(Yreg) ;
                 cycles(2) ;
                 break ;
             case 0xa1:        // LDA (zero page,X)
                 INDIRECTX(p) ;
-                A = fetch(p) ;
-                STATNZ(A) ;
+                Areg = fetch(p) ;
+                STATNZ(Areg) ;
                 cycles(6) ;
                 break ;
             case 0xa2:        // LDX immediate
-                X = fetch(PC++) ;
-                STATNZ(X) ;
+                Xreg = fetch(PC++) ;
+                STATNZ(Xreg) ;
                 cycles(2) ;
                 break ;
             case 0xa3:
                 break ;
             case 0xa4:        // LDY zero page
                 p = fetch(PC++) ;
-                Y = fetch(p) ;
-                STATNZ(Y) ;
+                Yreg = fetch(p) ;
+                STATNZ(Yreg) ;
                 cycles(3) ;
                 break ;
             case 0xa5:        // LDA zero page
                 p = fetch(PC++) ;
-                A = fetch(p) ;
-                STATNZ(A) ;
+                Areg = fetch(p) ;
+                STATNZ(Areg) ;
                 cycles(3) ;
                 break ;
             case 0xa6:        // LDX zero page
                 p = fetch(PC++) ;
-                X = fetch(p) ;
-                STATNZ(X) ;
+                Xreg = fetch(p) ;
+                STATNZ(Xreg) ;
                 cycles(3) ;
                 break ;
             case 0xa7:        // SMB2                 * 65C02 (Rockwell and WDC only) *
@@ -1699,38 +1699,38 @@ void Machine::run (void)
                 cycles(5) ;
                 break ;
             case 0xa8:        // TAY
-                Y = A ;
-                STATNZ(Y) ;
+                Yreg = Areg ;
+                STATNZ(Yreg) ;
                 cycles(2) ;
                 break ;
             case 0xa9:        // LDA immediate
-                A = fetch(PC++) ;
-                STATNZ(A) ;
+                Areg = fetch(PC++) ;
+                STATNZ(Areg) ;
                 cycles(2) ;
                 break ;
             case 0xaa:        // TAX
-                X = A ;
-                STATNZ(X) ;
+                Xreg = Areg ;
+                STATNZ(Xreg) ;
                 cycles(2) ;
                 break ;
             case 0xab:
                 break ;
             case 0xac:        // LDY absolute
                 ABSOLUT(p) ;
-                Y = fetch(p) ;
-                STATNZ(Y) ;
+                Yreg = fetch(p) ;
+                STATNZ(Yreg) ;
                 cycles(4) ;
                 break ;
             case 0xad:        // LDA absolute
                 ABSOLUT(p) ;
-                A = fetch(p) ;
-                STATNZ(A) ;
+                Areg = fetch(p) ;
+                STATNZ(Areg) ;
                 cycles(4) ;
                 break ;
             case 0xae:        // LDX absolute
                 ABSOLUT(p) ;
-                X = fetch(p) ;
-                STATNZ(X) ;
+                Xreg = fetch(p) ;
+                STATNZ(Xreg) ;
                 cycles(4) ;
                 break ;
             case 0xaf:        // BBS2                 * 65C02 (Rockwell and WDC only) *
@@ -1741,38 +1741,38 @@ void Machine::run (void)
 
             case 0xb0:        // BCS
                 BRADDR(p) ;
-                BRANCH(P&C) ;
+                BRANCH(Preg&C) ;
                 break ;
             case 0xb1:        // LDA (zero page),Y
                 INDIRECTY(p) ;
-                A = fetch(p) ;
-                STATNZ(A) ;
+                Areg = fetch(p) ;
+                STATNZ(Areg) ;
                 cycles(6) ;
                 break ;
             case 0xb2:        // LDA (zero page)      * 65C02 *
                 INDIRECTZP(p)
-                A = fetch(p) ;
-                STATNZ(A) ;
+                Areg = fetch(p) ;
+                STATNZ(Areg) ;
                 cycles(5) ;
                 break ;
             case 0xb3:
                 break ;
             case 0xb4:        // LDY zero page,X
                 ZEROPAGEX(p) ;
-                Y = fetch(p) ;
-                STATNZ(Y) ;
+                Yreg = fetch(p) ;
+                STATNZ(Yreg) ;
                 cycles(4) ;
                 break ;
             case 0xb5:        // LDA zero page,X
                 ZEROPAGEX(p) ;
-                A = fetch(p) ;
-                STATNZ(A) ;
+                Areg = fetch(p) ;
+                STATNZ(Areg) ;
                 cycles(4) ;
                 break ;
             case 0xb6:        // LDX zero page,Y
                 ZEROPAGEY(p) ;
-                X = fetch(p) ;
-                STATNZ(X) ;
+                Xreg = fetch(p) ;
+                STATNZ(Xreg) ;
                 cycles(4) ;
                 break ;
             case 0xb7:        // SMB3                 * 65C02 (Rockwell and WDC only) *
@@ -1780,38 +1780,38 @@ void Machine::run (void)
                 cycles(5) ;
                 break ;
             case 0xb8:        // CLV
-                P &= V ^ 0xff ;
+                Preg &= V ^ 0xff ;
                 cycles(2) ;
                 break ;
             case 0xb9:        // LDA absolute,Y
                 ABSOLUTY(p) ;
-                A = fetch(p) ;
-                STATNZ(A) ;
+                Areg = fetch(p) ;
+                STATNZ(Areg) ;
                 cycles(4) ;
                 break ;
             case 0xba:        // TSX
-                X = S ;
-                STATNZ(X) ;
+                Xreg = Sreg ;
+                STATNZ(Xreg) ;
                 cycles(2) ;
                 break ;
             case 0xbb:
                 break ;
             case 0xbc:        // LDY absolute,X
                 ABSOLUTX(p) ;
-                Y = fetch(p) ;
-                STATNZ(Y) ;
+                Yreg = fetch(p) ;
+                STATNZ(Yreg) ;
                 cycles(4) ;
                 break ;
             case 0xbd:        // LDA absolute,X
                 ABSOLUTX(p) ;
-                A = fetch(p) ;
-                STATNZ(A) ;
+                Areg = fetch(p) ;
+                STATNZ(Areg) ;
                 cycles(4) ;
                 break ;
             case 0xbe:        // LDX absolute,Y
                 ABSOLUTY(p) ;
-                X = fetch(p) ;
-                STATNZ(X) ;
+                Xreg = fetch(p) ;
+                STATNZ(Xreg) ;
                 cycles(4) ;
                 break ;
             case 0xbf:        // BBS3                 * 65C02 (Rockwell and WDC only) *
@@ -1822,12 +1822,12 @@ void Machine::run (void)
 
             case 0xc0:        // CPY immediate
                 p = PC++ ;
-                COMPARE(Y,p) ;
+                COMPARE(Yreg,p) ;
                 cycles(2) ;
                 break ;
             case 0xc1:        // CMP (zero page,X)
                 INDIRECTX(p) ;
-                COMPARE(A,p) ;
+                COMPARE(Areg,p) ;
                 cycles(6) ;
                 break ;
             case 0xc2:       //  --- Unimplemented opcode, but the 65C02 skips the following byte.  I think. 
@@ -1839,12 +1839,12 @@ void Machine::run (void)
                 break ;
             case 0xc4:        // CPY zero page
                 p = fetch(PC++) ;
-                COMPARE(Y,p) ;
+                COMPARE(Yreg,p) ;
                 cycles(3) ;
                 break ;
             case 0xc5:        // CMP zero page
                 p = fetch(PC++) ;
-                COMPARE(A,p) ;
+                COMPARE(Areg,p) ;
                 cycles(3) ;
                 break ;
             case 0xc6:        // DEC zero page
@@ -1857,20 +1857,20 @@ void Machine::run (void)
                 cycles(5) ;
                 break ;
             case 0xc8:        // INY
-                Y += 1 ;
-                Y &= 0xff ;
-                STATNZ(Y) ;
+                Yreg += 1 ;
+                Yreg &= 0xff ;
+                STATNZ(Yreg) ;
                 cycles(2) ;
                 break ;
             case 0xc9:        // CMP immediate
                 p = PC++ ;
-                COMPARE(A,p) ;
+                COMPARE(Areg,p) ;
                 cycles(2) ;
                 break ;
             case 0xca:        // DEX
-                X -= 1 ;
-                X &= 0xff ;
-                STATNZ(X) ;
+                Xreg -= 1 ;
+                Xreg &= 0xff ;
+                STATNZ(Xreg) ;
                 cycles(2) ;
                 break ;
             case 0xcb:        // WAI                  * 65C02 (WDC only)
@@ -1878,12 +1878,12 @@ void Machine::run (void)
                 break ;
             case 0xcc:        // CPY absolute
                 ABSOLUT(p) ;
-                COMPARE(Y,p) ;
+                COMPARE(Yreg,p) ;
                 cycles(4) ;
                 break ;
             case 0xcd:        // CMP absolute
                 ABSOLUT(p) ;
-                COMPARE(A,p) ;
+                COMPARE(Areg,p) ;
                 cycles(4) ;
                 break ;
             case 0xce:        // DEC absolute
@@ -1899,16 +1899,16 @@ void Machine::run (void)
 
             case 0xd0:        // BNE
                 BRADDR(p) ;
-                BRANCH((P&Z)==0) ;
+                BRANCH((Preg&Z)==0) ;
                 break ;
             case 0xd1:        // CMP (zero page),Y
                 INDIRECTY(p) ;
-                COMPARE(A,p) ;
+                COMPARE(Areg,p) ;
                 cycles(5) ;
                 break ;
             case 0xd2:        // CMP (zero page)      * 65C02 *
                 INDIRECTZP(p) ;
-                COMPARE(A,p) ;
+                COMPARE(Areg,p) ;
                 cycles(5) ;
                 break ;
             case 0xd3:
@@ -1920,7 +1920,7 @@ void Machine::run (void)
                 break ;
             case 0xd5:        // CMP zero page,X
                 ZEROPAGEX(p) ;
-                COMPARE(A,p) ;
+                COMPARE(Areg,p) ;
                 cycles(4) ;
                 break ;
             case 0xd6:        // DEC zero page,X
@@ -1933,17 +1933,17 @@ void Machine::run (void)
                 cycles(5) ;
                 break ;
             case 0xd8:        // CLD
-                P &= D ^ 0xff;
+                Preg &= D ^ 0xff;
                 cycles(2) ;
                 break ;
             case 0xd9:        // CMP absolute,Y
                 ABSOLUTY(p) ;
-                COMPARE(A,p) ;
+                COMPARE(Areg,p) ;
                 cycles(4) ;
                 break ;
             case 0xda:        // PHX                  * 65C02 *
-                store (X, 0x100|S--) ;
-                S &= 0xff ;
+                store (Xreg, 0x100|Sreg--) ;
+                Sreg &= 0xff ;
                 cycles(3) ;
                 break ;
             case 0xdb:        // STP                  * 65C02 (WDC only)
@@ -1956,7 +1956,7 @@ void Machine::run (void)
                 break ;
             case 0xdd:        // CMP absolute,X
                 ABSOLUTX(p) ;
-                COMPARE(A,p) ;
+                COMPARE(Areg,p) ;
                 cycles(4) ;
                 break ;
             case 0xde:        // DEC absolute,X
@@ -1972,7 +1972,7 @@ void Machine::run (void)
 
             case 0xe0:        // CPX immediate
                 p = PC++ ;
-                COMPARE(X,p) ;
+                COMPARE(Xreg,p) ;
                 cycles(2) ;
                 break ;
             case 0xe1:        // SBC (zero page,X)
@@ -1989,7 +1989,7 @@ void Machine::run (void)
                 break ;
             case 0xe4:        // CPX zero page
                 p = fetch(PC++) ;
-                COMPARE(X,p) ;
+                COMPARE(Xreg,p) ;
                 cycles(3) ;
                 break ;
             case 0xe5:        // SBC zero page
@@ -2007,9 +2007,9 @@ void Machine::run (void)
                 cycles(5) ;
                 break ;
             case 0xe8:        // INX
-                X += 1 ;
-                X &= 0xff ;
-                STATNZ(X) ;
+                Xreg += 1 ;
+                Xreg &= 0xff ;
+                STATNZ(Xreg) ;
                 cycles(2) ;
                 break ;
             case 0xe9:        // SBC immediate
@@ -2023,7 +2023,7 @@ void Machine::run (void)
                 break ;
             case 0xec:        // CPX absolute
                 ABSOLUT(p) ;
-                COMPARE(X,p) ;  
+                COMPARE(Xreg,p) ;  
                 cycles(4) ;
                 break ;
             case 0xed:        // SBC absolute
@@ -2044,7 +2044,7 @@ void Machine::run (void)
 
             case 0xf0:        // BEQ
                 BRADDR(p) ;
-                BRANCH(P&Z) ;
+                BRANCH(Preg&Z) ;
                 break ;
             case 0xf1:        // SBC (zero page),Y
                 INDIRECTY(p) ;
@@ -2078,7 +2078,7 @@ void Machine::run (void)
                 cycles(5) ;
                 break ;
             case 0xf8:        // SED
-                P |= D ;
+                Preg |= D ;
                 break ;
             case 0xf9:        // SBC absolute,Y
                 ABSOLUTY(p) ;
@@ -2086,10 +2086,10 @@ void Machine::run (void)
                 cycles(4) ;
                 break ;
             case 0xfa:        // PLX                  * 65C02 *
-                S += 1 ;
-                S &= 0xff ;
-                X = fetch(0x100|S) ;
-                STATNZ(X) ;
+                Sreg += 1 ;
+                Sreg &= 0xff ;
+                Xreg = fetch(0x100|Sreg) ;
+                STATNZ(Xreg) ;
                 cycles(4) ;
                 break ;
             case 0xfb:
@@ -2116,7 +2116,7 @@ void Machine::run (void)
                 break ;
         }
 
-        P |= UN ;    // status bit 5 is unused, and always set.
+        Preg |= UN ;    // status bit 5 is unused, and always set.
 
         //  Save processor state in the trace queue for possible history dumps on traps.
 

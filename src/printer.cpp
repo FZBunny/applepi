@@ -126,13 +126,13 @@ quint8 Printer::fetch_Printer_ROM (int slotNumber, quint8 p)
     if ((p==0) && (calledFrom==m_slotAddr)) {                      // Did someone say "PR#1" ?
         MAC->m_ram[0x36] = 0x10 ;            // Set the character output vector
         MAC->m_ram[0x37] = m_slotAddr >> 8 ; // to point to us
-        ps->Areg = 0 ;
+        ps->Aregister = 0 ;
         ps->Pstat &= C ^ 0xff ;
         c = RTS ;
     } else if ((p==0x10) && (calledFrom==entryPoint)) {            // Print a single character.
 //printf ("Printer::fetch_Printer_ROM A=%2.2x\n", ps->Areg&0x7f) ;     
-        m_out->putChar (ps->Areg&0x7f) ;
-        if ((ps->Areg&0x7f) == '\r') m_out->putChar ('\n') ;
+        m_out->putChar (ps->Aregister&0x7f) ;
+        if ((ps->Aregister&0x7f) == '\r') m_out->putChar ('\n') ;
         m_out->flush() ;
         if (MAC->m_ss[0] == 0x83) {          // If a ctrl-C was entered at the keyboard,
             close() ;                        // close the output file & reset the output vector.
