@@ -30,15 +30,9 @@
 #include "mainwindow.h"
 #include "debugging_dumps.h"
 
-#include "xaudio2.h"
+#include "mmdeviceapi.h"
+#include "audioclient.h"  // XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX FUCK! 
 #include "roapi.h"
-
-
-//  Constructor is called in MainWindow::MainWindow
-
-Speaker::Speaker (MainWindow* parent)
-{
-}
 
 
 //  Make a square wave
@@ -62,24 +56,32 @@ void Speaker::toggleSpeaker (void)
     }
     int cyclesDifference = processorCycles - m_previousCycles ;
 
-    int len = cyclesDifference / SAMPLE_DELTA ;
-    if (len > BUFFER_LEN) {
-        m_bufferPtr = 0 ;
-        m_previousValue = (m_previousValue == m_lo) ? m_hi : m_lo ;
+    m_qLock.lock() ;
+    if (cyclesDifference > SND_QUEUE_SIZE) {
+        m_qHead = m_qTail = 0 ;
         m_previousCycles = processorCycles ;
+        m_previousValue = (m_previousValue == 0) ? m_hi : 0 ;
+        m_qLock.unlock() ;
         return ;
     }
 
-    int newIndex = m_bufferPtr + len ;
-    if (newIndex >= BUFFER_LEN) newIndex = BUFFER_LEN - 1 ;
+    int oldTail = m_qTail ;
+    m_qTail += cyclesDifference / SAMPLE_DELTA ;
 
-    m_bufferLock.lock() ;
-    for (int i= m_bufferPtr; i<newIndex; i++) m_tmpBuffer[i] = m_previousValue ;
-    m_bufferPtr = newIndex;
-    m_bufferLock.unlock() ;
+    if (m_qTail >= SND_QUEUE_SIZE) {
+        for (int i = oldTail; i < SND_QUEUE_SIZE; i++) m_queue[i] = m_previousValue ;
+        m_qTail -= SND_QUEUE_SIZE ;
+        for (uint i = 0; i < m_qTail; i++) m_queue[i] = m_previousValue ;
+        if (m_qTail > m_qHead) m_qHead = m_qTail ;   // Just let queue overruns happen.
+    }
+    else {
+        for (uint i = oldTail; i < m_qTail; i++) m_queue[i] = m_previousValue ;
+    }
+    m_qLock.unlock() ;
 
     m_previousCycles = processorCycles ;
-    m_previousValue = (m_previousValue == m_lo) ? m_hi : m_lo ;
+    m_previousValue = (m_previousValue == 0) ? m_hi : 0 ;
+
 }
 
 
@@ -90,8 +92,8 @@ void Speaker::setVolume (float value)
 
     float volume = 1.28 * (value*value / 100) ;
 
-    m_hi = MID + volume ;
-    m_lo = MID - volume ;
+    m_hi = volume ;
+
 //printf ("MID=%i  value=%f  volume=%f m_hi=%i  m_lo=%i\n", MID, value, volume, m_hi, m_lo) ;
 }
 
@@ -104,108 +106,121 @@ void Speaker::setVolume (float value)
 
 void Speaker::run (void)
 {
-    const int SLEEP = 1 ;     // sleep time im milliseconds
+    const CLSID CLSID_MMDeviceEnumerator = __uuidof(MMDeviceEnumerator) ;
+    const IID IID_IMMDeviceEnumerator =    __uuidof(IMMDeviceEnumerator) ;
+    const IID IID_IAudioClient =           __uuidof(IAudioClient) ;
+    const IID IID_IAudioRenderClient =     __uuidof(IAudioRenderClient) ;
+    const char* noSound = "***  applepi-win won't be able to produce sounds from the Apple II speaker.\n";
 
-    HRESULT hr ;
-    IXAudio2*               xAudio2 ;
-    IXAudio2MasteringVoice* masterVoice ;
-    IXAudio2SourceVoice*    sourceVoice ;
+    HRESULT hr;
+    WAVEFORMATEX* waveFmt ;
+    IMMDevice* device ;
+    IAudioClient* audioClient ;
+    IMMDeviceEnumerator* enumerator ;
 
-    // waveFmt holds a WAVE header in our fictitious RIFF file
-    WAVEFORMATEX waveFmt;              // #1: These two variables must be kept together in this
-    quint8       pcmData[BUFFER_LEN];  // #2: order. (i.e, wave structure followed by PCM data.)
-
-    waveFmt.wFormatTag = WAVE_FORMAT_PCM; // See https://www-mmsp.ece.mcgill.ca/Documents/AudioFormats/WAVE/WAVE.html
-    waveFmt.nChannels = 1;                // and https://learn.microsoft.com/en-us/windows/win32/xaudio2/xaudio2-apis-portal
-    waveFmt.nSamplesPerSec = RATE;
-    waveFmt.nAvgBytesPerSec = RATE;
-    waveFmt.nBlockAlign = 1;
-    waveFmt.wBitsPerSample = 8;
-    waveFmt.cbSize = 0;
-    
-    XAUDIO2_BUFFER  xAudio2Buffer;
-    xAudio2Buffer.Flags = 0;
-//    xAudio2Buffer.Flags = XAUDIO2_END_OF_STREAM;
-    xAudio2Buffer.pAudioData = (const BYTE*)&waveFmt;
-    xAudio2Buffer.AudioBytes = 0;
-    xAudio2Buffer.PlayBegin = 0;
-    xAudio2Buffer.PlayLength = 0;
-    xAudio2Buffer.LoopBegin = 0;
-    xAudio2Buffer.LoopLength = 0;
-    xAudio2Buffer.LoopCount = 0;
-    xAudio2Buffer.pContext = nullptr;
-
+    char    dummyBuffer[16] ;
+    UINT32  bufferFrameCount ;
     m_previousCycles = 0 ;
-    m_previousValue = MID ;
-    m_bufferPtr = 0 ;
-    memset (pcmData, MID, sizeof(pcmData)) ;
-    const char* noSound = "***  applepi-win won't be able to produce sounds from the Apple II speaker.\n\n" ;
+    m_previousValue = 0;
+    m_qHead = 0 ;
+    m_qTail = 0 ;
 
-    hr = CoInitializeEx (nullptr, COINIT_MULTITHREADED) ;
+    hr = CoInitialize (NULL) ;
+    hr = CoCreateInstance (CLSID_MMDeviceEnumerator, NULL, CLSCTX_ALL, IID_IMMDeviceEnumerator, (void**)&enumerator) ;
     if (FAILED(hr)) goto error1 ;
 
-    hr = XAudio2Create (&xAudio2, 0, XAUDIO2_DEFAULT_PROCESSOR); 
-//    hr = XAudio2Create (&xAudio2, 0, COINIT_APARTMENTTHREADED) ;
+    hr = enumerator->GetDefaultAudioEndpoint (eRender, eConsole, &device) ;
     if (FAILED(hr)) goto error2 ;
 
-    hr = xAudio2->CreateMasteringVoice (&masterVoice) ;
+    hr = device->Activate (IID_IAudioClient, CLSCTX_ALL, NULL, (void**)&audioClient) ;
     if (FAILED(hr)) goto error3 ;
 
-    hr = xAudio2->CreateSourceVoice (&sourceVoice, (WAVEFORMATEX*)&waveFmt) ;
+    hr = audioClient->GetMixFormat (&waveFmt) ;
     if (FAILED(hr)) goto error4 ;
+    waveFmt->wFormatTag = WAVE_FORMAT_PCM ;  // See https://www-mmsp.ece.mcgill.ca/Documents/AudioFormats/WAVE/WAVE.html
+    waveFmt->nChannels = 1 ;
+    waveFmt->nSamplesPerSec = RATE ;
+    waveFmt->nAvgBytesPerSec = RATE ;
+    waveFmt->nBlockAlign = 1 ;
+    waveFmt->wBitsPerSample = 8 ;
+    waveFmt->cbSize = 0 ;
 
-    hr = sourceVoice->Start() ;
+// "reference times" are 100 nano-second chunks, or 10,000 chunks/mSec; we want to request 20 millisecond buffers.
+    REFERENCE_TIME requestBufferDuration = 20 * 1E4 ;
+
+    hr = audioClient->Initialize (AUDCLNT_SHAREMODE_SHARED, 0, requestBufferDuration, 0, waveFmt, NULL) ;
     if (FAILED(hr)) goto error5 ;
 
+    hr = audioClient->GetBufferSize (&bufferFrameCount) ;
+    if (FAILED(hr)) goto error6 ;
+printf("bufferFrameCount = %d\n", bufferFrameCount) ;
+exit(0) ;
+
     while (true) {
-        if (m_bufferPtr) {
-            m_bufferLock.lock() ;
-            memmove (pcmData, m_tmpBuffer, m_bufferPtr) ;
-            xAudio2Buffer.AudioBytes = m_bufferPtr ;
-            xAudio2Buffer.PlayLength = m_bufferPtr ;
-            m_bufferPtr = 0 ;
-            m_bufferLock.unlock() ;
-//xdump (pcmData, len, 0) ;
-            hr = sourceVoice->SubmitSourceBuffer(&xAudio2Buffer, nullptr) ;
-            if (FAILED(hr)) printf ("SubmitSourceBuffer returned err code 0x%8.8x\n", hr) ;
-        } 
-/**
-        else {
-            m_bufferLock.lock() ;
-            int nBytes = RATE / (SLEEP * 1000) ;
-            memset (pcmData, m_previousValue, nBytes) ;
-            xAudio2Buffer.AudioBytes = nBytes;
-            xAudio2Buffer.PlayLength = nBytes;
-            hr = sourceVoice->SubmitSourceBuffer(&xAudio2Buffer, nullptr) ;
-            m_bufferLock.unlock() ;
-            if (FAILED(hr)) printf("SubmitSourceBuffer returned err code 0x%8.8x\n", hr) ;
+        int len, oldHead;
+        if (m_qHead < m_qTail) {
+            m_qLock.lock() ;
+            oldHead = m_qHead ;
+            len = m_qTail - oldHead ;
+            m_qHead = m_qTail ;
+            m_qLock.unlock() ;
+//            snd_pcm_writei(m_soundHandle, m_queue + oldHead, len);
         }
-**/
-        Sleep (SLEEP) ;
+        else if (m_qHead > m_qTail) {
+            m_qLock.lock() ;
+            len = SND_QUEUE_SIZE - m_qHead ;
+            m_qHead = 0 ;
+            m_qLock.unlock() ;
+//            snd_pcm_writei(m_soundHandle, m_queue + m_qHead, len);
+        }
+        else {
+//            memset(dummyBuffer, m_previousValue, sizeof(dummyBuffer));
+//            snd_pcm_writei(m_soundHandle, dummyBuffer, sizeof(dummyBuffer));
+        }
+        // ( About the sleep-&-repeat hackery... poll calls refuse to work,)
+        Sleep (20) ;   // ( and ALSA callbacks are not implemented on some Linux distros. )
+
     }
 
 error1:
-    printf("\n*** 'CoInitializeEx' call failed in Speaker initialization. Error code=%8.8x\n", hr) ;
-    puts(noSound) ;
+    printf ("\n*** 'CoCreateInstance' call failed in Speaker initialization. Error code=%8.8x\n", hr) ;
+    printf ("%s\n", noSound) ;
     return ;
 error2:
-    printf("\n*** 'XAudio2Create' call failed in Speaker initialization. Error code=%8.8x\n", hr) ;
-    puts(noSound) ;
+    printf ("\n*** 'GetDefaultAudioEndpoint' call failed in Speaker initialization. Error code=%8.8x\n", hr) ;
+    printf ("%s\n", noSound) ;
     return ;
 error3:
-    printf("\n*** 'CreateMasteringVoice' call failed in Speaker initialization. Error code=%8.8x\n", hr) ;
-    puts(noSound) ;
+    printf ("\n*** 'Activate' call failed in Speaker initialization. Error code=%8.8x\n", hr) ;
+    printf ("%s\n", noSound) ;
     return ;
 error4:
-    printf("\n*** 'CreateSourceVoice' call failed in Speaker initialization. Error code=%8.8x\n", hr) ;
-    puts(noSound) ;
+    printf ("\n*** 'GetMixFormat' call failed in Speaker initialization. Error code=%8.8x\n", hr) ;
+    printf ("%s\n", noSound) ;
     return ;
 error5:
-    printf("\n*** source voice 'Start' call failed in Speaker initialization. Error code=%8.8x\n", hr) ;
-    puts(noSound) ;
+    printf ("\n*** 'Initialize' call failed in Speaker initialization. Error code=%8.8x\n", hr);
+    printf ("%s\n", noSound);
     return ;
-
+error6:
+    printf ("\n*** 'GetBufferSize' call failed in Speaker initialization. Error code=%8.8x\n", hr);
+    printf ("%s\n", noSound);
+    return ;
+error7:
+    printf ("\n*** '' call failed in Speaker initialization. Error code=%8.8x\n", hr);
+    printf ("%s\n", noSound);
+    return ;
+error8:
+    printf ("\n*** '' call failed in Speaker initialization. Error code=%8.8x\n", hr);
+    printf ("%s\n", noSound);
+    return ;
+error9:
+    printf ("\n*** '' call failed in Speaker initialization. Error code=%8.8x\n", hr);
+    printf ("%s\n", noSound);
+    return ;
+error10:
+    printf ("\n*** '' call failed in Speaker initialization. Error code=%8.8x\n", hr);
+    printf ("%s\n", noSound);
+    return ;
 }
-
-
 
