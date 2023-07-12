@@ -58,7 +58,6 @@ void VolumeDial::sliderChange (QAbstractSlider::SliderChange)
     m_parent->setVolume (newValue) ;
     CFG->Set ("speaker_volume", (uint)m_value) ;
     repaint () ;
-
 //    QAudioDeviceInfo info (QAudioDeviceInfo::defaultOutputDevice()) ;
 }
 

@@ -33,8 +33,7 @@
 
 #include "xaudio2.h"
 
-#include <QThread>
-#include <QMutex>
+#include "mainwindow.h"
 
 class MainWindow ;
 
@@ -42,7 +41,7 @@ class Speaker : public QThread
 {
 public:
 
-    Speaker () {} ;
+    Speaker (MainWindow* parent) ;
     ~Speaker(void) {} ;
 
     void setVolume (float value) ;
@@ -54,21 +53,20 @@ private:
 
     MainWindow*  m_parent ;
 
-    static const int SND_QUEUE_SIZE = 10000 ;        // Sound queue size, bytes
-    static const int RATE = 10000 ;                  // Max. samples/second
-    static const quint64 SAMPLE_DELTA = 1E6 / RATE ; // No. of 6502 cycles between samples
+    static const int SND_QUEUE_SIZE = 10000;        // Sound queue (m_queue) size, bytes
+    static const int RATE = 10000;                  // Max. samples/second
+    static const quint64 SAMPLE_DELTA = 1E6 / RATE; // No. of 6502 cycles between samples
 
-    uint  m_hi ;
-
-    uint     m_previousValue ;
-    quint64  m_previousCycles ;
-
-    QMutex   m_qLock ;
-    qint8    m_queue[SND_QUEUE_SIZE] ;
-    uint     m_qHead ;
-    uint     m_qTail ;
+    QMutex   m_qLock;
+    qint8    m_queue[SND_QUEUE_SIZE];
+    uint     m_qHead;
+    uint     m_qTail;
+    uint     m_previousValue;
+    quint64  m_previousCycles;
+    HANDLE   m_timerHandle ;
+    uint     m_hi;
 
 } ;
 
-#endif   // WIN_SPEAKER_H
+#endif
 

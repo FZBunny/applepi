@@ -255,7 +255,7 @@ MainWindow::MainWindow (void)
     uint volume ;
     m_cfg->Get ("speaker_volume", &volume) ;
 #ifdef Q_OS_WINDOWS
-    m_speaker = new Speaker() ;
+    m_speaker = new Speaker(this) ;
 #else
     m_speaker = new Speaker(this) ;
 #endif
