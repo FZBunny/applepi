@@ -98,6 +98,17 @@ void Speaker::setVolume (float value)
 }
 
 
+void Speaker::submitBuffer (int len)
+{
+    HRESULT hr ;
+    const char* submitBuffer = "SubmitSourceBuffer returned err code 0x%8.8x\n" ;
+
+    m_xAudioBuffer.AudioBytes = len ;
+    m_xAudioBuffer.PlayLength = len ;
+    hr = m_sourceVoice->SubmitSourceBuffer (&m_xAudioBuffer, nullptr) ;
+    if (FAILED(hr)) ::printf (submitBuffer, hr) ; ::fflush(stdout) ;
+}
+
 
 
 //--------------------------------------------------------------------------------
@@ -116,9 +127,8 @@ void Speaker::run (void)
     HRESULT hr ;
     IXAudio2*               xAudio2 ;
     IXAudio2MasteringVoice* masterVoice ;
-    IXAudio2SourceVoice*    sourceVoice ;
 
-    XAUDIO2_BUFFER  xAudioBuffer = { 0 } ;
+    m_xAudioBuffer = { 0 } ;
 
     WAVEFORMATEX waveFmt {   // Holds a WAVE header in our fictitious RIFF file
         WAVE_FORMAT_PCM,     // wFormatTag
@@ -135,7 +145,6 @@ void Speaker::run (void)
     m_previousCycles = 0 ;
     m_previousValue = 0 ;
     memset (m_queue, 0, SND_QUEUE_SIZE) ;
-    const char* submitBuffer = "SubmitSourceBuffer returned err code 0x%8.8x\n" ;
     const char* noSound = "***  applepi-win won't be able to produce sounds from the Apple II speaker.\n\n" ;
 
     hr = CoInitializeEx (nullptr, COINIT_MULTITHREADED) ;
@@ -147,10 +156,10 @@ void Speaker::run (void)
     hr = xAudio2->CreateMasteringVoice (&masterVoice) ;
     if (FAILED(hr)) goto error3 ;
 
-    hr = xAudio2->CreateSourceVoice (&sourceVoice, &waveFmt) ;
+    hr = xAudio2->CreateSourceVoice (&m_sourceVoice, &waveFmt) ;
     if (FAILED(hr)) goto error4 ;
 
-    hr = sourceVoice->Start() ;
+    hr = m_sourceVoice->Start() ;
     if (FAILED(hr)) goto error5 ;
 
     const int sleepMS = 10 ;
@@ -161,38 +170,27 @@ void Speaker::run (void)
         if (m_qHead < m_qTail) {
             m_qLock.lock() ;
             len = m_qTail - m_qHead ;
-//::printf ("1  len=%d\n", len) ; ::fflush(stdout) ;
-            xAudioBuffer.pAudioData = (const BYTE*)m_queue + m_qHead ;
+            m_xAudioBuffer.pAudioData = (const BYTE*)m_queue + m_qHead ;
             m_qHead = m_qTail ;
             m_qLock.unlock() ;
-            xAudioBuffer.AudioBytes = len ;
-            xAudioBuffer.PlayLength = len ;
-            hr = sourceVoice->SubmitSourceBuffer (&xAudioBuffer, nullptr) ;
-            if (FAILED(hr)) ::printf (submitBuffer, hr) ; ::fflush(stdout) ;
+            submitBuffer (len) ;
         } else if (m_qHead > m_qTail) {
             m_qLock.lock() ;
             len = SND_QUEUE_SIZE - m_qHead ;
-//::printf ("2  len=%d\n", len) ; ::fflush(stdout) ;
-            xAudioBuffer.pAudioData = (const BYTE*)m_queue + m_qHead ;
+            m_xAudioBuffer.pAudioData = (const BYTE*)m_queue + m_qHead ;
             m_qHead = 0 ;
             m_qLock.unlock() ;
-            xAudioBuffer.AudioBytes = len ;
-            xAudioBuffer.PlayLength = len ;
-            hr = sourceVoice->SubmitSourceBuffer (&xAudioBuffer, nullptr) ;
-            if (FAILED(hr)) ::printf (submitBuffer, hr) ; ::fflush(stdout) ;
+            submitBuffer (len) ;
         } else {
             XAUDIO2_VOICE_STATE state ;
-            sourceVoice->GetState (&state) ;
+            m_sourceVoice->GetState (&state) ;
             if (state.BuffersQueued < 2) {
                 int dummyLen = sizeof (dummyBuffer) ;
                 memset (dummyBuffer, m_previousValue, dummyLen) ;
-                xAudioBuffer.pAudioData = (const BYTE*)dummyBuffer ;
-                xAudioBuffer.AudioBytes = 10*sleepMS ;
-                xAudioBuffer.PlayLength = 10*sleepMS ;
-                hr = sourceVoice->SubmitSourceBuffer (&xAudioBuffer, nullptr) ;
-                if (FAILED (hr)) ::printf (submitBuffer, hr) ; ::fflush (stdout) ;
+                m_xAudioBuffer.pAudioData = (const BYTE*)dummyBuffer ;
+                submitBuffer (10*sleepMS) ;
             }
-            Sleep (sleepMS-1) ;
+            Sleep (sleepMS-2) ;
         }
 
     }

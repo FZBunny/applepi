@@ -49,6 +49,7 @@ public:
 
 private:
 
+    void submitBuffer (int len) ;
     void run(void) ;
 
     MainWindow*  m_parent ;
@@ -56,6 +57,9 @@ private:
     static const int SND_QUEUE_SIZE = 10000;        // Sound queue (m_queue) size, bytes
     static const int RATE = 10000;                  // Max. samples/second
     static const quint64 SAMPLE_DELTA = 1E6 / RATE; // No. of 6502 cycles between samples
+
+    IXAudio2SourceVoice*  m_sourceVoice ;
+    XAUDIO2_BUFFER        m_xAudioBuffer ;
 
     QMutex   m_qLock;
     qint8    m_queue[SND_QUEUE_SIZE];
