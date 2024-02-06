@@ -258,7 +258,7 @@ void Machine::shutDown(void)
     m_powerIsOn = false ;
     m_floppy->close(0) ;
     m_floppy->close(1) ;
-    m_floppy->forgetTrackNumbers() ;
+//    m_floppy->forgetTrackNumbers() ;
 } 
 //    m_tape->close() ;
 //    closeCapture() ;
