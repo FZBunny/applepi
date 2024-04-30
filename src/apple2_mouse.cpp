@@ -50,6 +50,9 @@
 #include  "machine.h"
 #include  "apple2_mouse.h"
 
+#define DEBUGFLAG 0x03
+#define DBUG(bits) if(DEBUGFLAG & bits)printf
+
 
 Apple2Mouse::Apple2Mouse (int slot)
 {
@@ -106,6 +109,7 @@ quint8 Apple2Mouse::mouseROMReferenced (quint16 ptr)  // Called by 'Machine::fet
 
     if (ptr < (m_romStartAddr+0x100)) {
         c = mouse_rom_3420270C [loByte] ;
+//printf ("mouse_rom_3420270C:%4.4x=%2.2x  PC=%4.4x\n", ptr, c, MAC->savedPC()) ;
     } else {                               // Must be a fetch address >= C800
         if (ptr > 0xc800) ptr -= 0xc700 ;  // Fold addrs above C4ff to C800-CFFF part of ROM
         c = mouse_rom_3420270C [ptr] ;
@@ -123,28 +127,28 @@ quint8 Apple2Mouse::PIA_fetch (quint16 ptr)           // Called by 'Machine::fet
         case 0:
             if (CRA && 0x04) {
                 c = DDRA ;
-printf ("Fetch mouse DDRA=%2.2X  savedPC=%4.4X\n", c, MAC->savedPC()) ;
+DBUG(0x01) ("Fetch mouse DDRA=%2.2X  savedPC=%4.4X\n", c, MAC->savedPC()) ;
             } else  {
                 c = IORA ;
-printf ("Fetch mouse PIA =%2.2X  savedPC=%4.4X\n", c, MAC->savedPC()) ;
+DBUG(0x01) ("Fetch mouse PIA =%2.2X  savedPC=%4.4X\n", c, MAC->savedPC()) ;
             }
             break ;
         case 1:
             c = CRA ;
-printf ("Fetch mouse  CRA=%2.2X  savedPC=%4.4X\n", c, MAC->savedPC()) ;
+DBUG(0x01) ("Fetch mouse  CRA=%2.2X  savedPC=%4.4X\n", c, MAC->savedPC()) ;
             break ;
         case 2:
             if (CRB && 0x04) {
                 c = DDRB ;
-printf ("Fetch mouse DDRB=%2.2X  savedPC=%4.4X\n", c, MAC->savedPC()) ;
+DBUG(0x01) ("Fetch mouse DDRB=%2.2X  savedPC=%4.4X\n", c, MAC->savedPC()) ;
              } else {
                 c = IORB ;
-printf ("Fetch mouse PIB =%2.2X  savedPC=%4.4X\n", c, MAC->savedPC()) ;
+DBUG(0x01) ("Fetch mouse PIB =%2.2X  savedPC=%4.4X\n", c, MAC->savedPC()) ;
              }
             break ;
         case 3:
             c = CRB ;
-printf ("Fetch mouse  CRB=%2.2X  savedPC=%4.4X\n", c, MAC->savedPC()) ;
+DBUG(0x01) ("Fetch mouse  CRB=%2.2X  savedPC=%4.4X\n", c, MAC->savedPC()) ;
             break ;
         default:
             fprintf (stderr, "Apple2Mouse::PIA_fetch: Fetch of invalid register number (%i) at PC=%4.4X\n", registerNo, MAC->savedPC()) ;
@@ -163,28 +167,28 @@ void Apple2Mouse::PIA_store (quint16 ptr, quint8 c)
         case 0:
             if (CRA && 0x04) {
                 DDRA = c ;
-printf ("Store mouse DDRA=%2.2X  savedPC=%4.4X\n", c, MAC->savedPC()) ;
+DBUG(0x02) ("Store mouse DDRA=%2.2X  savedPC=%4.4X\n", c, MAC->savedPC()) ;
             } else {
                 IORA = c ;
-printf ("Store mouse IORA=%2.2X  savedPC=%4.4X\n", c, MAC->savedPC()) ;
+DBUG(0x02) ("Store mouse IORA=%2.2X  savedPC=%4.4X\n", c, MAC->savedPC()) ;
             }
             break ;
         case 1:
             CRA = c ;
-printf ("Store mouse  CRA=%2.2X  savedPC=%4.4X\n", c, MAC->savedPC()) ;
+DBUG(0x02) ("Store mouse  CRA=%2.2X  savedPC=%4.4X\n", c, MAC->savedPC()) ;
             break ;
         case 2:
             if (CRB && 0x04) {
-printf ("Store mouse DDRB=%2.2X  savedPC=%4.4X\n", c, MAC->savedPC()) ;
+DBUG(0x02) ("Store mouse DDRB=%2.2X  savedPC=%4.4X\n", c, MAC->savedPC()) ;
                 DDRB = c ;
             } else {
-printf ("Store mouse IORB=%2.2X  savedPC=%4.4X\n", c, MAC->savedPC()) ;
+DBUG(0x02) ("Store mouse IORB=%2.2X  savedPC=%4.4X\n", c, MAC->savedPC()) ;
                 IORB = c ;
             }
             break ;
         case 3:
             CRB = c ;
-printf ("Store mouse  CRB=%2.2X  savedPC=%4.4X\n", c, MAC->savedPC()) ;
+DBUG(0x02) ("Store mouse  CRB=%2.2X  savedPC=%4.4X\n", c, MAC->savedPC()) ;
             break ;
         default:
             fprintf (stderr, "Apple2Mouse::PIA_store: Store invalid register number (%i) at PC=%4.4X\n", registerNo, MAC->savedPC()) ;

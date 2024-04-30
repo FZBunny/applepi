@@ -120,7 +120,7 @@ quint8 Printer::fetch_Printer_ROM (int slotNumber, quint8 p)
 
     // Ignore 2 fetches after $Cn00 or $Cn10 entry; just a side-effect
     // of last few lines of fn. "Machine::run" saving history data.
-    if ((calledFrom==m_slotAddr)   && ((p==0x01) || (p==0x02))) return 0 ;
+    if ((calledFrom==m_slotAddr) && ((p==0x01) || (p==0x02))) return 0 ;
     if ((calledFrom==entryPoint) && ((p==0x11) || (p==0x12))) return 0 ;
 
     if ((p==0) && (calledFrom==m_slotAddr)) {                      // Did someone say "PR#1" ?
