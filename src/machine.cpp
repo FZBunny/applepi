@@ -831,7 +831,7 @@ void Machine::run (void)
             const char c = Areg & 0x7f ;
             static const char CR  = 0x0d ;
             static const char LF  = 0x0a ;
-            if (m_echoToTerminal) {     //   Echo screen character to terminal?
+            if (m_echoToTerminal) {       //   Echo screen character to terminal?
                     printf ("%c", c) ;
                     if (c == CR) printf ("%c", LF) ;
                     fflush (stdout) ;
@@ -879,9 +879,10 @@ void Machine::run (void)
             case 0x02:        // Unimplemented opcode of 65C02.  See the following URL; the tests in that file
                 PC++ ;        // can't be passed without acting as if opcode $02 is 2-byte "NOP". (Same as several others)
 // https://raw.githubusercontent.com/Klaus2m5/6502_65C02_functional_tests/master/bin_files/65C02_extended_opcodes_test.lst   
-                UNIMPLEMENTED
+                UNIMPLEMENTED                                                                      // XXXXX FIXME cycles()? XXXXX
                 break ;
             case 0x03:
+                UNIMPLEMENTED                                                                      // XXXXX FIXME cycles()? XXXXX
                 break ;
             case 0x04:        // TSB zero page        * 65C02 (Rockwell and WDC only) *
                 p = fetch(PC++) ;
@@ -921,6 +922,7 @@ void Machine::run (void)
                 cycles(2) ;
                 break ;
             case 0x0b:
+                UNIMPLEMENTED                                                                      // XXXXX FIXME cycles()? XXXXX
                 break ;
             case 0x0c:        // TSB absolute         * 65C02 (Rockwell and WDC only) *
                 ABSOLUT(p) ;
@@ -1001,6 +1003,7 @@ void Machine::run (void)
                 cycles(2) ;
                 break ;
             case 0x1b:
+                UNIMPLEMENTED                                                                      // XXXXX FIXME cycles()? XXXXX
                 break ;
             case 0x1c:        // TRB absolute         * 65C02 (Rockwell and WDC only) *
                 ABSOLUT(p) ;
@@ -1040,11 +1043,11 @@ void Machine::run (void)
                 STATNZ(Areg) ;
                 cycles(6) ;
                 break ;
-            case 0x22:        //  --- Unimplemented opcode  
-                UNIMPLEMENTED
+            case 0x22: 
+                UNIMPLEMENTED                                                                      // XXXXX FIXME cycles()? XXXXX
                 PC++ ; 
                 break ;
-            case 0x23:        //  --- Unimplemented opcode 
+            case 0x23:
                 UNIMPLEMENTED
                 cycles(1) ;
                 break ;
@@ -1086,7 +1089,8 @@ void Machine::run (void)
                 Areg &= 0xff ;
                 cycles(2) ;
                 break ;
-            case 0x2b:
+            case 0x2b:                                                                             // XXXXX FIXME cycles()? XXXXX
+                UNIMPLEMENTED
                 break ;
             case 0x2c:        // BIT absolute
                 ABSOLUT(p) ;
@@ -1126,7 +1130,8 @@ void Machine::run (void)
                 STATNZ(Areg) ;
                 cycles(6) ;
                 break ;
-            case 0x33:
+            case 0x33:                                                                             // XXXXX FIXME cycles()? XXXXX
+                UNIMPLEMENTED
                 break ;
             case 0x34:        // BIT zero page,X      * 65C02 *
                 ZEROPAGEX(p) ;
@@ -1149,7 +1154,8 @@ void Machine::run (void)
                 cycles(5) ;
                 break ;
             case 0x38:        // SEC
-               Preg|= C ;
+                Preg|= C ;
+                cycles(2) ;
                 break ;
             case 0x39:        // AND absolute,Y
                 ABSOLUTY(p) ;
@@ -1163,7 +1169,8 @@ void Machine::run (void)
                 STATNZ(Areg) ;
                 cycles(2) ;
                 break ;
-            case 0x3b:
+            case 0x3b:                                                                             // XXXXX FIXME cycles()? XXXXX
+                UNIMPLEMENTED
                 break ;
             case 0x3c:        // BIT absolute,X       * 65C02 *
                 ABSOLUTX(p) ;
@@ -1210,7 +1217,8 @@ void Machine::run (void)
                 PC++ ;
                 cycles(2) ;
                 break ;
-            case 0x43:
+            case 0x43:                                                                             // XXXXX FIXME cycles()? XXXXX
+                UNIMPLEMENTED
                 break ;
             case 0x44:        //  --- Unimplemented opcode, but the 65C02 skips the following byte.  I think. 
                 UNIMPLEMENTED
@@ -1249,7 +1257,8 @@ void Machine::run (void)
                 STATNZ(Areg) ;
                 cycles(2) ;
                 break ;
-            case 0x4b:
+            case 0x4b:                                                                             // XXXXX FIXME cycles()? XXXXX
+                UNIMPLEMENTED
                 break ;
             case 0x4c:        // JMP absolute
                 ABSOLUT(p) ;
@@ -1289,7 +1298,8 @@ void Machine::run (void)
                 STATNZ(Areg) ;
                 cycles(5) ;
                 break ;
-            case 0x53:                          // XXXXXXXXXX  overlooked opcode; FIX ME
+            case 0x53:                                                                             // XXXXX FIXME cycles()? XXXXX
+                UNIMPLEMENTED
                 break ;
             case 0x54:        //  --- Unimplemented opcode, but the 65C02 skips the following byte.  I think. 
                 UNIMPLEMENTED
@@ -1326,7 +1336,8 @@ void Machine::run (void)
                 Sreg &= 0xff ;
                 cycles(3) ;
                 break ;
-            case 0x5b:
+            case 0x5b:                                                                             // XXXXX FIXME cycles()? XXXXX
+                UNIMPLEMENTED
                 break ;
             case 0x5c:        //  --- Unimplemented opcode, but the 65C02 skips the following two bytes.  I think. 
                 UNIMPLEMENTED
@@ -1370,7 +1381,8 @@ void Machine::run (void)
                 PC++ ;
                 cycles(2) ;
                 break ;
-            case 0x63:
+            case 0x63:                                                                             // XXXXX FIXME cycles()? XXXXX
+                UNIMPLEMENTED
                 break ;
             case 0x64:        // STZ zero page        * 65C02 *
                 p = fetch(PC++) ;
@@ -1413,7 +1425,8 @@ void Machine::run (void)
                 STATNZ(Areg) ;
                 cycles(2) ;
                 break ;
-            case 0x6b:
+            case 0x6b:                                                                             // XXXXX FIXME cycles()? XXXXX
+                UNIMPLEMENTED
                 break ;
             case 0x6c:        // JMP (absolute)
                 ABSOLUT(p) ;
@@ -1451,7 +1464,8 @@ void Machine::run (void)
                 addmem(p) ;
                 cycles(5) ;
                 break ;
-            case 0x73:
+            case 0x73:                                                                             // XXXXX FIXME cycles()? XXXXX
+                UNIMPLEMENTED
                 break ;
             case 0x74:        // STZ zero page,X      * 65C02 *
                 ZEROPAGEX(p) ;
@@ -1488,7 +1502,8 @@ void Machine::run (void)
                 STATNZ(Yreg) ;
                 cycles(4) ;
                 break ;
-            case 0x7b:
+            case 0x7b:                                                                             // XXXXX FIXME cycles()? XXXXX
+                UNIMPLEMENTED
                 break ;
             case 0x7c:        // JMP (absolute,X)     * 65C02 *
                 INDIRECTABSX(p) ;
@@ -1526,7 +1541,8 @@ void Machine::run (void)
                 PC++ ;
                 cycles(2) ;
                 break ;
-            case 0x83:
+            case 0x83:                                                                             // XXXXX FIXME cycles()? XXXXX
+                UNIMPLEMENTED
                 break ;
             case 0x84:        // STY zero page
                 p = fetch(PC++) ;
@@ -1564,7 +1580,8 @@ void Machine::run (void)
                 STATNZ(Areg) ;
                 cycles(2) ;
                 break ;
-            case 0x8b:
+            case 0x8b:                                                                             // XXXXX FIXME cycles()? XXXXX
+                UNIMPLEMENTED
                 break ;
             case 0x8c:        // STY absolute
                 ABSOLUT(p) ;
@@ -1601,7 +1618,8 @@ void Machine::run (void)
                 store (Areg, p) ;
                 cycles(5) ;
                 break ;
-            case 0x93:
+            case 0x93:                                                                             // XXXXX FIXME cycles()? XXXXX
+                UNIMPLEMENTED
                 break ;
             case 0x94:        // STY zero page,X
                 ZEROPAGEX(p) ;
@@ -1634,8 +1652,10 @@ void Machine::run (void)
                 break ;
             case 0x9a:        // TXS
                 Sreg = Xreg ;
+                cycles(2) ;
                 break ;
-            case 0x9b:
+            case 0x9b:                                                                             // XXXXX FIXME cycles()? XXXXX
+                UNIMPLEMENTED
                 break ;
             case 0x9c:        // STZ absolute         * 65C02 *
                 ABSOLUT(p) ;
@@ -1674,7 +1694,8 @@ void Machine::run (void)
                 STATNZ(Xreg) ;
                 cycles(2) ;
                 break ;
-            case 0xa3:
+            case 0xa3:                                                                             // XXXXX FIXME cycles()? XXXXX
+                UNIMPLEMENTED
                 break ;
             case 0xa4:        // LDY zero page
                 p = fetch(PC++) ;
@@ -1713,7 +1734,8 @@ void Machine::run (void)
                 STATNZ(Xreg) ;
                 cycles(2) ;
                 break ;
-            case 0xab:
+            case 0xab:                                                                             // XXXXX FIXME cycles()? XXXXX
+                UNIMPLEMENTED
                 break ;
             case 0xac:        // LDY absolute
                 ABSOLUT(p) ;
@@ -1755,7 +1777,8 @@ void Machine::run (void)
                 STATNZ(Areg) ;
                 cycles(5) ;
                 break ;
-            case 0xb3:
+            case 0xb3:                                                                             // XXXXX FIXME cycles()? XXXXX
+                UNIMPLEMENTED
                 break ;
             case 0xb4:        // LDY zero page,X
                 ZEROPAGEX(p) ;
@@ -1794,7 +1817,8 @@ void Machine::run (void)
                 STATNZ(Xreg) ;
                 cycles(2) ;
                 break ;
-            case 0xbb:
+            case 0xbb:                                                                             // XXXXX FIXME cycles()? XXXXX
+                UNIMPLEMENTED
                 break ;
             case 0xbc:        // LDY absolute,X
                 ABSOLUTX(p) ;
@@ -1835,7 +1859,8 @@ void Machine::run (void)
                 PC++ ;
                 cycles(2) ;
                 break ;
-            case 0xc3:
+            case 0xc3:                                                                             // XXXXX FIXME cycles()? XXXXX
+                UNIMPLEMENTED
                 break ;
             case 0xc4:        // CPY zero page
                 p = fetch(PC++) ;
@@ -1874,7 +1899,8 @@ void Machine::run (void)
                 cycles(2) ;
                 break ;
             case 0xcb:        // WAI                  * 65C02 (WDC only)
-                m_WAI_executed = true ;
+                m_WAI_executed = true ;                                                            // XXXXX m_WAI_executed is NEVER REFERRED TO !
+                cycles(3) ;                                                                        // XXXXX FIXME ?
                 break ;
             case 0xcc:        // CPY absolute
                 ABSOLUT(p) ;
@@ -1911,7 +1937,8 @@ void Machine::run (void)
                 COMPARE(Areg,p) ;
                 cycles(5) ;
                 break ;
-            case 0xd3:
+            case 0xd3:                                                                             // XXXXX FIXME cycles()? XXXXX
+                UNIMPLEMENTED
                 break ;
             case 0xd4:        //  --- Unimplemented opcode, but the 65C02 skips the following byte.  I think. 
                 UNIMPLEMENTED
@@ -1947,7 +1974,8 @@ void Machine::run (void)
                 cycles(3) ;
                 break ;
             case 0xdb:        // STP                  * 65C02 (WDC only)
-                m_STP_executed = true ;
+                m_STP_executed = true ;                                                            // XXXXX m_STP_executed is NEVER REFERRED TO !
+                cycles(3) ;                                                                        // XXXXX FIXME ?
                 break ;
             case 0xdc:        //  --- Unimplemented opcode, but the 65C02 skips the following two bytes.  I think. 
                 UNIMPLEMENTED
@@ -1985,7 +2013,8 @@ void Machine::run (void)
                 PC++ ;
                 cycles(2) ;
                 break ;
-            case 0xe3:
+            case 0xe3:                                                                             // XXXXX FIXME cycles()? XXXXX
+                UNIMPLEMENTED
                 break ;
             case 0xe4:        // CPX zero page
                 p = fetch(PC++) ;
@@ -2018,8 +2047,10 @@ void Machine::run (void)
                 cycles(2) ;
                 break ;
             case 0xea:        // NOP
+                cycles(2) ;
                 break ;
             case 0xeb:
+                UNIMPLEMENTED                                                                      // XXXXX FIXME cycles() ?
                 break ;
             case 0xec:        // CPX absolute
                 ABSOLUT(p) ;
@@ -2057,6 +2088,7 @@ void Machine::run (void)
                 cycles(5) ;
                 break ;
             case 0xf3:
+                UNIMPLEMENTED
                 break ;
             case 0xf4:        //  --- Unimplemented opcode, but the 65C02 skips the following byte.  I think. 
                 UNIMPLEMENTED
@@ -2079,6 +2111,7 @@ void Machine::run (void)
                 break ;
             case 0xf8:        // SED
                 Preg |= D ;
+                cycles(2) ;
                 break ;
             case 0xf9:        // SBC absolute,Y
                 ABSOLUTY(p) ;
@@ -2093,6 +2126,7 @@ void Machine::run (void)
                 cycles(4) ;
                 break ;
             case 0xfb:
+                UNIMPLEMENTED                                                                      // XXXXX FIXME cycles()?
                 break ;
             case 0xfc:        //  --- Unimplemented opcode, but the 65C02 skips the following two bytes.  I think. 
                 UNIMPLEMENTED
@@ -2112,7 +2146,7 @@ void Machine::run (void)
             case 0xff:        // BBS7                 * 65C02 (Rockwell and WDC only) *
                 BRBIT(zpByte&0x80)
                 break ;
-            default:
+            default:          // This should never be executed...
                 break ;
         }
 
