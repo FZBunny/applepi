@@ -245,12 +245,12 @@ void Machine::store_sspage (quint8 c, quint16 p)
                 case 9:                        // C009  ALTZP on      (aux. stack and zero page)
                     RdALTZP = ON ;
                     break ;
-                case 0xa:                      // C00A  RdC3ROM off   (rom in slot 3)
-//printf ("set C3 off pc=%4.4x\n", m_savedPC) ;
+                case 0xa:                      // C00A  RdC3ROM off   (use rom in slot 3)
+//printf ("set C3=OFF pc=%4.4x\n", m_savedPC) ;
                     RdC3ROM = OFF ;
                     break ;
-                case 0xb:                      // C00B  RdC3ROM on    (internal rom)
-//printf ("set C3 on  pc=%4.4x\n", m_savedPC) ;
+                case 0xb:                      // C00B  RdC3ROM on    (use internal rom)
+//printf ("set C3=ON  pc=%4.4x\n", m_savedPC) ;
                     RdC3ROM = ON ;
                     break ;
                 case 0xc:                      // C00C  Rd80COL off   (40 column display)
