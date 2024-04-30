@@ -79,7 +79,7 @@ quint8 Machine::fetch (quint16 p)
     }
 
     if (p < 0xd000) {                // c000 - cfff   I/O-related address space
-        c = fetch_ioSpace (p) ;
+        c = fetch_ioSpace (p) ;      // (both soft-switches and ROM address space)
         return c ;
     }
 
@@ -119,7 +119,7 @@ quint8 Machine::fetch_ioSpace (quint16 p)     //  Addresses c000 - cfff
         } else {
             c = m_rom[p] ;
         }
-    } else {                       // Executing lower ($C100-$C0FF) part of ROM   XXXXXXXXXX  RdCXROM test should be ABOVE the ">c7ff" test! FIXME! XXXXXXX-
+    } else {                       // Executing lower ($C100-$C0FF) part of ROM   XXXXXXXXXX should RdCXROM test be ABOVE the ">c7ff" test? FIXME?
         if (RdCXROM) {             // Is it motherboard ROM?
             c = m_rom[p] ;         // Yes.
         } else {                   // Nope - must be peripheral card ROM
