@@ -70,14 +70,12 @@ void Apple2Mouse::mouseMoved (QMouseEvent *e)         // Called by 'Screen::mous
     QPoint p = e->pos() ;
     m_X = p.x()/2 ;
     m_Y = p.y()/2 ;
-    
 //------------------------
     MAC->m_ram[0x0478+m_slot] = m_X & 0xff ;
     MAC->m_ram[0x0578+m_slot] = m_X >> 8 ;
     MAC->m_ram[0x04f8+m_slot] = m_Y & 0xff ;
     MAC->m_ram[0x05f8+m_slot] = m_Y >> 8 ;
 //------------------------
-
     IORA = m_X ;
     IORB = m_Y ;
 //printf ("mouse move event x=%4.4i y=%4.4i\n", p.x(), p.y()) ;  fflush(stdout) ;
@@ -108,11 +106,11 @@ quint8 Apple2Mouse::mouseROMReferenced (quint16 ptr)  // Called by 'Machine::fet
     int  loByte = ptr & 0xff ;
 
     if (ptr < (m_romStartAddr+0x100)) {
-        c = mouse_rom_3420270C [loByte] ;
+        c = mouse_rom_3420270C[loByte] ;
 //printf ("mouse_rom_3420270C:%4.4x=%2.2x  PC=%4.4x\n", ptr, c, MAC->savedPC()) ;
     } else {                               // Must be a fetch address >= C800
         if (ptr > 0xc800) ptr -= 0xc700 ;  // Fold addrs above C4ff to C800-CFFF part of ROM
-        c = mouse_rom_3420270C [ptr] ;
+        c = mouse_rom_3420270C[ptr] ;
     }
 
     return c ;
