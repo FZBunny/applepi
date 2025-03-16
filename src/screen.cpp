@@ -711,7 +711,7 @@ void Screen::mouseReleaseEvent (QMouseEvent *e)
 }
 
 
-void Screen::enterEvent (QEvent*)
+void Screen::enterEvent (QEvent*)   // XXXXX tell mouse about this; set coordinates XXXXX  FIXME
 {
 //printf ("enterEvent\n") ;
     if (MAC->displayMonoDblHiRes()) QApplication::setOverrideCursor (Qt::BlankCursor) ;
