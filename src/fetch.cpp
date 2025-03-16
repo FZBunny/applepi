@@ -294,7 +294,7 @@ quint8 Machine::fetch_sspage (quint16 p)
         case 3:                                // C030 .. C03F  ; Speaker
             m_parent->speaker()->toggleSpeaker () ;
             break ;
-        case 4:                                // C040 .. C04F
+        case 4:                                // C040 .. C04F  ;
             break ;
         case 5:                                // C050 .. C05F
             switch (loNibble) {
@@ -380,8 +380,8 @@ quint8 Machine::fetch_sspage (quint16 p)
                     c = m_parent->m_gamepad->readAnalog(3) ;
                     break ;
                 case 8:                        // C068 STATEREG
-                    c = 0 ;                         // ( ProDos 8 v2.0.3 does a 'TRB  $C068', but most docs )
-                    if (RdCXROM)       c =  0x01 ;  // ( say 'STATEREG' is implemented only on the IIgs and later... )
+                    c = 0 ;                         // ( ProDos 8 v2.0.3 does a 'TRB  $C068', but most docs say  )
+                    if (RdCXROM)       c =  0x01 ;  // ( 'STATEREG' is implemented only on the IIgs and later... )
                     if (RdBNK2)        c |= 0x04 ;
              //               if (RdBNK2 == OFF) c |= 0x08 ;RdLCRAM
                     if (RdLCRAM)       c &= 0xf7 ;
@@ -411,7 +411,7 @@ quint8 Machine::fetch_sspage (quint16 p)
             if (loNibble==0) {    // Reset Analog inputs (gamepad)
                 m_parent->m_gamepad->reset() ;
             } else if (loNibble==0x0f) {
-                c = RdHIRES ;     // C07F also returns 'RdHIRES'... why? *shrugs*
+                c = RdHIRES ;     // C07F also returns 'RdHIRES'... why? *shrug*
             } else {
                 c = 0 ;
             }
